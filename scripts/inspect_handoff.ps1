@@ -40,6 +40,7 @@ $summary = [ordered]@{
         layer_operator_shortcuts = $launchPacket.layer_operator_shortcuts.schema
         layer_operator_groups = $launchPacket.layer_operator_groups.schema
         layer_research_workflow = $launchPacket.layer_research_workflow.schema
+        boundary_emphasis_control = $launchPacket.boundary_emphasis_control.schema
         style_renderer_entries = $launchPacket.style_renderer_entries.schema
         style_profile_renderer_routes = $launchPacket.style_profile_renderer_routes.schema
         module_boundary_registry = $launchPacket.module_boundary_registry.schema
@@ -80,6 +81,15 @@ $summary = [ordered]@{
         runtime_warning_count = $launchPacket.layer_research_workflow.runtime_warning_count
         remediation_hint_count = $launchPacket.layer_research_workflow.remediation_hint_count
         qt_surface = $launchPacket.layer_research_workflow.qt_surface
+    }
+    boundary_emphasis_control = @{
+        launch_packet_schema = $launchPacket.boundary_emphasis_control.schema
+        renderer_capabilities_schema = $capabilities.boundary_emphasis_control.schema
+        status = $launchPacket.boundary_emphasis_control.status
+        control_count = $launchPacket.boundary_emphasis_control.control_count
+        target_layer_types = $launchPacket.boundary_emphasis_control.target_layer_types
+        renderer_hook_status = $launchPacket.boundary_emphasis_control.renderer_hook_status
+        qt_surface = $launchPacket.boundary_emphasis_control.qt_surface
     }
     style_renderer_entries = @{
         launch_packet_schema = $launchPacket.style_renderer_entries.schema

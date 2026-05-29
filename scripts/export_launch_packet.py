@@ -1547,6 +1547,55 @@ def layer_research_workflow_packet(
     }
 
 
+def boundary_emphasis_control_packet(
+    state: dict[str, object] | None,
+    selected_layer: str | None,
+    source: str,
+) -> dict[str, object]:
+    state = state if isinstance(state, dict) else {}
+
+    def _float_value(key: str, default: float) -> float:
+        try:
+            return float(state.get(key, default))
+        except (TypeError, ValueError):
+            return default
+
+    color = state.get("color_rgb")
+    if not isinstance(color, (list, tuple)) or len(color) != 3:
+        color = [80, 180, 255]
+    color_rgb = [max(0, min(255, int(channel))) for channel in color]
+    controls = [
+        {"id": "target_mode", "label": "Boundary target", "kind": "combo"},
+        {"id": "color_rgb", "label": "RGB emphasis color", "kind": "rgb"},
+        {"id": "contrast", "label": "Contrast", "kind": "slider"},
+        {"id": "opacity", "label": "Opacity", "kind": "slider"},
+        {"id": "gamma", "label": "Gamma", "kind": "slider"},
+        {"id": "breathing_enabled", "label": "Breathing effect", "kind": "checkbox"},
+        {"id": "breathing_period_s", "label": "Breathing period", "kind": "slider"},
+    ]
+    return {
+        "schema": "rrkal_displaytools.boundary_emphasis_control.v1",
+        "source": source,
+        "status": "ui_ready",
+        "selected_layer": selected_layer,
+        "target_mode": state.get("target_mode", "auto_selected_boundary_layer"),
+        "target_layer_types": ["country_boundary", "territorial_sea", "exclusive_economic_zone", "maritime_boundary"],
+        "color_rgb": color_rgb,
+        "contrast": _float_value("contrast", 1.35),
+        "opacity": _float_value("opacity", 0.42),
+        "gamma": _float_value("gamma", 1.0),
+        "breathing_enabled": bool(state.get("breathing_enabled", True)),
+        "breathing_period_s": _float_value("breathing_period_s", 4.0),
+        "hover_behavior": "Records the intended pointer-hover preview for territory, territorial sea, EEZ or maritime boundary masks.",
+        "open_behavior": "Use the Layers dock button to open the dialog; boundary-layer row double-click binding is queued.",
+        "qt_surface": "Layers dock boundary emphasis dialog",
+        "renderer_hook_status": "queued_backend_mask",
+        "control_count": len(controls),
+        "controls": controls,
+        "boundary": "UI profile and launch-packet state only; renderer mask rasterization and geospatial ownership remain backend work.",
+    }
+
+
 def layer_capability_matrix_packet(
     source: str,
     selected_layer: str | None = None,
@@ -2377,6 +2426,7 @@ def launch_packet(
         "layer_operator_shortcuts": layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None),
         "layer_operator_groups": layer_operator_groups_packet(layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None), "scripts.export_launch_packet"),
         "layer_research_workflow": layer_research_workflow_packet(layer_filter_packet(profile), layer_group_view_packet(profile), layer_operator_groups_packet(layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None), "scripts.export_launch_packet"), layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref), "scripts.export_launch_packet"),
+        "boundary_emphasis_control": boundary_emphasis_control_packet(profile.get("boundary_emphasis_control") if isinstance(profile.get("boundary_emphasis_control"), dict) else None, profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, "scripts.export_launch_packet"),
         "style_renderer_entries": style_renderer_entries_packet("scripts.export_launch_packet", profile.get("style_profile") if isinstance(profile.get("style_profile"), str) else None),
         "style_profile_renderer_routes": style_profile_renderer_routes_packet(style_renderer_entries_packet("scripts.export_launch_packet", profile.get("style_profile") if isinstance(profile.get("style_profile"), str) else None), "scripts.export_launch_packet"),
         "module_boundary_registry": module_boundary_registry_packet("scripts.export_launch_packet"),

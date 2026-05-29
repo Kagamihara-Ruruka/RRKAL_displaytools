@@ -200,6 +200,21 @@ if ($launchPacket.layer_research_workflow.qt_surface -ne "Layers dock research w
 if ($launchPacket.layer_research_workflow.researcher_path -notcontains "Select or reveal a layer") {
     throw "Launch packet layer_research_workflow researcher path incomplete"
 }
+if ($launchPacket.boundary_emphasis_control.schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
+    throw "Launch packet boundary_emphasis_control schema missing or invalid"
+}
+if ($launchPacket.boundary_emphasis_control.status -ne "ui_ready") {
+    throw "Launch packet boundary_emphasis_control not UI ready"
+}
+if ([int]$launchPacket.boundary_emphasis_control.control_count -lt 7) {
+    throw "Launch packet boundary_emphasis_control controls missing"
+}
+if ($launchPacket.boundary_emphasis_control.target_layer_types -notcontains "exclusive_economic_zone") {
+    throw "Launch packet boundary_emphasis_control EEZ target missing"
+}
+if ($launchPacket.boundary_emphasis_control.renderer_hook_status -ne "queued_backend_mask") {
+    throw "Launch packet boundary_emphasis_control renderer hook status mismatch"
+}
 if ($launchPacket.style_renderer_entries.schema -ne "rrkal_displaytools.style_renderer_entries.v1") {
     throw "Launch packet style_renderer_entries schema missing or invalid"
 }
@@ -661,6 +676,15 @@ if ($capabilities.layer_research_workflow.schema -ne "rrkal_displaytools.layer_r
 if ($capabilities.layer_research_workflow.status -ne "ready") {
     throw "Renderer layer_research_workflow not ready"
 }
+if ($capabilities.boundary_emphasis_control.schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
+    throw "Renderer boundary_emphasis_control schema missing or invalid"
+}
+if ($capabilities.boundary_emphasis_control.status -ne "ui_ready") {
+    throw "Renderer boundary_emphasis_control not UI ready"
+}
+if ($capabilities.boundary_emphasis_control.renderer_hook_status -ne "queued_backend_mask") {
+    throw "Renderer boundary_emphasis_control hook status mismatch"
+}
 if ($capabilities.style_renderer_entries.schema -ne "rrkal_displaytools.style_renderer_entries.v1") {
     throw "Renderer style_renderer_entries schema missing or invalid"
 }
@@ -945,6 +969,21 @@ if ($handoff.layer_research_workflow.renderer_capabilities_schema -ne "rrkal_dis
 }
 if ($handoff.layer_research_workflow.qt_surface -ne "Layers dock research workflow label") {
     throw "Handoff inspection layer_research_workflow Qt surface mismatch"
+}
+if ($handoff.launch_packet_contracts.boundary_emphasis_control -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
+    throw "Handoff inspection boundary_emphasis_control launch contract missing or invalid"
+}
+if ($handoff.boundary_emphasis_control.launch_packet_schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
+    throw "Handoff inspection boundary_emphasis_control launch schema missing or invalid"
+}
+if ($handoff.boundary_emphasis_control.renderer_capabilities_schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
+    throw "Handoff inspection boundary_emphasis_control renderer schema missing or invalid"
+}
+if ([int]$handoff.boundary_emphasis_control.control_count -lt 7) {
+    throw "Handoff inspection boundary_emphasis_control controls missing"
+}
+if ($handoff.boundary_emphasis_control.qt_surface -ne "Layers dock boundary emphasis dialog") {
+    throw "Handoff inspection boundary_emphasis_control Qt surface mismatch"
 }
 if ($handoff.launch_packet_contracts.style_renderer_entries -ne "rrkal_displaytools.style_renderer_entries.v1") {
     throw "Handoff inspection style_renderer_entries launch contract missing or invalid"

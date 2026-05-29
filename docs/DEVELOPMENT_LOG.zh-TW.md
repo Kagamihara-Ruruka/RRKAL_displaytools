@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-05-30 - Boundary emphasis UI control
+
+- Added `rrkal_displaytools.boundary_emphasis_control.v1` for country boundary, territorial sea, EEZ and maritime-boundary emphasis controls.
+- Qt Layers dock now has a `Boundary emphasis controls...` dialog with RGB, contrast, opacity, gamma and breathing controls; renderer mask rasterization is explicitly marked as backend-queued.
+- Smoke: PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Layer research workflow
 
 - Added `rrkal_displaytools.layer_research_workflow.v1` to connect layer filter/group state, selected layer, runtime warnings and renderer remediation hints into a researcher-facing workflow.

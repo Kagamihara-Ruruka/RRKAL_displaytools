@@ -1477,6 +1477,55 @@ def layer_research_workflow_packet(
     }
 
 
+def boundary_emphasis_control_packet(
+    state: dict[str, object] | None,
+    selected_layer: str | None,
+    source: str,
+) -> dict[str, object]:
+    state = state if isinstance(state, dict) else {}
+
+    def _float_value(key: str, default: float) -> float:
+        try:
+            return float(state.get(key, default))
+        except (TypeError, ValueError):
+            return default
+
+    color = state.get("color_rgb")
+    if not isinstance(color, (list, tuple)) or len(color) != 3:
+        color = [80, 180, 255]
+    color_rgb = [max(0, min(255, int(channel))) for channel in color]
+    controls = [
+        {"id": "target_mode", "label": "Boundary target", "kind": "combo"},
+        {"id": "color_rgb", "label": "RGB emphasis color", "kind": "rgb"},
+        {"id": "contrast", "label": "Contrast", "kind": "slider"},
+        {"id": "opacity", "label": "Opacity", "kind": "slider"},
+        {"id": "gamma", "label": "Gamma", "kind": "slider"},
+        {"id": "breathing_enabled", "label": "Breathing effect", "kind": "checkbox"},
+        {"id": "breathing_period_s", "label": "Breathing period", "kind": "slider"},
+    ]
+    return {
+        "schema": "rrkal_displaytools.boundary_emphasis_control.v1",
+        "source": source,
+        "status": "ui_ready",
+        "selected_layer": selected_layer,
+        "target_mode": state.get("target_mode", "auto_selected_boundary_layer"),
+        "target_layer_types": ["country_boundary", "territorial_sea", "exclusive_economic_zone", "maritime_boundary"],
+        "color_rgb": color_rgb,
+        "contrast": _float_value("contrast", 1.35),
+        "opacity": _float_value("opacity", 0.42),
+        "gamma": _float_value("gamma", 1.0),
+        "breathing_enabled": bool(state.get("breathing_enabled", True)),
+        "breathing_period_s": _float_value("breathing_period_s", 4.0),
+        "hover_behavior": "Records the intended pointer-hover preview for territory, territorial sea, EEZ or maritime boundary masks.",
+        "open_behavior": "Use the Layers dock button to open the dialog; boundary-layer row double-click binding is queued.",
+        "qt_surface": "Layers dock boundary emphasis dialog",
+        "renderer_hook_status": "queued_backend_mask",
+        "control_count": len(controls),
+        "controls": controls,
+        "boundary": "UI profile and launch-packet state only; renderer mask rasterization and geospatial ownership remain backend work.",
+    }
+
+
 def layer_capability_matrix_packet(
     source: str,
     selected_layer: str | None = None,
@@ -2156,6 +2205,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_research_workflow_label = QtWidgets.QLabel("Layer research workflow: pending")
         self.layer_research_workflow_label.setWordWrap(True)
         layers_layout.addWidget(self.layer_research_workflow_label)
+        self.boundary_emphasis_button = QtWidgets.QPushButton("Boundary emphasis controls...")
+        self.boundary_emphasis_button.clicked.connect(self.open_boundary_emphasis_dialog)
+        layers_layout.addWidget(self.boundary_emphasis_button)
+        self.boundary_emphasis_label = QtWidgets.QLabel("Boundary emphasis: UI ready, renderer mask hook queued")
+        self.boundary_emphasis_label.setWordWrap(True)
+        layers_layout.addWidget(self.boundary_emphasis_label)
         self.profile_launch_readiness_label = QtWidgets.QLabel("Profile/launch readiness: pending")
         self.profile_launch_readiness_label.setWordWrap(True)
         layers_layout.addWidget(self.profile_launch_readiness_label)
@@ -3023,6 +3078,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_shortcuts": self.collect_layer_operator_shortcuts(),
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "layer_research_workflow": self.collect_layer_research_workflow(),
+            "boundary_emphasis_control": self.collect_boundary_emphasis_control(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
             "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
             "module_boundary_registry": self.collect_module_boundary_registry(),
@@ -3196,6 +3252,105 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.collect_layer_capability_matrix(),
             "rrkal_displaytools_qt_panel",
         )
+
+    def collect_boundary_emphasis_control(self) -> dict[str, object]:
+        state = getattr(self, "boundary_emphasis_state", None)
+        return boundary_emphasis_control_packet(
+            state if isinstance(state, dict) else None,
+            self.selected_layer_key,
+            "rrkal_displaytools_qt_panel",
+        )
+
+    def open_boundary_emphasis_dialog(self) -> None:
+        packet = self.collect_boundary_emphasis_control()
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle("Boundary emphasis controls")
+        layout = QtWidgets.QVBoxLayout(dialog)
+        note = QtWidgets.QLabel(
+            "Controls the UI profile for country/territory/territorial sea/EEZ emphasis. "
+            "Renderer mask rasterization is queued for the backend pass."
+        )
+        note.setWordWrap(True)
+        layout.addWidget(note)
+        form = QtWidgets.QFormLayout()
+        target_combo = QtWidgets.QComboBox()
+        target_combo.addItems(
+            [
+                "auto_selected_boundary_layer",
+                "country_boundary",
+                "territorial_sea",
+                "exclusive_economic_zone",
+                "maritime_boundary",
+            ]
+        )
+        current_target = str(packet.get("target_mode") or "auto_selected_boundary_layer")
+        index = target_combo.findText(current_target)
+        if index >= 0:
+            target_combo.setCurrentIndex(index)
+        form.addRow("Target", target_combo)
+        rgb_widgets: list[QtWidgets.QSpinBox] = []
+        rgb_layout = QtWidgets.QHBoxLayout()
+        for label, value in zip(("R", "G", "B"), packet.get("color_rgb", [80, 180, 255])):
+            spin = QtWidgets.QSpinBox()
+            spin.setRange(0, 255)
+            spin.setPrefix(f"{label} ")
+            spin.setValue(int(value))
+            rgb_widgets.append(spin)
+            rgb_layout.addWidget(spin)
+        form.addRow("RGB", rgb_layout)
+        horizontal = getattr(QtCore.Qt, "Horizontal", None)
+        if horizontal is None:
+            horizontal = QtCore.Qt.Orientation.Horizontal
+
+        def _slider(value: float, scale: int, minimum: int, maximum: int) -> QtWidgets.QSlider:
+            slider = QtWidgets.QSlider(horizontal)
+            slider.setRange(minimum, maximum)
+            slider.setValue(int(round(value * scale)))
+            return slider
+
+        contrast_slider = _slider(float(packet.get("contrast", 1.35)), 100, 50, 300)
+        opacity_slider = _slider(float(packet.get("opacity", 0.42)), 100, 0, 100)
+        gamma_slider = _slider(float(packet.get("gamma", 1.0)), 100, 25, 250)
+        breathing_checkbox = QtWidgets.QCheckBox("Enable breathing highlight")
+        breathing_checkbox.setChecked(bool(packet.get("breathing_enabled", True)))
+        breathing_period_slider = _slider(float(packet.get("breathing_period_s", 4.0)), 10, 10, 120)
+        form.addRow("Contrast", contrast_slider)
+        form.addRow("Opacity", opacity_slider)
+        form.addRow("Gamma", gamma_slider)
+        form.addRow("Breathing", breathing_checkbox)
+        form.addRow("Breathing period", breathing_period_slider)
+        layout.addLayout(form)
+        buttons = QtWidgets.QHBoxLayout()
+        apply_button = QtWidgets.QPushButton("Apply UI state")
+        close_button = QtWidgets.QPushButton("Close")
+        buttons.addWidget(apply_button)
+        buttons.addWidget(close_button)
+        layout.addLayout(buttons)
+
+        def _apply_state() -> None:
+            self.boundary_emphasis_state = {
+                "target_mode": target_combo.currentText(),
+                "color_rgb": [spin.value() for spin in rgb_widgets],
+                "contrast": contrast_slider.value() / 100.0,
+                "opacity": opacity_slider.value() / 100.0,
+                "gamma": gamma_slider.value() / 100.0,
+                "breathing_enabled": breathing_checkbox.isChecked(),
+                "breathing_period_s": breathing_period_slider.value() / 10.0,
+            }
+            updated = self.collect_boundary_emphasis_control()
+            if hasattr(self, "boundary_emphasis_label"):
+                self.boundary_emphasis_label.setText(
+                    f"Boundary emphasis: {updated.get('status', 'unknown')} "
+                    f"target={updated.get('target_mode')} color={updated.get('color_rgb')} "
+                    f"opacity={updated.get('opacity')}"
+                )
+
+        apply_button.clicked.connect(_apply_state)
+        close_button.clicked.connect(dialog.accept)
+        if hasattr(dialog, "exec"):
+            dialog.exec()
+        else:
+            dialog.exec_()
 
     def collect_layer_capability_matrix(self) -> dict[str, object]:
         runtime_ack = self.layer_runtime_ack_payload if isinstance(self.layer_runtime_ack_payload, dict) else None
@@ -3985,6 +4140,13 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 f"(selected={research_workflow.get('selected_layer') or '-'}, "
                 f"warnings={research_workflow.get('runtime_warning_count', 0)}, "
                 f"hints={research_workflow.get('remediation_hint_count', 0)})"
+            )
+        boundary_emphasis = self.collect_boundary_emphasis_control()
+        if hasattr(self, "boundary_emphasis_label"):
+            self.boundary_emphasis_label.setText(
+                f"Boundary emphasis: {boundary_emphasis.get('status', 'unknown')} "
+                f"target={boundary_emphasis.get('target_mode')} "
+                f"hook={boundary_emphasis.get('renderer_hook_status')}"
             )
         readiness_ui = self.collect_profile_launch_readiness_ui()
         if hasattr(self, "profile_launch_readiness_label"):
@@ -5906,6 +6068,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_shortcuts": self.collect_layer_operator_shortcuts(),
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "layer_research_workflow": self.collect_layer_research_workflow(),
+            "boundary_emphasis_control": self.collect_boundary_emphasis_control(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
             "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
             "module_boundary_registry": self.collect_module_boundary_registry(),
