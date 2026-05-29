@@ -2294,15 +2294,34 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
 
     def collect_layer_group_view_state(self) -> dict[str, object]:
         groups = self.layer_group_definitions()
+        labels = dict(LAYER_LABELS)
         visible_rows = [
             key for key, label in LAYER_LABELS
             if self.layer_filter_matches(key, label) and self.layer_group_allows_row(key)
         ]
+        selected_group = (
+            self.layer_group_for_key(self.selected_layer_key)
+            if self.selected_layer_key is not None
+            else None
+        )
+        active_group_collapsed = selected_group in self.layer_group_collapsed if selected_group is not None else False
         return {
             "schema": "rrkal_displaytools.layer_group_view.v1",
             "mode": "ui_row_collapse",
             "available_groups": groups,
             "collapsed_groups": sorted(self.layer_group_collapsed),
+            "visible_counts_by_group": {
+                group_id: sum(
+                    1
+                    for key in keys
+                    if self.layer_filter_matches(key, labels.get(key, key)) and self.layer_group_allows_row(key)
+                )
+                for group_id, keys in groups.items()
+            },
+            "total_counts_by_group": {group_id: len(keys) for group_id, keys in groups.items()},
+            "selected_layer_group": selected_group,
+            "selected_layer_hidden_by_group": active_group_collapsed,
+            "active_group_collapsed": active_group_collapsed,
             "visible_row_count": len(visible_rows),
             "total_layers": len(LAYER_LABELS),
             "boundary": "Qt row grouping only; collapsed groups do not change renderer visibility or runtime state.",
@@ -2380,8 +2399,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 matched_count += 1
         if self.layer_group_status_label is not None:
             collapsed = ", ".join(sorted(self.layer_group_collapsed)) or "none"
+            group_state = self.collect_layer_group_view_state()
+            selected_group = group_state.get("selected_layer_group") or "none"
+            active_group_state = "collapsed" if group_state.get("active_group_collapsed") else "available"
             self.layer_group_status_label.setText(
-                f"Layer groups: collapsed={collapsed}; visible_rows={matched_count}/{len(LAYER_LABELS)}"
+                f"Layer groups: collapsed={collapsed}; visible_rows={matched_count}/{len(LAYER_LABELS)}; "
+                f"selected_group={selected_group} ({active_group_state})"
             )
         if self.layer_filter_status_label is not None:
             query = self.layer_filter_text or "all"

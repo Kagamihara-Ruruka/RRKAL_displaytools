@@ -124,6 +124,11 @@ rrkal_displaytools.qt_panel_profile.v1
 | `mode` | string | 目前為 `ui_row_collapse` 或 no-GUI export 的 `no_gui_export_status`。 |
 | `available_groups` | object | group id 到 layer key 清單的映射。 |
 | `collapsed_groups` | array | 目前被 collapse 的 group id 清單。 |
+| `visible_counts_by_group` | object | filter 與 group collapse 後，各 group 仍顯示的 row 數。 |
+| `total_counts_by_group` | object | 各 group 的 row 總數。 |
+| `selected_layer_group` | string or null | 目前 active layer 所屬 group，若不屬於 group 則為 null。 |
+| `selected_layer_hidden_by_group` | boolean | 目前 active layer 是否因所屬 group collapse 而在 Layers row 中被藏起來。 |
+| `active_group_collapsed` | boolean | `selected_layer_group` 是否目前處於 collapse 狀態。 |
 | `visible_row_count` | integer | filter 與 group collapse 後仍顯示的 row 數。 |
 | `total_layers` | integer | 可顯示的 layer row 總數。 |
 | `boundary` | string | 明確標示 group collapse 只影響 Qt UI row，不影響 renderer state。 |

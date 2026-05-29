@@ -191,6 +191,11 @@ def profile_payload_errors(profile: dict[str, object]) -> list[str]:
                 "mode",
                 "available_groups",
                 "collapsed_groups",
+                "visible_counts_by_group",
+                "total_counts_by_group",
+                "selected_layer_group",
+                "selected_layer_hidden_by_group",
+                "active_group_collapsed",
                 "visible_row_count",
                 "total_layers",
                 "boundary",
@@ -212,6 +217,27 @@ def profile_payload_errors(profile: dict[str, object]) -> list[str]:
             if collapsed_groups is not None:
                 if not isinstance(collapsed_groups, list) or any(not isinstance(item, str) for item in collapsed_groups):
                     errors.append("layer_group_view.collapsed_groups must be a list of strings")
+            for field in ("visible_counts_by_group", "total_counts_by_group"):
+                value = layer_group_view.get(field)
+                if value is not None:
+                    if (
+                        not isinstance(value, dict)
+                        or any(
+                            not isinstance(group_id, str)
+                            or not isinstance(count, int)
+                            or isinstance(count, bool)
+                            or count < 0
+                            for group_id, count in value.items()
+                        )
+                    ):
+                        errors.append(f"layer_group_view.{field} must map strings to non-negative integers")
+            selected_layer_group = layer_group_view.get("selected_layer_group")
+            if selected_layer_group is not None and not isinstance(selected_layer_group, str):
+                errors.append("layer_group_view.selected_layer_group must be a string or null")
+            for field in ("selected_layer_hidden_by_group", "active_group_collapsed"):
+                value = layer_group_view.get(field)
+                if value is not None and not isinstance(value, bool):
+                    errors.append(f"layer_group_view.{field} must be boolean")
             for field in ("visible_row_count", "total_layers"):
                 value = layer_group_view.get(field)
                 if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
@@ -501,6 +527,11 @@ def profile_schema_packet() -> dict[str, object]:
                 "mode",
                 "available_groups",
                 "collapsed_groups",
+                "visible_counts_by_group",
+                "total_counts_by_group",
+                "selected_layer_group",
+                "selected_layer_hidden_by_group",
+                "active_group_collapsed",
                 "visible_row_count",
                 "total_layers",
                 "boundary",

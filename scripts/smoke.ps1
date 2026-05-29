@@ -49,6 +49,12 @@ if ($launchPacket.layer_group_view.schema -ne "rrkal_displaytools.layer_group_vi
 if ($null -eq $launchPacket.layer_group_view.available_groups.hydrology) {
     throw "Launch packet layer_group_view hydrology group missing"
 }
+if ($null -eq $launchPacket.layer_group_view.visible_counts_by_group.hydrology) {
+    throw "Launch packet layer_group_view hydrology visible count missing"
+}
+if ($null -eq $launchPacket.layer_group_view.selected_layer_hidden_by_group) {
+    throw "Launch packet layer_group_view selected-layer hidden diagnostic missing"
+}
 if ($launchPacket.layer_undo.schema -ne "rrkal_displaytools.layer_stack_undo.v1") {
     throw "Launch packet layer_undo schema missing or invalid"
 }

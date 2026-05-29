@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Layer group active selection diagnostics
+
+Scope:
+- `layer_group_view` now records per-group visible/total row counts.
+- The active layer's group and hidden-by-collapse state are exposed in Qt status, profiles, launch packets, provenance, No-GUI export, profile schema, closed-loop status, and smoke gates.
+- The Layers panel now tells researchers when the selected layer still exists but is hidden by a collapsed row group.
+
+Positioning:
+- This closes a small UIUX ambiguity from the group collapse workflow without changing renderer visibility or layer runtime state.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Layer group collapse view
 
 Scope:

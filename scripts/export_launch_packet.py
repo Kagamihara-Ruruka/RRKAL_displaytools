@@ -291,11 +291,22 @@ def layer_group_view_packet(profile: dict[str, object], matched_layers: list[str
             group_for_layer[key] = group_id
     candidates = matched_layers if matched_layers is not None else [key for key in BOOL_FLAGS if key != "demo_closed_loop"]
     visible_rows = [key for key in candidates if group_for_layer.get(key) not in set(collapsed)]
+    selected_layer = str(profile.get("selected_layer", "")).strip()
+    selected_group = group_for_layer.get(selected_layer) if selected_layer else None
+    active_group_collapsed = selected_group in set(collapsed) if selected_group is not None else False
     return {
         "schema": "rrkal_displaytools.layer_group_view.v1",
         "mode": "no_gui_export_status",
         "available_groups": groups,
         "collapsed_groups": collapsed,
+        "visible_counts_by_group": {
+            group_id: sum(1 for key in keys if key in candidates and group_for_layer.get(key) not in set(collapsed))
+            for group_id, keys in groups.items()
+        },
+        "total_counts_by_group": {group_id: len(keys) for group_id, keys in groups.items()},
+        "selected_layer_group": selected_group,
+        "selected_layer_hidden_by_group": active_group_collapsed,
+        "active_group_collapsed": active_group_collapsed,
         "visible_row_count": len(visible_rows),
         "total_layers": len([key for key in BOOL_FLAGS if key != "demo_closed_loop"]),
         "boundary": "No-GUI launch packet preserves Qt row grouping only; renderer visibility is unchanged.",
