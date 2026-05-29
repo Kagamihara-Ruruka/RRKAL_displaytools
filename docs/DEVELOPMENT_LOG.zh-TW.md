@@ -1,5 +1,19 @@
 ﻿# Development Log
 
+## 2026-05-29 - Boundary closed-ring area hit
+
+Scope:
+- Added conservative screen-space interior hit testing for fully visible closed boundary rings.
+- Boundary hover and selected-layer boundary picking still prefer line proximity, then fall back to closed-ring area hits.
+- Renderer boundary highlight ack/capabilities and closed-loop status now mark `closed_ring_area_hit_test` as applied.
+
+Positioning:
+- This lets researchers point inside available closed rings and still trigger feature-linked highlight behavior.
+- Authoritative polygon territory identity and open-line area inference remain separate future work.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Boundary highlight fill tone controls
 
 Scope:

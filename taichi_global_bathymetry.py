@@ -3537,6 +3537,110 @@ class GeoVectorLineOverlay:
                         best["feature"] = feature
         return best
 
+    def area_hit_test(
+        self,
+        screen_x: float,
+        screen_y: float,
+        yaw: float,
+        pitch: float,
+        zoom: float,
+        flip_longitude: bool,
+        flip_latitude: bool,
+    ) -> dict | None:
+        if not self.lines:
+            return None
+        aspect = self.width / float(self.height)
+        cy = math.cos(-yaw)
+        sy = math.sin(-yaw)
+        cp = math.cos(-pitch)
+        sp = math.sin(-pitch)
+        max_jump = max(self.width, self.height) * 0.35
+        best: dict | None = None
+        best_area = float("inf")
+
+        def screen_polygon_area(points: list[tuple[float, float]]) -> float:
+            if len(points) < 3:
+                return 0.0
+            area = 0.0
+            for idx, point in enumerate(points):
+                next_point = points[(idx + 1) % len(points)]
+                area += point[0] * next_point[1] - next_point[0] * point[1]
+            return abs(area) * 0.5
+
+        def point_in_polygon(point_x: float, point_y: float, points: list[tuple[float, float]]) -> bool:
+            inside = False
+            count = len(points)
+            if count < 3:
+                return False
+            prev_x, prev_y = points[-1]
+            for next_x, next_y in points:
+                crosses = (next_y > point_y) != (prev_y > point_y)
+                if crosses:
+                    denominator = prev_y - next_y
+                    if abs(denominator) < 1e-9:
+                        continue
+                    x_at_y = (prev_x - next_x) * (point_y - next_y) / denominator + next_x
+                    if point_x < x_at_y:
+                        inside = not inside
+                prev_x, prev_y = next_x, next_y
+            return inside
+
+        for line_index, line in enumerate(self.lines):
+            if len(line) < 4:
+                continue
+            try:
+                line_closed = bool(np.linalg.norm(line[0] - line[-1]) < 1e-3)
+            except Exception:
+                line_closed = False
+            if not line_closed:
+                continue
+            lon = np.radians(line[:, 0].astype(np.float32))
+            lat = np.radians(line[:, 1].astype(np.float32))
+            if flip_longitude:
+                lon = -lon
+            if flip_latitude:
+                lat = -lat
+            cos_lat = np.cos(lat)
+            x = cos_lat * np.sin(lon)
+            y = np.sin(lat)
+            z = cos_lat * np.cos(lon)
+            x1 = cy * x + sy * z
+            y1 = y
+            z1 = -sy * x + cy * z
+            x2 = x1
+            y2 = cp * y1 - sp * z1
+            z2 = sp * y1 + cp * z1
+            visible = z2 > 0.006
+            if not bool(np.all(visible)):
+                continue
+            sx = ((x2 / (float(zoom) * aspect)) + 1.0) * 0.5 * self.width
+            sy2 = (1.0 - ((y2 / float(zoom)) + 1.0) * 0.5) * self.height
+            points = [(float(sx[idx]), float(sy2[idx])) for idx in range(len(line))]
+            if any(
+                abs(points[idx][0] - points[idx - 1][0]) > max_jump
+                or abs(points[idx][1] - points[idx - 1][1]) > max_jump
+                for idx in range(1, len(points))
+            ):
+                continue
+            area = screen_polygon_area(points)
+            if area < 8.0 or area >= best_area:
+                continue
+            if not point_in_polygon(float(screen_x), float(screen_y), points):
+                continue
+            best_area = area
+            best = {
+                "line_index": line_index,
+                "distance_px": 0.0,
+                "screen_x": float(screen_x),
+                "screen_y": float(screen_y),
+                "area_px2": area,
+                "hit_kind": "closed_ring_area",
+            }
+            feature = self.line_feature(line_index)
+            if feature:
+                best["feature"] = feature
+        return best
+
 
 
 BOUNDARY_SPECS = {
@@ -12904,6 +13008,7 @@ class HybridRenderController:
                 "hover_contrast_gamma_color",
                 "closed_ring_polygon_fill_preview",
                 "closed_ring_fill_contrast_gamma",
+                "closed_ring_area_hit_test",
             ],
             "pending": [
                 "authoritative_polygon_territory_identity",
@@ -13022,6 +13127,36 @@ class HybridRenderController:
                 }
                 if isinstance(hit.get("feature"), dict):
                     best["feature"] = hit["feature"]
+        if best.get("layer_id"):
+            return best
+        best_area = float("inf")
+        for layer_id, overlay in getattr(self, "boundary_overlays", {}).items():
+            if target_layers is not None and layer_id not in target_layers:
+                continue
+            if not self.layer_visible.get(layer_id, True) or overlay is None:
+                continue
+            hit = overlay.area_hit_test(
+                x,
+                y,
+                self.yaw,
+                self.pitch,
+                self.zoom,
+                self.flip_longitude,
+                self.flip_latitude,
+            )
+            if hit and float(hit.get("area_px2", float("inf"))) < best_area:
+                best_area = float(hit.get("area_px2", float("inf")))
+                best = {
+                    "layer_id": layer_id,
+                    "line_index": hit["line_index"],
+                    "distance_px": hit.get("distance_px", 0.0),
+                    "screen_x": hit.get("screen_x", x),
+                    "screen_y": hit.get("screen_y", y),
+                    "area_px2": hit.get("area_px2"),
+                    "hit_kind": hit.get("hit_kind", "closed_ring_area"),
+                }
+                if isinstance(hit.get("feature"), dict):
+                    best["feature"] = hit["feature"]
         return best
 
     def nearest_hydrology_hit(self, x: float, y: float, layer_id: str, radius_px: float = 12.0) -> dict[str, object]:
@@ -13092,7 +13227,7 @@ class HybridRenderController:
             "schema": "rrkal_displaytools.renderer_layer_pick_result.v1",
             "event": "selected_layer_pick",
             "renderer_layer": layer_id,
-            "picker": "boundary_line",
+            "picker": "boundary_area" if hit.get("hit_kind") == "closed_ring_area" else "boundary_line",
             "hit": picked,
             "hit_detail": hit if picked else None,
             "frame_index": self.frame_index,
@@ -16054,6 +16189,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "hover_contrast_gamma_color",
                 "closed_ring_polygon_fill_preview",
                 "closed_ring_fill_contrast_gamma",
+                "closed_ring_area_hit_test",
                 "source_property_feature_identity",
             ],
             "pending": [
