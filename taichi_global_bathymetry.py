@@ -2735,6 +2735,7 @@ def timeline_ack_payload_from_state_file(timeline_state_file: str | Path | None)
         "playback_readiness": timeline_playback_readiness_packet(),
         "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
         "segment_state": timeline_segment_state_packet(runtime_keyframes),
+        "active_step_state": timeline_active_step_state_packet(timeline_state, runtime_keyframes),
         "first_keyframe_apply": timeline_first_keyframe_apply_preview_packet(
             runtime_keyframes,
             applied=False,
@@ -2833,6 +2834,40 @@ def timeline_segment_state_packet(keyframes: list[object] | None = None) -> dict
         "segment_count": max(0, len(keyframes) - 1),
         "pending": ["renderer_step_playback", "inter_keyframe_interpolation", "animation_export"],
         "boundary": "Renderer exposes segment state for future step playback; it is not executing segment animation yet.",
+    }
+
+
+def timeline_active_step_state_packet(
+    timeline_state: dict[str, object] | None = None,
+    keyframes: list[object] | None = None,
+) -> dict[str, object]:
+    timeline_state = timeline_state if isinstance(timeline_state, dict) else {}
+    keyframes = [keyframe for keyframe in keyframes if isinstance(keyframe, dict)] if isinstance(keyframes, list) else []
+    playback = timeline_state.get("playback")
+    playback = playback if isinstance(playback, dict) else {}
+    try:
+        requested_index = int(playback.get("next_index", 0))
+    except (TypeError, ValueError):
+        requested_index = 0
+    active_index = None
+    active_keyframe_id = None
+    if keyframes:
+        active_index = max(0, min(requested_index, len(keyframes) - 1))
+        active_keyframe = keyframes[active_index]
+        active_keyframe_id = str(active_keyframe.get("id", f"keyframe_{active_index + 1}"))
+    return {
+        "schema": "rrkal_displaytools.timeline_active_step_state.v1",
+        "mode": "renderer_active_step_ack",
+        "source": "timeline_state.playback.next_index",
+        "playback_active": bool(playback.get("active")),
+        "requested_index": requested_index,
+        "active_index": active_index,
+        "active_keyframe_id": active_keyframe_id,
+        "keyframe_count": len(keyframes),
+        "step_available": active_index is not None,
+        "applies": ["renderer_startup_selection_hint"],
+        "pending": ["renderer_step_playback", "inter_keyframe_interpolation", "animation_export"],
+        "boundary": "Active step is a discrete keyframe selection contract; renderer playback, interpolation, and export remain pending.",
     }
 
 
@@ -13485,6 +13520,7 @@ class HybridRenderController:
             "playback_readiness": timeline_playback_readiness_packet(),
             "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
             "segment_state": timeline_segment_state_packet(runtime_keyframes),
+            "active_step_state": timeline_active_step_state_packet(timeline_state, runtime_keyframes),
             "first_keyframe_apply": getattr(
                 self,
                 "timeline_first_keyframe_apply_result",
@@ -16748,6 +16784,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
             "ack_schema": "rrkal_displaytools.renderer_timeline_ack.v1",
             "playback_plan_schema": "rrkal_displaytools.timeline_playback_plan.v1",
             "segment_state_schema": "rrkal_displaytools.timeline_segment_state.v1",
+            "active_step_state_schema": "rrkal_displaytools.timeline_active_step_state.v1",
             "first_keyframe_apply_schema": "rrkal_displaytools.timeline_first_keyframe_apply.v1",
             "playback_readiness": timeline_playback_readiness_packet(),
             "controls": ["timeline-state-file", "timeline-ack-file", "ack-timeline-state-and-exit"],
@@ -16757,6 +16794,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "rrkal_displaytools.timeline_runtime_state.v1",
                 "rrkal_displaytools.timeline_playback_plan.v1",
                 "rrkal_displaytools.timeline_segment_state.v1",
+                "rrkal_displaytools.timeline_active_step_state.v1",
                 "rrkal_displaytools.timeline_first_keyframe_apply.v1",
                 "profile.timeline_keyframes",
             ],

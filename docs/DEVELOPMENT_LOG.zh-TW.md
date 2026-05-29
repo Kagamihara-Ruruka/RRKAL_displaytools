@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Timeline active step state contract
+
+Scope:
+- Added `rrkal_displaytools.timeline_active_step_state.v1`.
+- Qt launch/provenance packets, No-GUI launch packets, Timeline runtime state, renderer ack payloads, renderer capabilities, closed-loop status, docs, and smoke gates now expose requested/active keyframe index and active keyframe id.
+- This does not claim renderer timeline playback yet; it gives renderer startup and future playback code a stable discrete step selection contract.
+
+Positioning:
+- This is the next reversible step after segment state, preparing renderer startup to apply the active Timeline step instead of assuming the first keyframe.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Timeline active segment contract
 
 Scope:

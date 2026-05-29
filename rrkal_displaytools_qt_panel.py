@@ -1382,6 +1382,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "timeline_playback_readiness": self.collect_timeline_playback_readiness(),
             "timeline_playback_plan": self.collect_timeline_playback_plan(),
             "timeline_segment_state": self.collect_timeline_segment_state(),
+            "timeline_active_step_state": self.collect_timeline_active_step_state(),
             "timeline_runtime_state_file": str(TIMELINE_STATE_PATH),
             "timeline_ack_file": str(TIMELINE_ACK_PATH),
             "timeline_ack": self.timeline_ack_payload,
@@ -2773,6 +2774,30 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "boundary": "Segment state describes the next playback segment; renderer step playback is not claimed yet.",
         }
 
+    def collect_timeline_active_step_state(self) -> dict[str, object]:
+        keyframe_count = len(self.timeline_keyframes)
+        requested_index = int(self.timeline_playback_index)
+        active_index = None
+        active_keyframe_id = None
+        if keyframe_count > 0:
+            active_index = max(0, min(requested_index, keyframe_count - 1))
+            active_keyframe = self.timeline_keyframes[active_index]
+            active_keyframe_id = str(active_keyframe.get("id", f"keyframe_{active_index + 1}"))
+        return {
+            "schema": "rrkal_displaytools.timeline_active_step_state.v1",
+            "mode": "qt_preview_active_step",
+            "source": "timeline_state.playback.next_index",
+            "playback_active": bool(self.timeline_playback_active),
+            "requested_index": requested_index,
+            "active_index": active_index,
+            "active_keyframe_id": active_keyframe_id,
+            "keyframe_count": keyframe_count,
+            "step_available": active_index is not None,
+            "applies": ["qt_preview_step_selection", "renderer_startup_selection_hint"],
+            "pending": ["renderer_step_playback", "inter_keyframe_interpolation", "animation_export"],
+            "boundary": "Active step is a discrete keyframe selection contract; renderer playback, interpolation, and export remain pending.",
+        }
+
     def collect_timeline_runtime_state(self) -> dict[str, object]:
         return {
             "schema": "rrkal_displaytools.timeline_runtime_state.v1",
@@ -2781,6 +2806,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "playback_readiness": self.collect_timeline_playback_readiness(),
             "playback_plan": self.collect_timeline_playback_plan(),
             "segment_state": self.collect_timeline_segment_state(),
+            "active_step_state": self.collect_timeline_active_step_state(),
             "timeline_keyframes": [dict(keyframe) for keyframe in self.timeline_keyframes],
             "source": "rrkal_displaytools_qt_panel",
             "boundary": "Renderer receives Timeline keyframes as state only; renderer playback/interpolation/export remain pending.",
@@ -3736,6 +3762,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "timeline_playback_readiness": self.collect_timeline_playback_readiness(),
             "timeline_playback_plan": self.collect_timeline_playback_plan(),
             "timeline_segment_state": self.collect_timeline_segment_state(),
+            "timeline_active_step_state": self.collect_timeline_active_step_state(),
             "timeline_runtime_state_file": str(TIMELINE_STATE_PATH),
             "timeline_state_last_write_utc": self.timeline_state_last_write_utc,
             "timeline_state_write_error": self.timeline_state_write_error,
