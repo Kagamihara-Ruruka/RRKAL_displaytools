@@ -33,6 +33,13 @@ BOOL_FLAGS = {
     "demo_closed_loop": "demo-closed-loop",
 }
 
+DEFAULT_CANVAS_PREVIEW = {
+    "schema": "rrkal_displaytools.canvas_preview.v1",
+    "mode": "state",
+    "renderer_thumbnail_path": None,
+    "renderer_sync": "static_renderer_output_thumbnail",
+}
+
 
 def resolve_profile(profile: Path | None, template: str | None) -> Path:
     if profile is not None:
@@ -89,6 +96,15 @@ def profile_display_path(path: Path) -> str:
         return str(path)
 
 
+def canvas_preview_packet(profile: dict[str, object]) -> dict[str, object]:
+    payload = profile.get("canvas_preview")
+    if isinstance(payload, dict):
+        merged = dict(DEFAULT_CANVAS_PREVIEW)
+        merged.update(payload)
+        return merged
+    return dict(DEFAULT_CANVAS_PREVIEW)
+
+
 def launch_packet(profile_path: Path, profile: dict[str, object], rrkal_data_manifest_ref: str = "") -> dict[str, object]:
     portable_command = ["py", "-3", "taichi_global_bathymetry.py", *renderer_args(profile, rrkal_data_manifest_ref)]
     manifest_ref = rrkal_data_manifest_ref or str(profile.get("renderer", {}).get("rrkal_data_manifest_ref", "")).strip()
@@ -112,6 +128,7 @@ def launch_packet(profile_path: Path, profile: dict[str, object], rrkal_data_man
         "profile": profile,
         "rrkal_data_manifest_ref": manifest_ref,
         "rrkal_data_manifest_ref_boundary": "Reference-only handoff field; displaytools does not discover, download, validate, import, or govern this manifest.",
+        "canvas_preview": canvas_preview_packet(profile),
         "closed_loop_status": renderer_closed_loop_status_packet(),
         "portable_command": portable_command,
         "portable_command_line": " ".join(portable_command),

@@ -1,5 +1,18 @@
 ﻿# Development Log
 
+## 2026-05-29 - Canvas preview no-GUI handoff
+
+Scope:
+- No-GUI launch packet export now includes the `canvas_preview` contract.
+- Repo-shared profile templates now carry a default `canvas_preview` state-mode block.
+
+Positioning:
+- This keeps Qt-saved profiles, built-in templates, and script-exported launch packets aligned.
+- Static thumbnail references remain UI/provenance state; runtime PNG files remain ignored.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Canvas preview profile state
 
 Scope:
