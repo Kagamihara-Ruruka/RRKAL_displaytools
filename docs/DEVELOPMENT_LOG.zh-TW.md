@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-29 - Layer runtime interaction context
+
+- Added `rrkal_displaytools.layer_runtime_interaction_context.v1` to connect runtime warnings with selected-layer renderer pick context and source-property feature identity.
+- Qt Properties now shows a `Runtime context` row; copyable research provenance carries pick target, hit status, feature label and feature identity when renderer pick evidence is available.
+- No-GUI launch packets and static renderer capability discovery expose the same schema while explicitly marking live pick context unavailable.
+- Smoke: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1` PASS.
+
 ## 2026-05-29 - Layer runtime warning list
 
 - Added `rrkal_displaytools.layer_runtime_warning_list.v1` to turn Runtime badge counts into researcher-facing info/warning/error messages.

@@ -421,10 +421,63 @@ def layer_runtime_warning_list_packet(
     }
 
 
+def layer_runtime_interaction_context_packet(
+    warning_list: dict[str, object] | None,
+    selected_layer: str | None,
+    renderer_target: str | None,
+    pick_state: dict[str, object] | None,
+    source: str,
+) -> dict[str, object]:
+    warning_list = warning_list if isinstance(warning_list, dict) else {}
+    pick_state = pick_state if isinstance(pick_state, dict) else {}
+    pick_result = pick_state.get("pick_result")
+    pick_result = pick_result if isinstance(pick_result, dict) else {}
+    pick_event = str(pick_result.get("event") or pick_state.get("event") or "waiting")
+    pick_renderer_layer = pick_state.get("selected_renderer_layer") or pick_result.get("renderer_layer")
+    hit_value = pick_result.get("hit")
+    feature_identity = pick_result.get("feature_identity")
+    feature_identity = feature_identity if isinstance(feature_identity, dict) else {}
+    feature_properties = pick_result.get("feature_properties") or pick_result.get("properties")
+    feature_properties = feature_properties if isinstance(feature_properties, dict) else {}
+    feature_label = pick_result.get("feature_label") or pick_result.get("label") or pick_result.get("name")
+    if not feature_identity:
+        for key in ("name", "NAME", "NAME_EN", "SOVEREIGNT", "ADMIN", "ISO_A3", "MRGID", "GEONAME"):
+            value = feature_properties.get(key) or pick_result.get(key)
+            if value not in (None, ""):
+                feature_identity[key.lower()] = value
+    pick_available = bool(pick_state)
+    target_matches = bool(renderer_target and pick_renderer_layer == renderer_target)
+    if not pick_available:
+        summary_text = f"No renderer pick context yet; warning severity={warning_list.get('severity', 'unknown')}."
+    else:
+        hit_text = "hit" if hit_value is True else "no-hit" if hit_value is False else "unknown-hit"
+        feature_text = f", feature={feature_label}" if isinstance(feature_label, str) and feature_label.strip() else ""
+        summary_text = f"pick={pick_event}, target={pick_renderer_layer or '-'}, {hit_text}{feature_text}."
+    return {
+        "schema": "rrkal_displaytools.layer_runtime_interaction_context.v1",
+        "source": source,
+        "selected_layer": selected_layer,
+        "renderer_target": renderer_target,
+        "warning_severity": warning_list.get("severity"),
+        "warning_count": warning_list.get("warning_count"),
+        "pick_context_available": pick_available,
+        "pick_event": pick_event,
+        "pick_renderer_layer": pick_renderer_layer,
+        "pick_target_matches_selected_layer": target_matches,
+        "pick_hit": hit_value,
+        "feature_label": feature_label,
+        "feature_identity": feature_identity,
+        "summary_text": summary_text,
+        "copyable_provenance": True,
+        "boundary": "Connects runtime warnings with selected-layer renderer picking and source-property feature identity when renderer pick evidence is available.",
+    }
+
+
 def layer_capability_matrix_packet(
     source: str,
     selected_layer: str | None = None,
     runtime_ack: dict[str, object] | None = None,
+    pick_state: dict[str, object] | None = None,
 ) -> dict[str, object]:
     runtime_evidence = layer_runtime_evidence_packet(runtime_ack)
     layers = [layer_capability_packet(key, label) for key, label in LAYER_LABELS]
@@ -459,6 +512,8 @@ def layer_capability_matrix_packet(
     selected = next((layer for layer in layers if layer["key"] == selected_layer), None)
     runtime_evidence_summary = layer_runtime_evidence_summary_packet(runtime_evidence)
     runtime_badge_summary = layer_runtime_badge_summary_packet(layers, selected_layer, source)
+    runtime_warning_list = layer_runtime_warning_list_packet(runtime_badge_summary, runtime_evidence_summary, source)
+    renderer_target = selected.get("renderer_target") if isinstance(selected, dict) else None
     return {
         "schema": "rrkal_displaytools.layer_capability_matrix.v1",
         "source": source,
@@ -467,7 +522,14 @@ def layer_capability_matrix_packet(
         "runtime_evidence": runtime_evidence,
         "runtime_evidence_summary": runtime_evidence_summary,
         "runtime_badge_summary": runtime_badge_summary,
-        "runtime_warning_list": layer_runtime_warning_list_packet(runtime_badge_summary, runtime_evidence_summary, source),
+        "runtime_warning_list": runtime_warning_list,
+        "runtime_interaction_context": layer_runtime_interaction_context_packet(
+            runtime_warning_list,
+            selected_layer,
+            str(renderer_target) if renderer_target else None,
+            pick_state,
+            source,
+        ),
         "runtime_status_legend": layer_runtime_status_legend_packet(),
         "selected_layer": selected_layer,
         "selected_layer_capabilities": selected,
@@ -814,6 +876,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "capabilities": QtWidgets.QLabel("-"),
             "runtime_summary": QtWidgets.QLabel("-"),
             "runtime_warnings": QtWidgets.QLabel("-"),
+            "runtime_context": QtWidgets.QLabel("-"),
             "renderer_target": QtWidgets.QLabel("-"),
             "diagnostics": QtWidgets.QLabel("-"),
         }
@@ -828,6 +891,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         material_form.addRow("Layer capabilities", self.layer_property_labels["capabilities"])
         material_form.addRow("Runtime summary", self.layer_property_labels["runtime_summary"])
         material_form.addRow("Runtime warnings", self.layer_property_labels["runtime_warnings"])
+        material_form.addRow("Runtime context", self.layer_property_labels["runtime_context"])
         material_form.addRow("Renderer target", self.layer_property_labels["renderer_target"])
         material_form.addRow("Renderer diagnostics", self.layer_property_labels["diagnostics"])
         layer_property_actions = QtWidgets.QHBoxLayout()
@@ -1923,7 +1987,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
 
     def collect_layer_capability_matrix(self) -> dict[str, object]:
         runtime_ack = self.layer_runtime_ack_payload if isinstance(self.layer_runtime_ack_payload, dict) else None
-        return layer_capability_matrix_packet("rrkal_displaytools_qt_panel", self.selected_layer_key, runtime_ack)
+        pick_state = self.layer_pick_state_payload if isinstance(self.layer_pick_state_payload, dict) else None
+        return layer_capability_matrix_packet("rrkal_displaytools_qt_panel", self.selected_layer_key, runtime_ack, pick_state)
 
     def collect_layer_runtime_state(self) -> dict[str, object]:
         layers = self.collect_layer_stack_ui()
@@ -3943,6 +4008,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_property_labels["runtime_warnings"].setText(
             str(runtime_warning_list.get("summary_text", "-")) if isinstance(runtime_warning_list, dict) else "-"
         )
+        runtime_context = matrix.get("runtime_interaction_context") if isinstance(matrix, dict) else None
+        self.layer_property_labels["runtime_context"].setText(
+            str(runtime_context.get("summary_text", "-")) if isinstance(runtime_context, dict) else "-"
+        )
         renderer_target = LAYER_RUNTIME_ID_ALIASES.get(key, "-")
         self.layer_property_labels["renderer_target"].setText(str(renderer_target))
         self.layer_property_labels["diagnostics"].setText(self.layer_diagnostics_text(str(renderer_target)))
@@ -4006,9 +4075,11 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_runtime_evidence_summary_schema": "rrkal_displaytools.layer_runtime_evidence_summary.v1",
             "layer_runtime_badge_summary_schema": "rrkal_displaytools.layer_runtime_badge_summary.v1",
             "layer_runtime_warning_list_schema": "rrkal_displaytools.layer_runtime_warning_list.v1",
+            "layer_runtime_interaction_context_schema": "rrkal_displaytools.layer_runtime_interaction_context.v1",
             "runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "runtime_badge_summary": self.collect_layer_capability_matrix().get("runtime_badge_summary"),
             "runtime_warning_list": self.collect_layer_capability_matrix().get("runtime_warning_list"),
+            "runtime_interaction_context": self.collect_layer_capability_matrix().get("runtime_interaction_context"),
             "diagnostics_text": diagnostics_text,
             "runtime_ack_file": str(LAYER_RUNTIME_ACK_PATH),
             "runtime_ack": self.layer_runtime_ack_payload,
@@ -4532,6 +4603,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "layer_runtime_badge_summary": self.collect_layer_capability_matrix().get("runtime_badge_summary"),
             "layer_runtime_warning_list": self.collect_layer_capability_matrix().get("runtime_warning_list"),
+            "layer_runtime_interaction_context": self.collect_layer_capability_matrix().get("runtime_interaction_context"),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),

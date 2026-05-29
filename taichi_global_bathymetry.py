@@ -17620,6 +17620,33 @@ def layer_runtime_warning_list_packet(
     }
 
 
+def layer_runtime_interaction_context_packet(
+    warning_list: dict[str, object] | None,
+    selected_layer: str | None,
+    renderer_target: str | None,
+    source: str,
+) -> dict[str, object]:
+    warning_list = warning_list if isinstance(warning_list, dict) else {}
+    return {
+        "schema": "rrkal_displaytools.layer_runtime_interaction_context.v1",
+        "source": source,
+        "selected_layer": selected_layer,
+        "renderer_target": renderer_target,
+        "warning_severity": warning_list.get("severity"),
+        "warning_count": warning_list.get("warning_count"),
+        "pick_context_available": False,
+        "pick_event": "unavailable",
+        "pick_renderer_layer": None,
+        "pick_target_matches_selected_layer": False,
+        "pick_hit": None,
+        "feature_label": None,
+        "feature_identity": {},
+        "summary_text": "Static renderer capability discovery has no live pick context.",
+        "copyable_provenance": True,
+        "boundary": "Renderer capabilities expose the interaction-context schema; live feature identity arrives from Qt runtime pick state.",
+    }
+
+
 def layer_capability_matrix_packet() -> dict[str, object]:
     aliases = {
         "show_grid": "grid",
@@ -17717,6 +17744,7 @@ def layer_capability_matrix_packet() -> dict[str, object]:
         )
     runtime_evidence_summary = layer_runtime_evidence_summary_packet()
     runtime_badge_summary = layer_runtime_badge_summary_packet(layers, None, "taichi_global_bathymetry.renderer_capabilities")
+    runtime_warning_list = layer_runtime_warning_list_packet(runtime_badge_summary, runtime_evidence_summary, "taichi_global_bathymetry.renderer_capabilities")
     return {
         "schema": "rrkal_displaytools.layer_capability_matrix.v1",
         "source": "taichi_global_bathymetry.renderer_capabilities",
@@ -17750,7 +17778,13 @@ def layer_capability_matrix_packet() -> dict[str, object]:
         },
         "runtime_evidence_summary": runtime_evidence_summary,
         "runtime_badge_summary": runtime_badge_summary,
-        "runtime_warning_list": layer_runtime_warning_list_packet(runtime_badge_summary, runtime_evidence_summary, "taichi_global_bathymetry.renderer_capabilities"),
+        "runtime_warning_list": runtime_warning_list,
+        "runtime_interaction_context": layer_runtime_interaction_context_packet(
+            runtime_warning_list,
+            None,
+            None,
+            "taichi_global_bathymetry.renderer_capabilities",
+        ),
         "runtime_status_legend": layer_runtime_status_legend_packet(),
         "selected_layer": None,
         "selected_layer_capabilities": None,
