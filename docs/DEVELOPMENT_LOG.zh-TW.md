@@ -535,3 +535,16 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Qt Navigator and History placeholder docks
+
+Scope:
+- Added dockable `Navigator` and `History` panels to `rrkal_displaytools_qt_panel.py`.
+- Navigator shows a construction-state live thumbnail placeholder and disabled zoom field.
+- History lists completed UI flows and planned Photoshop-like features with explicit construction markers.
+
+Positioning:
+- This prioritizes UI/UIUX shape first while honestly marking unimplemented frontend features as under construction.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

@@ -109,6 +109,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self._build_ui()
         self._build_menu_bar()
         self._build_tool_dock()
+        self._build_auxiliary_docks()
+        self.statusBar().showMessage("Ready")
         self.process_timer = QtCore.QTimer(self)
         self.process_timer.setInterval(1500)
         self.process_timer.timeout.connect(self.update_process_status)
@@ -310,6 +312,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             QGroupBox::title { subcontrol-origin: margin; left: 12px; padding: 0 4px; }
             QPushButton { padding: 7px 10px; }
             QPlainTextEdit { font-family: Consolas, 'Cascadia Mono', monospace; }
+            QLabel#navigatorPreview { background: #202832; color: #d8e6f3; border: 1px dashed #8aa0b6; }
             """
         )
 
@@ -361,6 +364,43 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         layout.addStretch(1)
         dock.setWidget(tools)
         self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, dock)
+
+    def _build_auxiliary_docks(self) -> None:
+        navigator_dock = QtWidgets.QDockWidget("Navigator", self)
+        navigator_dock.setObjectName("navigatorDock")
+        navigator = QtWidgets.QWidget(navigator_dock)
+        navigator_layout = QtWidgets.QVBoxLayout(navigator)
+        navigator_layout.setContentsMargins(10, 10, 10, 10)
+        preview = QtWidgets.QLabel("🚧 Navigator preview\n施工中：live renderer thumbnail")
+        preview.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        preview.setMinimumHeight(120)
+        preview.setFrameShape(QtWidgets.QFrame.Shape.StyledPanel)
+        preview.setObjectName("navigatorPreview")
+        navigator_layout.addWidget(preview)
+        zoom_row = QtWidgets.QHBoxLayout()
+        zoom_row.addWidget(QtWidgets.QLabel("Zoom"))
+        self.zoom_placeholder = QtWidgets.QLineEdit("100%")
+        self.zoom_placeholder.setEnabled(False)
+        zoom_row.addWidget(self.zoom_placeholder)
+        navigator_layout.addLayout(zoom_row)
+        navigator_dock.setWidget(navigator)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, navigator_dock)
+
+        history_dock = QtWidgets.QDockWidget("History", self)
+        history_dock.setObjectName("historyDock")
+        self.history_list = QtWidgets.QListWidget()
+        for item in (
+            "✅ Qt Studio workspace loaded",
+            "✅ Profile/template launch flow",
+            "✅ Layer manifest/capabilities preview",
+            "🚧 Live renderer layer sync",
+            "🚧 Brush/mask tools",
+            "🚧 Timeline/keyframes",
+            "🚧 Undo stack",
+        ):
+            self.history_list.addItem(item)
+        history_dock.setWidget(self.history_list)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, history_dock)
 
     def _group(self, title: str) -> QtWidgets.QGroupBox:
         return QtWidgets.QGroupBox(title)

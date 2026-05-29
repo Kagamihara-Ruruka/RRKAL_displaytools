@@ -98,3 +98,4 @@ Last updated: 2026-05-29
 - 2026-05-29: Added Qt Studio menu bar and left tools dock toward Photoshop-like workspace structure.
 - 2026-05-29: Moved layer controls into a right-side dockable Qt Layers panel.
 - 2026-05-29: Moved ocean material controls into a dockable Qt Properties panel.
+- 2026-05-29: Added dockable Qt Navigator and History panels with construction placeholders.
