@@ -263,3 +263,7 @@
 
 - Pin records now capture coordinate source metadata for manual entry, renderer globe raycast and Qt canvas estimate fallback.
 - Pin list rows display the coordinate source for quick research review.
+
+### 2026-05-30 Pin projection rule note
+
+- Pin Annotation now visibly documents that Pins rotate with the globe and are hidden by horizon/depth occlusion when behind the globe.

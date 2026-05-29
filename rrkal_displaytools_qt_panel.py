@@ -2691,6 +2691,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.pin_cursor_fill_label = QtWidgets.QLabel(f"Pin cursor fill: {self.pin_cursor_fill_source_text()}")
         self.pin_cursor_fill_label.setWordWrap(True)
         pin_form.addRow("Cursor Fill", self.pin_cursor_fill_label)
+        pin_projection_note = QtWidgets.QLabel(
+            "Pin projection: renderer rotates geodetic markers with the globe every frame; "
+            "back-side pins are hidden by horizon/depth occlusion."
+        )
+        pin_projection_note.setWordWrap(True)
+        pin_form.addRow("Projection", pin_projection_note)
         pin_actions = QtWidgets.QHBoxLayout()
         add_pin_button = QtWidgets.QPushButton("加入 Pin")
         remove_pin_button = QtWidgets.QPushButton("移除選取 Pin")

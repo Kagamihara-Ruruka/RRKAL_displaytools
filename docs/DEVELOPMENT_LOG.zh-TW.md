@@ -3059,3 +3059,16 @@ Decision:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Pin projection rule note
+
+Scope:
+- Qt Pin Annotation panel now shows a visible Projection note explaining that renderer Pins rotate with the globe every frame.
+- The same note states that back-side Pins are hidden by horizon/depth occlusion.
+- Smoke verifies both the rotation and occlusion wording in the Qt panel source.
+
+Decision:
+- Pin behavior must be understandable from the UI because researchers need to trust whether a marker should remain visible while the globe rotates.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

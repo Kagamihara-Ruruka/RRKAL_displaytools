@@ -1578,6 +1578,12 @@ if ($qtPanelSource -notlike "*coordinate_source*") {
 if ($qtPanelSource -notlike "*source=*") {
     throw "Qt panel Pin list coordinate source summary missing"
 }
+if ($qtPanelSource -notlike "*Pin projection: renderer rotates geodetic markers with the globe every frame*") {
+    throw "Qt panel Pin projection rotation note missing"
+}
+if ($qtPanelSource -notlike "*back-side pins are hidden by horizon/depth occlusion*") {
+    throw "Qt panel Pin projection occlusion note missing"
+}
 if ($qtPanelSource -notlike "*screen_position*") {
     throw "Qt panel layer pick screen position diagnostics missing"
 }
