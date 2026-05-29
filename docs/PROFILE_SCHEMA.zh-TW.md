@@ -310,7 +310,7 @@ Timeline playback plan 目前把 style、layer visibility/blend、pins、boundar
 | `status` | string | 目前為 `ready`，表示覆蓋摘要可由 Qt、launch packet、renderer capabilities 與 handoff inspection 讀取。 |
 | `saved_state_groups` | array | 已納入 portable UI/profile replay 的狀態群組，例如 `renderer_config`、`selected_layer`、`layer_stack_ui`、`pins`、`boundary_highlight`、`boundary_emphasis_control`、`canvas_preview`、`timeline_keyframes`、`timeline_export_options`。 |
 | `saved_state_group_count` | integer | `saved_state_groups` 的數量。 |
-| `replay_surfaces` | array | 可讀取或復現這些狀態的入口，目前包含 Qt save/load profile、Qt startup `--profile` / `--template`、No-GUI launch packet、renderer first-keyframe apply、research provenance summary。 |
+| `replay_surfaces` | array | 可讀取或復現這些狀態的入口，目前包含 Qt save/load profile、Qt startup `--profile` / `--template`、Qt Inspect actions（Qt `Inspect:` buttons）、No-GUI launch packet、renderer first-keyframe apply、research provenance summary。 |
 | `replay_surface_count` | integer | `replay_surfaces` 的數量。 |
 | `qt_surface` | string | Qt 顯示入口，目前為 Layers dock `profileUiStateReplay` label。 |
 | `launch_packet_fields` | array | No-GUI launch packet 中與 replay 覆蓋相關的欄位。 |

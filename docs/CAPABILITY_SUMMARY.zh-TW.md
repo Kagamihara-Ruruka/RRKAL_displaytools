@@ -424,3 +424,8 @@
 
 - The clone quickstart now tells cross-machine users which `Inspect:` buttons to open first after launching Qt.
 - Smoke verifies the quickstart mentions `Inspect: Clone ready` and `Inspect: Boundary JSON` so onboarding docs stay aligned with the Qt Actions panel.
+
+### 2026-05-30 Profile replay Inspect surface
+
+- `profile_ui_state_replay.replay_surfaces` now includes `Qt Inspect actions` in Qt, no-GUI launch packets and renderer capability discovery.
+- The profile schema and smoke gates now keep this direct Qt inspection surface aligned across clone/handoff workflows.

@@ -1059,6 +1059,7 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
     replay_surfaces = [
         "Qt save/load profile",
         "Qt startup --profile/--template",
+        "Qt Inspect actions",
         "No-GUI launch packet",
         "renderer first-keyframe apply",
         "research provenance summary",

@@ -1725,6 +1725,9 @@ if ($qtPanelSource -notlike "*saved_state_groups*") {
 if ($qtPanelSource -notlike "*replay_surfaces*") {
     throw "Qt profile UI state replay surfaces are missing"
 }
+if ($qtPanelSource -notlike "*Qt Inspect actions*") {
+    throw "Qt profile UI state replay Inspect surface is missing"
+}
 
 $rendererSource = Get-Content -Raw -Encoding UTF8 taichi_global_bathymetry.py
 if ($rendererSource -notlike "*last_layer_pick_screen*") {
@@ -1744,6 +1747,9 @@ if ($rendererSource -notlike "*saved_state_groups*") {
 }
 if ($rendererSource -notlike "*replay_surfaces*") {
     throw "Renderer capability profile UI state replay surfaces missing"
+}
+if ($rendererSource -notlike "*Qt Inspect actions*") {
+    throw "Renderer capability profile UI state replay Inspect surface missing"
 }
 
 $scripts = Get-ChildItem scripts -Filter *.ps1
@@ -1833,6 +1839,9 @@ if ($launchPacketSource -notmatch 'saved_state_groups') {
 if ($launchPacketSource -notmatch 'replay_surfaces') {
     throw "Launch packet profile UI state replay surfaces missing"
 }
+if ($launchPacketSource -notmatch 'Qt Inspect actions') {
+    throw "Launch packet profile UI state replay Inspect surface missing"
+}
 if ($handoffInspectorSource -notmatch 'profile_ui_state_replay') {
     throw "Handoff inspection profile UI state replay output is missing"
 }
@@ -1869,6 +1878,9 @@ if ($profileSchemaDoc -notmatch 'saved_state_groups') {
 }
 if ($profileSchemaDoc -notmatch 'replay_surfaces') {
     throw "Profile schema docs missing profile UI state replay surfaces"
+}
+if ($profileSchemaDoc -notmatch 'Qt Inspect actions') {
+    throw "Profile schema docs missing profile UI state replay Inspect surface"
 }
 
 $cloneQuickstartDoc = Get-Content -LiteralPath (Join-Path $BoundaryIdentityRoot "docs\QUICKSTART_CLONE.zh-TW.md") -Raw -Encoding UTF8

@@ -230,6 +230,20 @@ Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
 
+## 2026-05-30 - Profile replay Inspect surface
+
+Scope:
+- Added `Qt Inspect actions` to `profile_ui_state_replay.replay_surfaces` in Qt, no-GUI launch packet and renderer capability discovery.
+- Updated profile schema docs to list Qt `Inspect:` actions as a replay/inspection surface.
+- Smoke verifies Qt, renderer, launch packet and schema docs all include the Inspect surface.
+
+Decision:
+- The profile/UI replay contract should describe the direct Qt inspection actions that now expose portable state coverage after clone.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+
 ## 2026-05-30 - Clone quickstart Inspect guidance
 
 Scope:
