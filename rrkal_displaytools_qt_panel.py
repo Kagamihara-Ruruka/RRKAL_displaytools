@@ -212,6 +212,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         open_templates_button = QtWidgets.QPushButton("模板目錄")
         open_local_profiles_button = QtWidgets.QPushButton("本機配置")
         export_packet_button = QtWidgets.QPushButton("匯出啟動包")
+        capabilities_button = QtWidgets.QPushButton("Renderer 能力")
         smoke_button = QtWidgets.QPushButton("Smoke check")
         launch_button = QtWidgets.QPushButton("啟動地球儀")
         restart_button = QtWidgets.QPushButton("套用並重啟")
@@ -224,6 +225,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         open_templates_button.clicked.connect(self.open_template_dir)
         open_local_profiles_button.clicked.connect(self.open_local_profile_dir)
         export_packet_button.clicked.connect(self.export_launch_packet_dialog)
+        capabilities_button.clicked.connect(self.show_renderer_capabilities)
         smoke_button.clicked.connect(self.run_smoke_check)
         launch_button.clicked.connect(self.launch_renderer)
         restart_button.clicked.connect(self.restart_renderer)
@@ -237,6 +239,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             open_templates_button,
             open_local_profiles_button,
             export_packet_button,
+            capabilities_button,
             smoke_button,
             launch_button,
             restart_button,
@@ -528,6 +531,22 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             encoding="utf-8",
         )
         self.status.setText(f"已匯出啟動包：{path}")
+
+    @QtCore.pyqtSlot()
+    def show_renderer_capabilities(self) -> None:
+        result = subprocess.run(
+            [sys.executable, str(RENDERER), "--print-renderer-capabilities"],
+            cwd=str(ROOT),
+            text=True,
+            capture_output=True,
+            timeout=90,
+        )
+        if result.returncode != 0:
+            self.status.setText("Renderer capabilities failed")
+            self.command_text.setPlainText((result.stderr or result.stdout).strip())
+            return
+        self.command_text.setPlainText(result.stdout.strip())
+        self.status.setText("已顯示 renderer capabilities JSON")
 
     @QtCore.pyqtSlot()
     def load_profile_dialog(self) -> None:

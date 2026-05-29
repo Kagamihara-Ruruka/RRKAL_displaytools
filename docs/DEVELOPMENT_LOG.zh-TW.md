@@ -1,5 +1,18 @@
 ﻿# Development Log
 
+## 2026-05-29 - Qt renderer capabilities display
+
+Scope:
+- Added `Renderer 能力` to the Qt panel.
+- The action runs `taichi_global_bathymetry.py --print-renderer-capabilities` and displays the JSON in the preview area.
+
+Positioning:
+- This surfaces renderer-contract discovery in the operator UI without launching the renderer.
+
+Validation:
+- Smoke passed before commit: `py -3 -m py_compile rrkal_displaytools_qt_panel.py taichi_global_bathymetry.py`.
+- Smoke passed before commit: `py -3 taichi_global_bathymetry.py --print-renderer-capabilities`.
+- Smoke passed before commit: PowerShell parser check for all scripts under `scripts/`.
 ## 2026-05-29 - Renderer capabilities JSON output
 
 Scope:
@@ -238,6 +251,7 @@ Validation:
 Next round rule:
 - Before any new development round, inspect current repo state.
 - After each round, update this log and commit before continuing.
+
 
 
 
