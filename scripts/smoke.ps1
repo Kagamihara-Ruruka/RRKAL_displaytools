@@ -527,6 +527,18 @@ if ($launchPacket.cursor_geodesy_readout.event_position_guard -ne "QMouseEvent.p
 if ($launchPacket.cursor_geodesy_readout.backend_raycast_status -ne "queued_renderer_globe_intersection") {
     throw "Launch packet cursor_geodesy_readout backend raycast status mismatch"
 }
+if ($launchPacket.pin_overlay.schema -ne "rrkal_displaytools.pin_projection.v1") {
+    throw "Launch packet pin_overlay schema missing or invalid"
+}
+if ($launchPacket.pin_overlay.rotation_rule -notlike "*every frame*") {
+    throw "Launch packet pin_overlay rotation rule missing"
+}
+if ($launchPacket.pin_overlay.occlusion_rule -notlike "*view_z <= horizon_eps*") {
+    throw "Launch packet pin_overlay occlusion rule missing"
+}
+if ($launchPacket.pin_overlay.renderer_overlay_status -ne "wired_to_pin_overlay_rgba_and_frame_composition") {
+    throw "Launch packet pin_overlay renderer overlay status mismatch"
+}
 $timelineExportDir = Join-Path $env:TEMP "rrkal_displaytools_smoke_timeline_export"
 $timelineExportGif = Join-Path $timelineExportDir "smoke.gif"
 $timelineExportMp4 = Join-Path $timelineExportDir "smoke.mp4"
@@ -699,6 +711,15 @@ if ($capabilities.cursor_geodesy_readout.projection_method -ne "viewport_equirec
 }
 if ($capabilities.cursor_geodesy_readout.backend_raycast_status -ne "queued_renderer_globe_intersection") {
     throw "Renderer cursor_geodesy_readout backend raycast status mismatch"
+}
+if ($capabilities.pin_overlay.schema -ne "rrkal_displaytools.pin_projection.v1") {
+    throw "Renderer pin_overlay schema missing or invalid"
+}
+if ($capabilities.pin_overlay.renderer_overlay_status -ne "wired_to_pin_overlay_rgba_and_frame_composition") {
+    throw "Renderer pin_overlay renderer overlay status mismatch"
+}
+if ($capabilities.pin_overlay.horizon_control -ne "--pin-horizon-eps / PIN_HORIZON_EPS") {
+    throw "Renderer pin_overlay horizon control missing"
 }
 if ($capabilities.boundary_emphasis_control.schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
     throw "Renderer boundary_emphasis_control schema missing or invalid"
@@ -1008,6 +1029,21 @@ if ($handoff.cursor_geodesy_readout.renderer_capabilities_schema -ne "rrkal_disp
 }
 if ($handoff.cursor_geodesy_readout.event_position_guard -ne "QMouseEvent.position with QMouseEvent.pos fallback") {
     throw "Handoff inspection cursor_geodesy_readout event guard missing"
+}
+if ($handoff.launch_packet_contracts.pin_overlay -ne "rrkal_displaytools.pin_projection.v1") {
+    throw "Handoff inspection pin_overlay launch contract missing or invalid"
+}
+if ($handoff.pin_overlay.launch_packet_schema -ne "rrkal_displaytools.pin_projection.v1") {
+    throw "Handoff inspection pin_overlay launch schema missing or invalid"
+}
+if ($handoff.pin_overlay.renderer_capabilities_schema -ne "rrkal_displaytools.pin_projection.v1") {
+    throw "Handoff inspection pin_overlay renderer schema missing or invalid"
+}
+if ($handoff.pin_overlay.renderer_overlay_status -ne "wired_to_pin_overlay_rgba_and_frame_composition") {
+    throw "Handoff inspection pin_overlay renderer overlay status mismatch"
+}
+if ($handoff.pin_overlay.horizon_control -ne "--pin-horizon-eps / PIN_HORIZON_EPS") {
+    throw "Handoff inspection pin_overlay horizon control missing"
 }
 if ($handoff.launch_packet_contracts.boundary_emphasis_control -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
     throw "Handoff inspection boundary_emphasis_control launch contract missing or invalid"

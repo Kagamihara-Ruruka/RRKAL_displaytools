@@ -22,6 +22,7 @@ TIMELINE_EXPORT_MP4 = "timeline_animation.mp4"
 sys.path.insert(0, str(ROOT))
 
 from closed_loop_status import renderer_closed_loop_status_packet  # noqa: E402
+from pin_projection import pin_projection_contract_packet  # noqa: E402
 from profile_schema import load_profile_payload, profile_payload_errors  # noqa: E402
 
 
@@ -2466,6 +2467,7 @@ def launch_packet(
         "layer_capability_matrix": layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref),
         "canvas_preview": canvas_preview_packet(profile),
         "cursor_geodesy_readout": cursor_geodesy_readout_packet(canvas_preview_packet(profile), "scripts.export_launch_packet"),
+        "pin_overlay": pin_projection_contract_packet(),
         "boundary_highlight": boundary_highlight_packet(profile),
         "active_layer_diagnostics": active_layer_diagnostics_packet(profile, rrkal_data_manifest_ref),
         "layer_undo": layer_undo_packet(),

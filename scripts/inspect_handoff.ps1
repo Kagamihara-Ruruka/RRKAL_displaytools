@@ -42,6 +42,7 @@ $summary = [ordered]@{
         layer_research_workflow = $launchPacket.layer_research_workflow.schema
         boundary_emphasis_control = $launchPacket.boundary_emphasis_control.schema
         cursor_geodesy_readout = $launchPacket.cursor_geodesy_readout.schema
+        pin_overlay = $launchPacket.pin_overlay.schema
         style_renderer_entries = $launchPacket.style_renderer_entries.schema
         style_profile_renderer_routes = $launchPacket.style_profile_renderer_routes.schema
         module_boundary_registry = $launchPacket.module_boundary_registry.schema
@@ -91,6 +92,15 @@ $summary = [ordered]@{
         event_position_guard = $launchPacket.cursor_geodesy_readout.event_position_guard
         backend_raycast_status = $launchPacket.cursor_geodesy_readout.backend_raycast_status
         qt_surface = $launchPacket.cursor_geodesy_readout.qt_surface
+    }
+    pin_overlay = @{
+        launch_packet_schema = $launchPacket.pin_overlay.schema
+        renderer_capabilities_schema = $capabilities.pin_overlay.schema
+        rotation_rule = $launchPacket.pin_overlay.rotation_rule
+        occlusion_rule = $launchPacket.pin_overlay.occlusion_rule
+        renderer_overlay_status = $launchPacket.pin_overlay.renderer_overlay_status
+        horizon_control = $launchPacket.pin_overlay.horizon_control
+        current_status = $launchPacket.pin_overlay.current_status
     }
     boundary_emphasis_control = @{
         launch_packet_schema = $launchPacket.boundary_emphasis_control.schema

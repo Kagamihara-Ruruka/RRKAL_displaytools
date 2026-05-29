@@ -203,6 +203,8 @@ def pin_projection_contract_packet() -> dict[str, Any]:
             "label_priority",
         ],
         "rotation_rule": "recompute screen position every frame from geodetic anchor and current globe camera",
-        "occlusion_rule": "hide behind-horizon anchors when view_z <= horizon_eps; clip off-viewport anchors; refine with renderer depth/globe mask when overlay drawing is wired",
-        "current_status": "math hook available; renderer overlay drawing pending",
+        "occlusion_rule": "hide behind-horizon anchors when view_z <= horizon_eps; clip off-viewport anchors; refine with renderer depth/globe mask when terrain/depth pass is wired",
+        "renderer_overlay_status": "wired_to_pin_overlay_rgba_and_frame_composition",
+        "horizon_control": "--pin-horizon-eps / PIN_HORIZON_EPS",
+        "current_status": "renderer overlay drawing wired; terrain/depth refinement pending",
     }

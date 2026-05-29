@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-05-30 - Pin projection occlusion evidence
+
+- Updated `rrkal_displaytools.pin_projection.v1` to reflect the current renderer path: Pins are projected every frame from geodetic anchors and composed through `pin_overlay_rgba`.
+- Launch packets, renderer capabilities, handoff inspection and smoke now verify Pin rotation and horizon occlusion evidence via `view_z <= horizon_eps` and `--pin-horizon-eps`.
+- Smoke: PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Cursor geodesy readout
 
 - Added `rrkal_displaytools.cursor_geodesy_readout.v1` for canvas mouse-position lon/lat readout, with explicit `position()/pos()` Qt event guard evidence.
