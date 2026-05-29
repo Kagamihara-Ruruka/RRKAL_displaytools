@@ -40,6 +40,7 @@ $summary = [ordered]@{
         layer_operator_shortcuts = $launchPacket.layer_operator_shortcuts.schema
         layer_operator_groups = $launchPacket.layer_operator_groups.schema
         style_renderer_entries = $launchPacket.style_renderer_entries.schema
+        profile_launch_readiness = $launchPacket.profile_launch_readiness.schema
         layer_undo = $launchPacket.layer_undo.schema
         session_journal = $launchPacket.session_journal.schema
         timeline_state = $launchPacket.timeline_state.schema
@@ -67,6 +68,15 @@ $summary = [ordered]@{
         entry_ids = $launchPacket.style_renderer_entries.entry_ids
         parchment_entry_available = $launchPacket.style_renderer_entries.parchment_entry_available
         tactical_entry_available = $launchPacket.style_renderer_entries.tactical_entry_available
+    }
+    profile_launch_readiness = @{
+        launch_packet_schema = $launchPacket.profile_launch_readiness.schema
+        renderer_capabilities_schema = $capabilities.profile_launch_readiness.schema
+        readiness = $launchPacket.profile_launch_readiness.readiness
+        renderer_readiness = $capabilities.profile_launch_readiness.readiness
+        ready_check_count = $launchPacket.profile_launch_readiness.ready_check_count
+        check_count = $launchPacket.profile_launch_readiness.check_count
+        cross_machine_commands = $launchPacket.profile_launch_readiness.cross_machine_commands
     }
     layer_capability_matrix = @{
         schema = $capabilities.layer_capability_matrix.schema

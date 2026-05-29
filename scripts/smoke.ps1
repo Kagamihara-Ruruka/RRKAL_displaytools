@@ -200,6 +200,15 @@ if ($launchPacket.style_renderer_entries.entry_ids -notcontains "parchment") {
 if ($launchPacket.style_renderer_entries.entry_ids -notcontains "tactical") {
     throw "Launch packet style_renderer_entries missing tactical entry"
 }
+if ($launchPacket.profile_launch_readiness.schema -ne "rrkal_displaytools.profile_launch_readiness.v1") {
+    throw "Launch packet profile_launch_readiness schema missing or invalid"
+}
+if ($launchPacket.profile_launch_readiness.readiness -ne "ready") {
+    throw "Launch packet profile_launch_readiness should be ready"
+}
+if ([int]$launchPacket.profile_launch_readiness.ready_check_count -lt 7) {
+    throw "Launch packet profile_launch_readiness ready check count missing"
+}
 if ($launchPacket.layer_undo.schema -ne "rrkal_displaytools.layer_stack_undo.v1") {
     throw "Launch packet layer_undo schema missing or invalid"
 }
@@ -538,6 +547,15 @@ if ($capabilities.style_renderer_entries.entry_ids -notcontains "parchment") {
 if ($capabilities.style_renderer_entries.entry_ids -notcontains "tactical") {
     throw "Renderer style_renderer_entries missing tactical entry"
 }
+if ($capabilities.profile_launch_readiness.schema -ne "rrkal_displaytools.profile_launch_readiness.v1") {
+    throw "Renderer profile_launch_readiness schema missing or invalid"
+}
+if ($capabilities.profile_launch_readiness.readiness -ne "ready") {
+    throw "Renderer profile_launch_readiness should be ready"
+}
+if ([int]$capabilities.profile_launch_readiness.ready_check_count -lt 7) {
+    throw "Renderer profile_launch_readiness ready check count missing"
+}
 if ($capabilities.layer_capability_matrix.schema -ne "rrkal_displaytools.layer_capability_matrix.v1") {
     throw "Renderer layer_capability_matrix capability missing or invalid"
 }
@@ -741,6 +759,21 @@ if ($handoff.style_renderer_entries.entry_ids -notcontains "parchment") {
 }
 if ($handoff.style_renderer_entries.entry_ids -notcontains "tactical") {
     throw "Handoff inspection style_renderer_entries missing tactical entry"
+}
+if ($handoff.launch_packet_contracts.profile_launch_readiness -ne "rrkal_displaytools.profile_launch_readiness.v1") {
+    throw "Handoff inspection profile_launch_readiness launch contract missing or invalid"
+}
+if ($handoff.profile_launch_readiness.launch_packet_schema -ne "rrkal_displaytools.profile_launch_readiness.v1") {
+    throw "Handoff inspection profile_launch_readiness launch schema missing or invalid"
+}
+if ($handoff.profile_launch_readiness.renderer_capabilities_schema -ne "rrkal_displaytools.profile_launch_readiness.v1") {
+    throw "Handoff inspection profile_launch_readiness renderer schema missing or invalid"
+}
+if ($handoff.profile_launch_readiness.readiness -ne "ready") {
+    throw "Handoff inspection profile_launch_readiness should be ready"
+}
+if ([int]$handoff.profile_launch_readiness.ready_check_count -lt 7) {
+    throw "Handoff inspection profile_launch_readiness ready check count missing"
 }
 if ($handoff.layer_capability_matrix.schema -ne "rrkal_displaytools.layer_capability_matrix.v1") {
     throw "Handoff inspection layer_capability_matrix summary missing or invalid"

@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-05-30 - Profile launch readiness contract
+
+- Added `rrkal_displaytools.profile_launch_readiness.v1` to summarize cross-machine readiness for profile schema, built-in templates, launch packet export, portable command, renderer capability discovery, style entries and layer operator groups.
+- Exposed readiness through Qt launch/provenance packets, No-GUI launch packets, renderer capability discovery, handoff inspection and closed-loop evidence.
+- Smoke: PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Style renderer entries contract
 
 - Added `rrkal_displaytools.style_renderer_entries.v1` so scientific, nautical, parchment and tactical styles have explicit renderer entry contracts.

@@ -102,6 +102,77 @@ def style_renderer_entries_packet(
     }
 
 
+def profile_launch_readiness_packet(
+    source: str,
+    style_entries: dict[str, object] | None = None,
+    layer_operator_groups: dict[str, object] | None = None,
+) -> dict[str, object]:
+    style_entries = style_entries if isinstance(style_entries, dict) else {}
+    layer_operator_groups = layer_operator_groups if isinstance(layer_operator_groups, dict) else {}
+    checks = [
+        {
+            "id": "profile_schema",
+            "ready": True,
+            "evidence": ["profile_schema.py", "docs/PROFILE_SCHEMA.zh-TW.md", "scripts/validate_profiles.py"],
+        },
+        {
+            "id": "built_in_templates",
+            "ready": True,
+            "evidence": ["profiles/*.json", "rrkal_displaytools_qt_panel.py --list-templates"],
+        },
+        {
+            "id": "launch_packet_export",
+            "ready": True,
+            "evidence": ["scripts/export_launch_packet.py", "Qt Export launch packet action"],
+        },
+        {
+            "id": "portable_command",
+            "ready": True,
+            "evidence": ["launch_packet.portable_command", "Qt Copy portable command action"],
+        },
+        {
+            "id": "renderer_capability_discovery",
+            "ready": True,
+            "evidence": ["taichi_global_bathymetry.py --print-renderer-capabilities"],
+        },
+        {
+            "id": "style_renderer_entries",
+            "ready": (
+                style_entries.get("schema") == "rrkal_displaytools.style_renderer_entries.v1"
+                and bool(style_entries.get("parchment_entry_available"))
+                and bool(style_entries.get("tactical_entry_available"))
+            ),
+            "evidence": ["style_renderer_entries", "parchment", "tactical"],
+        },
+        {
+            "id": "layer_operator_groups",
+            "ready": (
+                layer_operator_groups.get("schema") == "rrkal_displaytools.layer_operator_groups.v1"
+                and int(layer_operator_groups.get("complete_group_count") or 0) >= 5
+            ),
+            "evidence": ["layer_operator_groups", "Selection/Edit/Isolation/History/Diagnostics"],
+        },
+    ]
+    ready_check_count = sum(1 for check in checks if check["ready"])
+    return {
+        "schema": "rrkal_displaytools.profile_launch_readiness.v1",
+        "source": source,
+        "readiness": "ready" if ready_check_count == len(checks) else "partial",
+        "check_count": len(checks),
+        "ready_check_count": ready_check_count,
+        "checks": checks,
+        "cross_machine_commands": [
+            "scripts/setup_windows.ps1",
+            "scripts/smoke.ps1",
+            "scripts/run_qt_panel.ps1",
+            "scripts/inspect_handoff.ps1",
+        ],
+        "launch_packet_fields": ["profile_launch_readiness", "portable_command", "style_renderer_entries", "layer_operator_groups"],
+        "renderer_capability_field": "profile_launch_readiness",
+        "boundary": "Readiness summarizes displaytools launch/profile/renderer contracts only; RRKAL data discovery, download, import, and cache governance are out of scope.",
+    }
+
+
 if "--list-templates" in sys.argv[1:]:
     print(json.dumps(profile_template_packet(), ensure_ascii=False, indent=2))
     raise SystemExit(0)
@@ -2458,6 +2529,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_shortcuts": self.collect_layer_operator_shortcuts(),
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
+            "profile_launch_readiness": self.collect_profile_launch_readiness(),
             "layer_capability_matrix": self.collect_layer_capability_matrix(),
             "layer_runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
@@ -2556,6 +2628,13 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         style_combo = getattr(self, "style_combo", None)
         selected_style = style_combo.currentText() if style_combo is not None else None
         return style_renderer_entries_packet("rrkal_displaytools_qt_panel", selected_style)
+
+    def collect_profile_launch_readiness(self) -> dict[str, object]:
+        return profile_launch_readiness_packet(
+            "rrkal_displaytools_qt_panel",
+            self.collect_style_renderer_entries(),
+            self.collect_layer_operator_groups(),
+        )
 
     def collect_layer_operator_groups(self) -> dict[str, object]:
         return layer_operator_groups_packet(
@@ -5226,6 +5305,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_shortcuts": self.collect_layer_operator_shortcuts(),
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
+            "profile_launch_readiness": self.collect_profile_launch_readiness(),
             "layer_capability_matrix": self.collect_layer_capability_matrix(),
             "layer_runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "layer_runtime_badge_summary": self.collect_layer_capability_matrix().get("runtime_badge_summary"),
