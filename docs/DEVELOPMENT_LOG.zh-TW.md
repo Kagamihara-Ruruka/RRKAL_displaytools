@@ -1,5 +1,18 @@
 ﻿# Development Log
 
+## 2026-05-29 - README current-entry refresh
+
+Scope:
+- Updated `README.md` to point at the clone quickstart and module boundary docs.
+- Refreshed the current focus and Qt capability list to include runtime layer sync, selected-layer picking, layer pick JSON, and boundary closed-ring fill preview.
+
+Positioning:
+- This makes the public GitHub landing page match the current functional state.
+- No runtime behavior changed.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Cross-machine clone quickstart
 
 Scope:

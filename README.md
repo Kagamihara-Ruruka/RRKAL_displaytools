@@ -10,7 +10,9 @@ Positioning:
 Current focus:
 - Qt-first operator UI for controlling renderer launch flags and layers.
 - Taichi globe / bathymetry visualization prototype.
-- Hydrology basic layers, LOD hook contracts, ocean material controls, style profile renderer entries, and decoupling-ready diagnostics.
+- Live layer runtime bridge for visibility, opacity, blend, lock guard, selected-layer semantic target, and renderer pick state.
+- Hydrology, boundary, traffic, Pin, ocean material, style profile renderer entries, and decoupling-ready diagnostics.
+- Boundary highlight line mask plus closed-ring fill preview, with full territory identity kept explicit as future work.
 
 Run on another Windows machine:
 ```powershell
@@ -19,6 +21,9 @@ cd RRKAL_displaytools
 .\scripts\setup_windows.ps1
 .\scripts\run_qt_panel.ps1
 ```
+
+Detailed clone/smoke/Qt instructions:
+- `docs/QUICKSTART_CLONE.zh-TW.md`
 
 Manual equivalent:
 ```powershell
@@ -90,6 +95,10 @@ Primary files:
 
 Qt panel capabilities:
 - Toggle renderer layers without memorizing CLI flags.
+- Control layer lock, opacity, and blend mode through the renderer runtime bridge.
+- Inspect renderer layer runtime JSON and renderer layer pick JSON from the Layers panel.
+- Select Pin, traffic, boundary line, and hydrology line targets through selected-layer-aware renderer picking.
+- Configure boundary highlight color, alpha, contrast, gamma, feather, breathing, and closed-ring fill preview.
 - Load repo-shared profile templates from `profiles/`.
 - Save/load local layer profiles as JSON under `state/ui_profiles/`.
 - Apply current settings by restarting the renderer from the panel.
@@ -106,6 +115,8 @@ Core docs:
 - `docs/SETUP_WINDOWS.zh-TW.md`
 - `docs/RRKAL_HANDOFF_CONTRACT.zh-TW.md`
 - `docs/CAPABILITY_SUMMARY.zh-TW.md`
+- `docs/QUICKSTART_CLONE.zh-TW.md`
+- `docs/MODULE_BOUNDARIES.zh-TW.md`
 - `docs/DEVELOPMENT_LOG.zh-TW.md`
 
 Notes:
