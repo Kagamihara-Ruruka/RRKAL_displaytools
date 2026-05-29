@@ -1,5 +1,19 @@
 ﻿# Development Log
 
+## 2026-05-29 - Vehicle icon overlay closure
+
+Scope:
+- Added a lightweight renderer vehicle icon overlay for AIS vessels and ADS-B aircraft.
+- `vehicle_icons` now controls a real globe-masked overlay with `icon_max_count`, runtime visibility, opacity, and blend mode support.
+- Renderer capabilities now include `vehicle_icons` in runtime overlay opacity/blend support and only keep boundary aggregate blend pending.
+
+Positioning:
+- This turns the vehicle icon layer from a checkbox/pick-state control into an actual visual layer.
+- Remaining layer runtime work is boundary aggregate split/blend and deeper renderer-backed layer/object picking.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Visual aid runtime visibility
 
 Scope:

@@ -2139,6 +2139,50 @@ def mask_overlay_to_globe(overlay: np.ndarray, globe_mask: np.ndarray) -> np.nda
     return masked
 
 
+def render_vehicle_icon_overlay(
+    width: int,
+    height: int,
+    ais_projected: pd.DataFrame,
+    aircraft_projected: pd.DataFrame,
+    max_count: int,
+    style_profile: str,
+) -> np.ndarray:
+    overlay = np.zeros((height, width, 4), dtype=np.uint8)
+    budget = max(0, int(max_count))
+    if budget <= 0:
+        return overlay
+    style = str(style_profile or "scientific")
+    palettes = {
+        "scientific": ((72, 231, 255, 218), (255, 209, 102, 228)),
+        "nautical": ((99, 255, 218, 220), (255, 202, 212, 228)),
+        "tactical": ((57, 255, 20, 230), (255, 230, 0, 234)),
+        "parchment": ((47, 93, 98, 216), (127, 85, 57, 226)),
+    }
+    ship_color, aircraft_color = palettes.get(style, palettes["scientific"])
+    ais_count = 0 if ais_projected.empty else min(len(ais_projected), budget // 2 if not aircraft_projected.empty else budget)
+    aircraft_count = 0 if aircraft_projected.empty else min(len(aircraft_projected), budget - ais_count)
+
+    def draw_diamond(x: int, y: int, radius: int, color: tuple[int, int, int, int]) -> None:
+        for dy in range(-radius, radius + 1):
+            yy = y + dy
+            if yy < 0 or yy >= height:
+                continue
+            span = radius - abs(dy)
+            overlay[yy, max(0, x - span):min(width, x + span + 1), :] = color
+
+    def draw_cross(x: int, y: int, radius: int, color: tuple[int, int, int, int]) -> None:
+        if 0 <= y < height:
+            overlay[y, max(0, x - radius):min(width, x + radius + 1), :] = color
+        if 0 <= x < width:
+            overlay[max(0, y - radius):min(height, y + radius + 1), x, :] = color
+
+    for row in ais_projected.head(ais_count).itertuples(index=False):
+        draw_diamond(int(round(float(getattr(row, "screen_x")))), int(round(float(getattr(row, "screen_y")))), 3, ship_color)
+    for row in aircraft_projected.head(aircraft_count).itertuples(index=False):
+        draw_cross(int(round(float(getattr(row, "screen_x")))), int(round(float(getattr(row, "screen_y")))), 4, aircraft_color)
+    return overlay
+
+
 def build_datashader_overlay_config(style_profile: str, layer_kind: str, color_mode: str, point_px: int) -> dict:
     cmaps = resolve_datashader_style_cmaps(style_profile)
     layer_kind = str(layer_kind or "ais")
@@ -10473,6 +10517,7 @@ class HybridRenderController:
         self.overlay_rgba = np.zeros_like(self.globe_rgba)
         self.aircraft_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
+        self.vehicle_icon_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.frame_rgba = np.zeros_like(self.globe_rgba)
         self.globe_mask = np.zeros((args.height, args.width), dtype=np.uint8)
         self.pin_records, self.selected_pin_id = load_pin_records(
@@ -10584,12 +10629,14 @@ class HybridRenderController:
         self.runtime_overlay_opacity_percent: dict[str, int] = {
             "aircraft": 100,
             "pins": 100,
+            "vehicle_icons": 100,
         }
         self.runtime_overlay_blend_modes: dict[str, str] = {
             "lakes": "Normal",
             "rivers": "Normal",
             "aircraft": "Normal",
             "pins": "Normal",
+            "vehicle_icons": "Normal",
         }
         self.hydrology_overlays = self._load_hydrology_overlays()
         self.boundary_overlays = self._load_boundary_overlays()
@@ -10838,7 +10885,7 @@ class HybridRenderController:
             "runtime_layer_aliases": dict(LAYER_RUNTIME_ID_ALIASES),
             "frame_index": getattr(self, "frame_index", 0),
             "applies": ["visibility", "lock_guard_visibility", "opacity", "blend_mode_overlay"],
-            "pending": ["blend_mode_boundary_aggregate", "blend_mode_vehicle_icons"],
+            "pending": ["blend_mode_boundary_aggregate"],
             "error": self.layer_runtime_state_last_error,
             "source": "taichi_global_bathymetry",
         }
@@ -12373,6 +12420,8 @@ class HybridRenderController:
         if layer_id == "ocean_material":
             self.args.ocean_material = bool(visible)
             self.globe_dirty = True
+        if layer_id == "vehicle_icons":
+            self.args.vehicle_icons = bool(visible)
         self.overlay_dirty = True
         self.globe_dirty = self.globe_dirty or layer_id in {"globe", "ice", "forest", "clouds", "contours", "grid", "stars", "ocean_material"}
 
@@ -13683,6 +13732,20 @@ class HybridRenderController:
                 self.current_pin_projections = []
                 self.pin_visible_count = 0
                 self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
+            if self.layer_allowed_in_mode("vehicle_icons") and self.layer_visible.get("vehicle_icons", False):
+                self.vehicle_icon_overlay_rgba = mask_overlay_to_globe(
+                    render_vehicle_icon_overlay(
+                        self.width,
+                        self.height,
+                        self.current_sampled_projected,
+                        self.current_aircraft_sampled_projected,
+                        int(getattr(self.args, "icon_max_count", 800)),
+                        getattr(self.args, "style_profile", "scientific"),
+                    ),
+                    self.globe_mask,
+                )
+            else:
+                self.vehicle_icon_overlay_rgba = np.zeros_like(self.globe_rgba)
             if defer_vector_overlays:
                 self.vector_overlay_cache_deferred += 1
                 self.hydrology_dirty = True
@@ -13698,6 +13761,7 @@ class HybridRenderController:
         self.frame_rgba = alpha_compose(self.frame_rgba, self.boundary_overlay_rgba)
         self.frame_rgba = alpha_compose(self.frame_rgba, self.overlay_rgba)
         self.frame_rgba = self.compose_runtime_overlay(self.frame_rgba, "aircraft", self.aircraft_overlay_rgba)
+        self.frame_rgba = self.compose_runtime_overlay(self.frame_rgba, "vehicle_icons", self.vehicle_icon_overlay_rgba)
         self.frame_rgba = self.compose_runtime_overlay(self.frame_rgba, "pins", self.pin_overlay_rgba)
         self.frame_rgba = apply_style_profile(self.frame_rgba, getattr(self.args, "style_profile", "scientific"))
         self.last_render_ms = (time.time() - start) * 1000.0
@@ -15431,9 +15495,9 @@ def renderer_capabilities_packet() -> dict[str, object]:
             "ack_schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
             "runtime_layer_aliases": dict(LAYER_RUNTIME_ID_ALIASES),
             "applies": ["visibility", "lock_guard_visibility", "opacity", "blend_mode_overlay"],
-            "runtime_overlay_opacity_layers": ["aircraft", "pins"],
-            "runtime_overlay_blend_layers": ["lakes", "rivers", "aircraft", "pins"],
-            "pending": ["blend_mode_boundary_aggregate", "blend_mode_vehicle_icons"],
+            "runtime_overlay_opacity_layers": ["aircraft", "pins", "vehicle_icons"],
+            "runtime_overlay_blend_layers": ["lakes", "rivers", "aircraft", "pins", "vehicle_icons"],
+            "pending": ["blend_mode_boundary_aggregate"],
         },
         "rrkal_boundary": {
             "displaytools_owns": [
