@@ -3046,3 +3046,16 @@ Decision:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Pin coordinate source metadata
+
+Scope:
+- Qt Pin records now store `coordinate_source` and `coordinate_source_label` for manual lat/lon, renderer globe raycast and Qt canvas estimate placements.
+- Pin tool summary now shows the active coordinate source separately from the live cursor fill availability.
+- Pin list rows now include a source summary so saved research markers can be audited without opening JSON.
+
+Decision:
+- Researchers need provenance for how a Pin coordinate was produced, especially when cursor raycast and fallback estimates are both available.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

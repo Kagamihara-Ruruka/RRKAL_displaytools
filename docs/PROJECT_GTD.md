@@ -167,3 +167,4 @@ Last updated: 2026-05-29
 - 2026-05-30: Added Boundary emphasis control preservation to timeline keyframes and renderer timeline ack contracts.
 - 2026-05-30: Added Boundary target summaries to Timeline keyframe list rows.
 - 2026-05-30: Added fixed Pin cursor fill source status row in the Qt Pin panel.
+- 2026-05-30: Added Pin coordinate source metadata and list-row source summaries.

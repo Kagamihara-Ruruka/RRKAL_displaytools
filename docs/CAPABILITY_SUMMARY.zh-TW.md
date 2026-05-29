@@ -258,3 +258,8 @@
 
 - Pin Annotation now exposes a fixed Cursor Fill status row with renderer-raycast vs Qt-estimate source text.
 - Cursor fill status refreshes after coordinate fill and remains mirrored in the tool palette summary.
+
+### 2026-05-30 Pin coordinate source metadata
+
+- Pin records now capture coordinate source metadata for manual entry, renderer globe raycast and Qt canvas estimate fallback.
+- Pin list rows display the coordinate source for quick research review.

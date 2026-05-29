@@ -1981,6 +1981,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.pin_pick_history: list[str] = []
         self.pin_pick_history_signature: str | None = None
         self.selected_pin_id: str | None = None
+        self.pin_coordinate_source = "manual_lat_lon"
         self.research_pins: list[dict[str, object]] = []
         self.canvas_preview_label: QtWidgets.QLabel | None = None
         self.canvas_meta_label: QtWidgets.QLabel | None = None
@@ -2674,6 +2675,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.pin_note_edit.textChanged.connect(lambda _text, self=self: self.refresh_tool_target())
         self.pin_lat_edit.textChanged.connect(lambda _text, self=self: self.refresh_tool_target())
         self.pin_lon_edit.textChanged.connect(lambda _text, self=self: self.refresh_tool_target())
+        self.pin_lat_edit.textChanged.connect(lambda _text, self=self: self.mark_pin_coordinate_manual())
+        self.pin_lon_edit.textChanged.connect(lambda _text, self=self: self.mark_pin_coordinate_manual())
         self.pin_priority_spin.valueChanged.connect(lambda _value, self=self: self.refresh_tool_target())
         self.pin_label_mode_combo.currentIndexChanged.connect(lambda _value, self=self: self.refresh_tool_target())
         self.pin_label_min_priority_spin.valueChanged.connect(lambda _value, self=self: self.refresh_tool_target())
@@ -4075,7 +4078,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 "latitude": self.pin_lat_edit.text().strip() if self.pin_lat_edit is not None else "",
                 "longitude": self.pin_lon_edit.text().strip() if self.pin_lon_edit is not None else "",
                 "label_priority": self.pin_priority_spin.value() if self.pin_priority_spin is not None else 50,
-                "placement": "manual_lat_lon",
+                "placement": self.pin_coordinate_source,
+                "coordinate_source": self.pin_coordinate_source,
+                "coordinate_source_label": self.pin_coordinate_source_label(),
             },
             "renderer_sync": "planned",
             "cursor_fill_priority": "renderer_cursor_geodesy_state_then_ui_estimate",
@@ -6092,6 +6097,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"Active tool: {tool_label}\n"
             f"Target layer: {layer_label}\n"
             f"Pin: {self.collect_tool_state()['pin']['type']} / {self.collect_tool_state()['pin']['label']}\n"
+            f"Pin coordinate source: {self.pin_coordinate_source_label()}\n"
             f"Labels: {self.current_pin_label_mode()} >= {self.pin_label_min_priority_spin.value() if self.pin_label_min_priority_spin is not None else 50}\n"
             f"Pin cursor fill: {cursor_fill_text}"
         )
@@ -6124,7 +6130,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "longitude": longitude,
             "label_priority": self.pin_priority_spin.value() if self.pin_priority_spin is not None else 50,
             "target_layer": self.selected_layer_key,
-            "placement": "manual_lat_lon",
+            "placement": self.pin_coordinate_source,
+            "coordinate_source": self.pin_coordinate_source,
+            "coordinate_source_label": self.pin_coordinate_source_label(),
         }
         self.research_pins.append(pin)
         self.selected_pin_id = str(pin["id"])
@@ -6154,14 +6162,27 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             return f"Qt canvas estimate fallback (lat={self.cursor_latitude:.4f}, lon={self.cursor_longitude:.4f})"
         return "waiting for renderer or Qt cursor"
 
+    def pin_coordinate_source_label(self, source: str | None = None) -> str:
+        source_key = source or self.pin_coordinate_source
+        return {
+            "manual_lat_lon": "Manual lat/lon",
+            "renderer_globe_raycast": "Renderer globe raycast",
+            "qt_canvas_estimate": "Qt canvas estimate",
+        }.get(source_key, str(source_key))
+
+    def mark_pin_coordinate_manual(self) -> None:
+        self.pin_coordinate_source = "manual_lat_lon"
+
     def fill_pin_from_cursor(self) -> None:
         renderer_lat_lon = self.renderer_cursor_geodesy_lat_lon()
         if renderer_lat_lon is not None:
             latitude, longitude = renderer_lat_lon
             source = "renderer globe raycast"
+            source_key = "renderer_globe_raycast"
         elif self.cursor_latitude is not None and self.cursor_longitude is not None:
             latitude, longitude = self.cursor_latitude, self.cursor_longitude
             source = "Qt canvas estimate"
+            source_key = "qt_canvas_estimate"
         else:
             self.status.setText("尚未偵測到 Canvas 游標經緯度")
             return
@@ -6169,6 +6190,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.pin_lat_edit.setText(f"{latitude:.6f}")
         if self.pin_lon_edit is not None:
             self.pin_lon_edit.setText(f"{longitude:.6f}")
+        self.pin_coordinate_source = source_key
         self.refresh_tool_target()
         self.status.setText(
             f"已用游標位置填入 Pin：lat={latitude:.6f}, lon={longitude:.6f} ({source})"
@@ -6229,6 +6251,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.pin_lon_edit.setText(str(pin["longitude"]))
         if self.pin_priority_spin is not None and isinstance(pin.get("label_priority"), int):
             self.pin_priority_spin.setValue(max(0, min(100, int(pin["label_priority"]))))
+        source = pin.get("coordinate_source") or pin.get("placement")
+        if isinstance(source, str):
+            self.pin_coordinate_source = source
+            self.refresh_tool_target()
 
     def refresh_pin_list(self) -> None:
         if self.pin_list is None:
@@ -6239,9 +6265,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         for index, pin in enumerate(self.research_pins):
             selected = pin.get("id") == self.selected_pin_id
             prefix = "* " if selected else "  "
+            source_label = self.pin_coordinate_source_label(str(pin.get("coordinate_source") or pin.get("placement") or "manual_lat_lon"))
             self.pin_list.addItem(
                 f"{prefix}{pin.get('id')} | P{pin.get('label_priority', 50)} | {pin.get('type')} | {pin.get('label')} "
-                f"({pin.get('latitude')}, {pin.get('longitude')})"
+                f"({pin.get('latitude')}, {pin.get('longitude')}) | source={source_label}"
             )
             if selected:
                 selected_row = index
