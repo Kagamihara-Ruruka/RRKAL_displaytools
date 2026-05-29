@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Clone quickstart handoff inspection
+
+Scope:
+- Rewrote `docs/QUICKSTART_CLONE.zh-TW.md` as clean zh-TW quickstart text.
+- Added `scripts\inspect_handoff.ps1` as the first cross-machine contract inspection step before smoke/Qt launch.
+- Clarified runtime artifacts and RRKAL/displaytools boundaries for cloned workstations.
+
+Positioning:
+- This makes the clone-to-Qt path readable and reduces startup ambiguity on another Windows machine.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Handoff inspection script
 
 Scope:
