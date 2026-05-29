@@ -105,6 +105,7 @@ Core docs:
 - `docs/PROFILE_SCHEMA.zh-TW.md`
 - `docs/SETUP_WINDOWS.zh-TW.md`
 - `docs/RRKAL_HANDOFF_CONTRACT.zh-TW.md`
+- `docs/CAPABILITY_SUMMARY.zh-TW.md`
 - `docs/DEVELOPMENT_LOG.zh-TW.md`
 
 Notes:

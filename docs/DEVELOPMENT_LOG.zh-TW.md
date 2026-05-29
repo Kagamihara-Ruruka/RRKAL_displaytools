@@ -460,3 +460,15 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Capability summary documentation
+
+Scope:
+- Added `docs/CAPABILITY_SUMMARY.zh-TW.md`.
+- Updated docs index and README to reference the current capability summary.
+
+Positioning:
+- This supports the user rule that every push should include a current capability explanation.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
