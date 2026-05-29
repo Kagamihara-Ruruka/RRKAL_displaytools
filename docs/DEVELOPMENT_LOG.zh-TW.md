@@ -1,5 +1,16 @@
 ﻿# Development Log
 
+## 2026-05-29 - Shared profile schema validator
+
+Scope:
+- Added `profile_schema.py` as the shared profile schema validation module.
+- Updated Qt panel profile loading and `scripts/validate_profiles.py` to use the shared validator.
+
+Positioning:
+- This reduces drift between UI profile loading and smoke-time template validation.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 ## 2026-05-29 - Qt profile load validation
 
 Scope:
@@ -367,6 +378,7 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 
 
 
