@@ -8,6 +8,7 @@ governance; this file is only a displaytools control surface.
 
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
@@ -66,7 +67,7 @@ LAYER_LABELS = (
 
 
 class DisplayToolsQtPanel(QtWidgets.QMainWindow):
-    def __init__(self) -> None:
+    def __init__(self, initial_profile: Path | None = None) -> None:
         super().__init__()
         self.setWindowTitle("RRKAL DisplayTools Qt 控制面板")
         self.resize(1120, 780)
@@ -80,6 +81,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.process_timer.start()
         self.apply_baseline()
         self.refresh_template_list()
+        if initial_profile is not None:
+            self.load_profile_path(initial_profile)
         self.refresh_command_preview()
 
     def _build_ui(self) -> None:
@@ -340,6 +343,17 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                     self.checks[key].setChecked(bool(value))
         self.refresh_command_preview()
 
+    def load_profile_path(self, path: Path) -> None:
+        if not path.exists():
+            self.status.setText(f"找不到配置：{path}")
+            return
+        profile = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(profile, dict):
+            self.status.setText("配置格式錯誤：root 不是 JSON object")
+            return
+        self.apply_profile(profile)
+        self.status.setText(f"已載入配置：{path}")
+
     @QtCore.pyqtSlot()
     def refresh_template_list(self) -> None:
         PROFILE_TEMPLATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -418,12 +432,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         )
         if not path:
             return
-        profile = json.loads(Path(path).read_text(encoding="utf-8"))
-        if not isinstance(profile, dict):
-            self.status.setText("配置格式錯誤：root 不是 JSON object")
-            return
-        self.apply_profile(profile)
-        self.status.setText(f"已載入配置：{path}")
+        self.load_profile_path(Path(path))
 
     @QtCore.pyqtSlot()
     def launch_renderer(self) -> None:
@@ -563,9 +572,16 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.topo_step_edit.setText("64")
 
 
-def main() -> None:
-    app = QtWidgets.QApplication(sys.argv)
-    panel = DisplayToolsQtPanel()
+def build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="RRKAL_displaytools Qt operator panel")
+    parser.add_argument("--profile", type=Path, help="Load a panel profile JSON on startup")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> None:
+    args = build_arg_parser().parse_args(argv)
+    app = QtWidgets.QApplication([sys.argv[0]])
+    panel = DisplayToolsQtPanel(initial_profile=args.profile)
     panel.show()
     raise SystemExit(app.exec())
 

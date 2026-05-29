@@ -1,5 +1,18 @@
 ﻿# Development Log
 
+## 2026-05-29 - Qt panel startup profile loading
+
+Scope:
+- Added `--profile` to `rrkal_displaytools_qt_panel.py` so a JSON profile can be loaded on startup.
+- Added `-Profile` passthrough to `scripts/run_qt_panel.ps1`.
+- Updated README with a shared-template startup example.
+
+Positioning:
+- This improves cross-machine reproducibility of layer/UI launch state.
+
+Validation:
+- Smoke passed before commit: `py -3 -m py_compile rrkal_displaytools_qt_panel.py taichi_global_bathymetry.py`.
+- Smoke passed before commit: PowerShell parser check for `scripts/setup_windows.ps1` and `scripts/run_qt_panel.ps1`.
 ## 2026-05-29 - Qt panel grouped layer quick actions
 
 Scope:
@@ -145,4 +158,5 @@ Validation:
 Next round rule:
 - Before any new development round, inspect current repo state.
 - After each round, update this log and commit before continuing.
+
 

@@ -26,6 +26,11 @@ py -3 -m pip install -r requirements.txt
 py -3 rrkal_displaytools_qt_panel.py
 ```
 
+Open the panel with a shared template already loaded:
+```powershell
+.\scripts\run_qt_panel.ps1 -Profile .\profiles\maritime_hydrology.json
+```
+
 Direct renderer launch:
 ```powershell
 py -3 taichi_global_bathymetry.py --style-profile scientific --topo-source gebco --topo-step 48 --data-mode static
