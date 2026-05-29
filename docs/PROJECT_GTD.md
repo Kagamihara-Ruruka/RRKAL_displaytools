@@ -36,6 +36,7 @@ Last updated: 2026-05-29
 
 ## Done
 
+- 2026-05-29: Added layer runtime evidence schema to connect renderer ack results with the layer capability matrix.
 - 2026-05-29: Added layer capability matrix to read-only handoff inspection for cross-machine clone checks.
 - 2026-05-29: Added layer capability matrix contract for Qt/No-GUI/renderer capability discovery and active layer UI diagnostics.
 - 2026-05-29: Added Qt/No-GUI Timeline export options controls and profile schema support for export-on-launch, GIF, and MP4.

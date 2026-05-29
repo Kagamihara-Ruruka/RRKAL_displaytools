@@ -1,5 +1,19 @@
 # Development Log
 
+## 2026-05-29 - Layer capability runtime evidence
+
+Scope:
+- Added `rrkal_displaytools.layer_runtime_evidence.v1` under the layer capability matrix.
+- Qt layer capability matrix now summarizes the latest renderer layer runtime ack: changed visibility/opacity/blend counts, skipped locked layers, selected renderer target, frame, event, and error state.
+- No-GUI launch packets and renderer capability discovery explicitly report runtime evidence as unavailable instead of implying that static capability discovery saw a renderer ack.
+- Smoke now gates the runtime evidence schema.
+
+Positioning:
+- This connects declared layer capabilities to the most recent renderer response, making layer controls easier to trust during scientific review.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Handoff inspection layer capabilities
 
 Scope:

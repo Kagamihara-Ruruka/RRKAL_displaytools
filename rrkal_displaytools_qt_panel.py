@@ -212,8 +212,85 @@ def layer_capability_packet(key: str, label: str | None = None) -> dict[str, obj
     }
 
 
-def layer_capability_matrix_packet(source: str, selected_layer: str | None = None) -> dict[str, object]:
+def layer_runtime_evidence_packet(payload: dict[str, object] | None) -> dict[str, object]:
+    if not isinstance(payload, dict):
+        return {
+            "schema": "rrkal_displaytools.layer_runtime_evidence.v1",
+            "available": False,
+            "ack_schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
+            "event": None,
+            "updated_at_utc": None,
+            "frame_index": None,
+            "error": None,
+            "selected_renderer_layer": None,
+            "changed_layers": [],
+            "changed_opacity_layers": [],
+            "changed_blend_layers": [],
+            "skipped_locked_layers": [],
+            "counts": {
+                "changed_visibility": 0,
+                "changed_opacity": 0,
+                "changed_blend": 0,
+                "skipped_locked": 0,
+            },
+            "boundary": "No renderer ack has been observed yet; capability matrix is static only.",
+        }
+    changed_layers = [str(layer) for layer in payload.get("changed_layers", []) if layer is not None] if isinstance(payload.get("changed_layers"), list) else []
+    changed_opacity_layers = [str(layer) for layer in payload.get("changed_opacity_layers", []) if layer is not None] if isinstance(payload.get("changed_opacity_layers"), list) else []
+    changed_blend_layers = [str(layer) for layer in payload.get("changed_blend_layers", []) if layer is not None] if isinstance(payload.get("changed_blend_layers"), list) else []
+    skipped_locked_layers = [str(layer) for layer in payload.get("skipped_locked_layers", []) if layer is not None] if isinstance(payload.get("skipped_locked_layers"), list) else []
+    return {
+        "schema": "rrkal_displaytools.layer_runtime_evidence.v1",
+        "available": True,
+        "ack_schema": str(payload.get("schema") or "rrkal_displaytools.renderer_layer_runtime_ack.v1"),
+        "event": payload.get("event"),
+        "updated_at_utc": payload.get("updated_at_utc"),
+        "frame_index": payload.get("frame_index"),
+        "error": payload.get("error"),
+        "selected_renderer_layer": payload.get("selected_renderer_layer"),
+        "changed_layers": changed_layers,
+        "changed_opacity_layers": changed_opacity_layers,
+        "changed_blend_layers": changed_blend_layers,
+        "skipped_locked_layers": skipped_locked_layers,
+        "counts": {
+            "changed_visibility": len(changed_layers),
+            "changed_opacity": len(changed_opacity_layers),
+            "changed_blend": len(changed_blend_layers),
+            "skipped_locked": len(skipped_locked_layers),
+        },
+        "boundary": "Renderer ack evidence for the most recent layer runtime bridge apply.",
+    }
+
+
+def layer_capability_matrix_packet(
+    source: str,
+    selected_layer: str | None = None,
+    runtime_ack: dict[str, object] | None = None,
+) -> dict[str, object]:
+    runtime_evidence = layer_runtime_evidence_packet(runtime_ack)
     layers = [layer_capability_packet(key, label) for key, label in LAYER_LABELS]
+    for layer in layers:
+        renderer_target = str(layer.get("renderer_target") or "")
+        runtime_status = []
+        if runtime_evidence["available"] is False:
+            runtime_status.append("no_ack")
+        elif runtime_evidence.get("error"):
+            runtime_status.append("ack_error")
+        else:
+            if renderer_target in runtime_evidence["changed_layers"]:
+                runtime_status.append("visibility_changed")
+            if renderer_target in runtime_evidence["changed_opacity_layers"]:
+                runtime_status.append("opacity_changed")
+            if renderer_target in runtime_evidence["changed_blend_layers"]:
+                runtime_status.append("blend_changed")
+            if renderer_target in runtime_evidence["skipped_locked_layers"]:
+                runtime_status.append("skipped_locked")
+            if runtime_evidence.get("selected_renderer_layer") == renderer_target:
+                runtime_status.append("selected_target")
+            if not runtime_status:
+                runtime_status.append("no_recent_change")
+        layer["runtime_evidence_available"] = bool(runtime_evidence["available"])
+        layer["runtime_status"] = runtime_status
     counts = {
         "visibility": sum(1 for layer in layers if layer["visibility_live"]),
         "opacity": sum(1 for layer in layers if layer["opacity_live"]),
@@ -226,6 +303,7 @@ def layer_capability_matrix_packet(source: str, selected_layer: str | None = Non
         "source": source,
         "layer_count": len(layers),
         "live_counts": counts,
+        "runtime_evidence": runtime_evidence,
         "selected_layer": selected_layer,
         "selected_layer_capabilities": selected,
         "layers": layers,
@@ -1662,7 +1740,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         return str(layer_capability_packet(key).get("renderer_sync", "planned"))
 
     def collect_layer_capability_matrix(self) -> dict[str, object]:
-        return layer_capability_matrix_packet("rrkal_displaytools_qt_panel", self.selected_layer_key)
+        runtime_ack = self.layer_runtime_ack_payload if isinstance(self.layer_runtime_ack_payload, dict) else None
+        return layer_capability_matrix_packet("rrkal_displaytools_qt_panel", self.selected_layer_key, runtime_ack)
 
     def collect_layer_runtime_state(self) -> dict[str, object]:
         layers = self.collect_layer_stack_ui()
@@ -3631,8 +3710,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_property_labels["locked"].setText("Locked" if self.layer_locks[key].isChecked() else "Unlocked")
         self.layer_property_labels["opacity"].setText(f"{self.layer_opacity[key].value()}%")
         self.layer_property_labels["blend"].setText(self.layer_blends[key].currentText())
-        capabilities = layer_capability_packet(key, label)
-        self.layer_property_labels["capabilities"].setText(", ".join(capabilities["live_controls"]) or "planned")
+        matrix = self.collect_layer_capability_matrix()
+        capabilities = matrix.get("selected_layer_capabilities")
+        capabilities = capabilities if isinstance(capabilities, dict) else layer_capability_packet(key, label)
+        live_text = ", ".join(capabilities.get("live_controls", [])) or "planned"
+        runtime_text = ", ".join(capabilities.get("runtime_status", [])) or "no_ack"
+        self.layer_property_labels["capabilities"].setText(f"{live_text}; runtime={runtime_text}")
         renderer_target = LAYER_RUNTIME_ID_ALIASES.get(key, "-")
         self.layer_property_labels["renderer_target"].setText(str(renderer_target))
         self.layer_property_labels["diagnostics"].setText(self.layer_diagnostics_text(str(renderer_target)))
@@ -3690,8 +3773,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "selected_layer": key,
             "label": label,
             "renderer_target": renderer_target,
-            "capabilities": layer_capability_packet(key, label) if key is not None else None,
+            "capabilities": self.collect_layer_capability_matrix().get("selected_layer_capabilities") if key is not None else None,
             "layer_capability_matrix_schema": "rrkal_displaytools.layer_capability_matrix.v1",
+            "layer_runtime_evidence_schema": "rrkal_displaytools.layer_runtime_evidence.v1",
             "diagnostics_text": diagnostics_text,
             "runtime_ack_file": str(LAYER_RUNTIME_ACK_PATH),
             "runtime_ack": self.layer_runtime_ack_payload,
@@ -4211,6 +4295,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "active_layer": self.selected_layer_key,
             "layer_filter": self.collect_layer_filter_state(),
             "layer_group_view": self.collect_layer_group_view_state(),
+            "layer_capability_matrix": self.collect_layer_capability_matrix(),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),

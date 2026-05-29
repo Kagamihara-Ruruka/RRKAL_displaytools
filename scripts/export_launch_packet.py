@@ -317,6 +317,7 @@ def active_layer_diagnostics_packet(profile: dict[str, object]) -> dict[str, obj
         "renderer_target": renderer_target,
         "capabilities": layer_capability_packet(selected_layer, selected_label) if selected_layer else None,
         "layer_capability_matrix_schema": "rrkal_displaytools.layer_capability_matrix.v1",
+        "layer_runtime_evidence_schema": "rrkal_displaytools.layer_runtime_evidence.v1",
         "diagnostics_text": "no runtime ack/pick in no-GUI export",
         "runtime_ack_file": "state/renderer_layer_runtime_ack.json",
         "runtime_ack": None,
@@ -350,6 +351,30 @@ def layer_capability_packet(key: str, label: str | None = None) -> dict[str, obj
 
 def layer_capability_matrix_packet(source: str, selected_layer: str | None = None) -> dict[str, object]:
     layers = [layer_capability_packet(key, label) for key, label in LAYER_LABELS]
+    runtime_evidence = {
+        "schema": "rrkal_displaytools.layer_runtime_evidence.v1",
+        "available": False,
+        "ack_schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
+        "event": None,
+        "updated_at_utc": None,
+        "frame_index": None,
+        "error": None,
+        "selected_renderer_layer": None,
+        "changed_layers": [],
+        "changed_opacity_layers": [],
+        "changed_blend_layers": [],
+        "skipped_locked_layers": [],
+        "counts": {
+            "changed_visibility": 0,
+            "changed_opacity": 0,
+            "changed_blend": 0,
+            "skipped_locked": 0,
+        },
+        "boundary": "No-GUI launch packets do not include runtime renderer ack evidence.",
+    }
+    for layer in layers:
+        layer["runtime_evidence_available"] = False
+        layer["runtime_status"] = ["no_ack"]
     counts = {
         "visibility": sum(1 for layer in layers if layer["visibility_live"]),
         "opacity": sum(1 for layer in layers if layer["opacity_live"]),
@@ -362,6 +387,7 @@ def layer_capability_matrix_packet(source: str, selected_layer: str | None = Non
         "source": source,
         "layer_count": len(layers),
         "live_counts": counts,
+        "runtime_evidence": runtime_evidence,
         "selected_layer": selected_layer,
         "selected_layer_capabilities": selected,
         "layers": layers,

@@ -17561,6 +17561,8 @@ def layer_capability_matrix_packet() -> dict[str, object]:
                 "pick_live": key in pick_live,
                 "live_controls": live,
                 "renderer_sync": f"live: {', '.join(live)}" if live else "planned",
+                "runtime_evidence_available": False,
+                "runtime_status": ["no_ack"],
             }
         )
     return {
@@ -17572,6 +17574,27 @@ def layer_capability_matrix_packet() -> dict[str, object]:
             "opacity": sum(1 for layer in layers if layer["opacity_live"]),
             "blend": sum(1 for layer in layers if layer["blend_live"]),
             "selected_layer_pick": sum(1 for layer in layers if layer["pick_live"]),
+        },
+        "runtime_evidence": {
+            "schema": "rrkal_displaytools.layer_runtime_evidence.v1",
+            "available": False,
+            "ack_schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
+            "event": None,
+            "updated_at_utc": None,
+            "frame_index": None,
+            "error": None,
+            "selected_renderer_layer": None,
+            "changed_layers": [],
+            "changed_opacity_layers": [],
+            "changed_blend_layers": [],
+            "skipped_locked_layers": [],
+            "counts": {
+                "changed_visibility": 0,
+                "changed_opacity": 0,
+                "changed_blend": 0,
+                "skipped_locked": 0,
+            },
+            "boundary": "Renderer capability discovery is static; runtime ack evidence appears in Qt layer capability matrix after renderer launch.",
         },
         "selected_layer": None,
         "selected_layer_capabilities": None,
