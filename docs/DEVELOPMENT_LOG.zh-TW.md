@@ -230,6 +230,20 @@ Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
 
+## 2026-05-30 - Qt Style routes JSON action
+
+Scope:
+- Added a `Style routes` action button to the Qt Actions panel.
+- The action renders `style_renderer_entries` and `style_profile_renderer_routes` together in the command/JSON preview pane.
+- Closed-loop evidence now includes the Qt action, and smoke verifies the button plus `show_style_renderer_routes` handler.
+
+Decision:
+- Parchment and tactical renderer routes should be visible from the primary Qt UI, not only from no-GUI packets or handoff inspection.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+
 ## 2026-05-30 - Qt Hydrology LOD JSON action
 
 Scope:

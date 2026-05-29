@@ -2580,6 +2580,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         profile_replay_button = QtWidgets.QPushButton("Profile replay")
         ocean_port_button = QtWidgets.QPushButton("Ocean port")
         hydro_lod_button = QtWidgets.QPushButton("Hydro LOD")
+        style_routes_button = QtWidgets.QPushButton("Style routes")
         capabilities_button = QtWidgets.QPushButton("Renderer 能力")
         closed_loop_button = QtWidgets.QPushButton("閉環狀態")
         layer_manifest_button = QtWidgets.QPushButton("圖層 manifest")
@@ -2601,6 +2602,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         profile_replay_button.clicked.connect(self.show_profile_ui_state_replay)
         ocean_port_button.clicked.connect(self.show_ocean_material_control_port)
         hydro_lod_button.clicked.connect(self.show_hydrology_lod_status)
+        style_routes_button.clicked.connect(self.show_style_renderer_routes)
         capabilities_button.clicked.connect(self.show_renderer_capabilities)
         closed_loop_button.clicked.connect(self.show_closed_loop_status)
         layer_manifest_button.clicked.connect(self.show_layer_manifest)
@@ -2623,6 +2625,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             profile_replay_button,
             ocean_port_button,
             hydro_lod_button,
+            style_routes_button,
             capabilities_button,
             closed_loop_button,
             layer_manifest_button,
@@ -6946,6 +6949,19 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             )
         )
         self.status.setText("已顯示 hydrology / LOD hook JSON")
+
+    def show_style_renderer_routes(self) -> None:
+        self.command_text.setPlainText(
+            json.dumps(
+                {
+                    "style_renderer_entries": self.collect_style_renderer_entries(),
+                    "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        self.status.setText("已顯示 style profile renderer routes JSON")
 
     def show_pin_pick_state(self) -> None:
         try:

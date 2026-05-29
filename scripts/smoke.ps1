@@ -1665,6 +1665,12 @@ if ($qtPanelSource -notlike "*show_hydrology_lod_status*") {
 if ($qtPanelSource -notlike "*Hydro LOD*") {
     throw "Qt Hydro LOD action button is missing"
 }
+if ($qtPanelSource -notlike "*show_style_renderer_routes*") {
+    throw "Qt style renderer routes JSON action is missing"
+}
+if ($qtPanelSource -notlike "*Style routes*") {
+    throw "Qt Style routes action button is missing"
+}
 if ($qtPanelSource -notlike "*saved_state_groups*") {
     throw "Qt profile UI state replay saved groups are missing"
 }

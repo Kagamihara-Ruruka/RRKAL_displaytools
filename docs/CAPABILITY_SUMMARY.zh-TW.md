@@ -379,3 +379,8 @@
 
 - Qt Actions now includes `Hydro LOD`, which displays `hydrology_lod_readiness` and `hydrology_lod_runtime_evidence` together in the JSON preview pane.
 - This makes lake/river layer contracts, renderer targets, runtime ack files, pick-state files and LOD hook readiness inspectable from the primary Qt UI.
+
+### 2026-05-30 Qt Style routes JSON action
+
+- Qt Actions now includes `Style routes`, which displays `style_renderer_entries` and `style_profile_renderer_routes` together in the JSON preview pane.
+- Parchment and tactical renderer routes are now inspectable from Qt in addition to launch packets, renderer capabilities and handoff inspection.
