@@ -938,3 +938,18 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Layer runtime diagnostics UI
+
+Scope:
+- Added a Layers panel runtime bridge status label.
+- The label shows `renderer_layer_runtime_state.json`, selected layer, visible count, last write time, and pending opacity/blend/lock status.
+- Added `顯示 layer runtime JSON` to display the current runtime bridge payload in the central text area.
+- Research provenance now records the layer runtime bridge last write time and write error status.
+
+Positioning:
+- This makes renderer-backed layer visibility sync inspectable from Qt instead of requiring users to manually find files in `state/`.
+- The next step is applying opacity, blend mode, and lock semantics from the same runtime bridge.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

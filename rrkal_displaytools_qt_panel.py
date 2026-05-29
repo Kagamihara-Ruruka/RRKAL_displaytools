@@ -129,6 +129,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_rows: dict[str, QtWidgets.QWidget] = {}
         self.layer_property_labels: dict[str, QtWidgets.QLabel] = {}
         self.layer_visibility_snapshot: dict[str, bool] | None = None
+        self.layer_runtime_state_label: QtWidgets.QLabel | None = None
+        self.layer_runtime_state_last_write_utc: str | None = None
+        self.layer_runtime_state_write_error: str | None = None
         self.selected_layer_key: str | None = None
         self.active_tool = "move"
         self.tool_buttons: dict[str, QtWidgets.QToolButton] = {}
@@ -354,6 +357,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_stack_note = QtWidgets.QLabel("🚧 Lock / Opacity / Blend 目前是 UI state，下一步接 renderer 即時同步。")
         self.layer_stack_note.setWordWrap(True)
         layers_layout.addWidget(self.layer_stack_note)
+        self.layer_runtime_state_label = QtWidgets.QLabel(f"Layer runtime bridge: waiting for {LAYER_RUNTIME_STATE_PATH.name}")
+        self.layer_runtime_state_label.setWordWrap(True)
+        layers_layout.addWidget(self.layer_runtime_state_label)
         demo = QtWidgets.QCheckBox("閉環展示 preset（會覆蓋部分設定）")
         demo.stateChanged.connect(self.refresh_command_preview)
         self.checks["demo_closed_loop"] = demo
@@ -365,6 +371,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             ("輔助開/關", self.toggle_visual_aids),
             ("Solo 選取圖層", self.solo_selected_layer_visibility),
             ("還原 Solo 前可見性", self.restore_layer_visibility_snapshot),
+            ("顯示 layer runtime JSON", self.show_layer_runtime_state),
             ("重設 UI 圖層狀態", self.reset_layer_stack_controls),
         )
         layer_actions_layout = QtWidgets.QGridLayout()
@@ -965,14 +972,40 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     def write_layer_runtime_state(self) -> None:
         if not self.checks:
             return
+        payload = self.collect_layer_runtime_state()
         try:
             LAYER_RUNTIME_STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
             LAYER_RUNTIME_STATE_PATH.write_text(
-                json.dumps(self.collect_layer_runtime_state(), ensure_ascii=False, indent=2),
+                json.dumps(payload, ensure_ascii=False, indent=2),
                 encoding="utf-8",
             )
+            self.layer_runtime_state_last_write_utc = str(payload.get("updated_at_utc", ""))
+            self.layer_runtime_state_write_error = None
+            self.refresh_layer_runtime_state_label(payload)
         except OSError as exc:
+            self.layer_runtime_state_write_error = str(exc)
+            self.refresh_layer_runtime_state_label(payload)
             print(f"Unable to write layer runtime state: {exc}")
+
+    def refresh_layer_runtime_state_label(self, payload: dict[str, object] | None = None) -> None:
+        if self.layer_runtime_state_label is None:
+            return
+        if payload is None:
+            payload = self.collect_layer_runtime_state()
+        visible_layers = payload.get("visible_layers", [])
+        visible_count = len(visible_layers) if isinstance(visible_layers, list) else "-"
+        selected_layer = str(payload.get("selected_layer") or "-")
+        if self.layer_runtime_state_write_error:
+            self.layer_runtime_state_label.setText(
+                f"Layer runtime bridge: write failed: {self.layer_runtime_state_write_error}"
+            )
+            return
+        last_write = self.layer_runtime_state_last_write_utc or str(payload.get("updated_at_utc", "-"))
+        self.layer_runtime_state_label.setText(
+            f"Layer runtime bridge: {LAYER_RUNTIME_STATE_PATH.name}; selected={selected_layer}; "
+            f"visible={visible_count}/{len(LAYER_LABELS)}; last_write={last_write}; "
+            "visibility live, opacity/blend/lock pending"
+        )
 
     def current_pin_label_mode(self) -> str:
         if self.pin_label_mode_combo is None:
@@ -1552,6 +1585,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "pin_pick_state_file": str(PIN_PICK_STATE_PATH),
             "pin_pick_state_last_event": self.pin_pick_state_last_event,
             "layer_runtime_state_file": str(LAYER_RUNTIME_STATE_PATH),
+            "layer_runtime_state_last_write_utc": self.layer_runtime_state_last_write_utc,
+            "layer_runtime_state_write_error": self.layer_runtime_state_write_error,
             "canvas_select_hit_targets": self.canvas_layer_hit_keys(),
             "pin_overlay_boundary": "Pins are geodetic annotations; renderer sync must rotate them with the globe and apply horizon/depth occlusion.",
             "pin_projection_contract": pin_projection_contract_packet(),
@@ -1576,6 +1611,15 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         QtWidgets.QApplication.clipboard().setText(self.build_research_provenance())
         if hasattr(self, "status"):
             self.status.setText("已複製科研可重現性摘要")
+
+    def show_layer_runtime_state(self) -> None:
+        self.write_layer_runtime_state()
+        try:
+            text = LAYER_RUNTIME_STATE_PATH.read_text(encoding="utf-8")
+        except OSError:
+            text = json.dumps(self.collect_layer_runtime_state(), ensure_ascii=False, indent=2)
+        self.command_text.setPlainText(text)
+        self.status.setText(f"已顯示 layer runtime state JSON：{LAYER_RUNTIME_STATE_PATH}")
 
     def toggle_selected_layer_visibility(self) -> None:
         key = self.selected_layer_key
