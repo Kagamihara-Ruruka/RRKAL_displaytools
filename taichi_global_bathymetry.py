@@ -2735,7 +2735,7 @@ def timeline_ack_payload_from_state_file(timeline_state_file: str | Path | None)
         "playback_mode": playback.get("mode"),
         "playback_readiness": timeline_playback_readiness_packet(),
         "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
-        "segment_state": timeline_segment_state_packet(runtime_keyframes),
+        "segment_state": timeline_segment_state_packet(runtime_keyframes, active_step_state.get("active_index")),
         "active_step_state": active_step_state,
         "first_keyframe_apply": timeline_first_keyframe_apply_preview_packet(
             runtime_keyframes,
@@ -2816,21 +2816,29 @@ def timeline_playback_plan_packet(keyframes: list[object] | None = None) -> dict
     }
 
 
-def timeline_segment_state_packet(keyframes: list[object] | None = None) -> dict[str, object]:
+def timeline_segment_state_packet(
+    keyframes: list[object] | None = None,
+    active_index: int | None = 0,
+) -> dict[str, object]:
     keyframes = [keyframe for keyframe in keyframes if isinstance(keyframe, dict)] if isinstance(keyframes, list) else []
+    segment_index = 0
+    if len(keyframes) >= 2 and isinstance(active_index, int):
+        segment_index = max(0, min(active_index, len(keyframes) - 2))
     active_segment = None
     if len(keyframes) >= 2:
         active_segment = {
-            "from_index": 0,
-            "to_index": 1,
-            "from_keyframe_id": str(keyframes[0].get("id", "")),
-            "to_keyframe_id": str(keyframes[1].get("id", "")),
+            "from_index": segment_index,
+            "to_index": segment_index + 1,
+            "from_keyframe_id": str(keyframes[segment_index].get("id", "")),
+            "to_keyframe_id": str(keyframes[segment_index + 1].get("id", "")),
             "interpolatable_fields": ["ocean_material"],
             "discrete_fields": ["style_profile", "layer_visibility", "layer_blend", "pins", "boundary_highlight"],
         }
     return {
         "schema": "rrkal_displaytools.timeline_segment_state.v1",
-        "mode": "first_segment_preview",
+        "mode": "active_segment_preview",
+        "source": "timeline_state.playback.next_index",
+        "active_index": segment_index if active_segment is not None else None,
         "active_segment": active_segment,
         "segment_available": active_segment is not None,
         "segment_count": max(0, len(keyframes) - 1),
@@ -13541,7 +13549,7 @@ class HybridRenderController:
             else None,
             "playback_readiness": timeline_playback_readiness_packet(),
             "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
-            "segment_state": timeline_segment_state_packet(runtime_keyframes),
+            "segment_state": timeline_segment_state_packet(runtime_keyframes, active_step_state.get("active_index")),
             "active_step_state": active_step_state,
             "first_keyframe_apply": getattr(
                 self,

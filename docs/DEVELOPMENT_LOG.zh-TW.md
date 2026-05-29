@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Timeline active segment selection
+
+Scope:
+- `timeline_segment_state` now reports the active keyframe segment derived from the current active step instead of always reporting the first segment.
+- Qt, No-GUI launch/runtime state, renderer ack, smoke, and docs now use `active_segment_preview`.
+- This keeps playback/export pending while making the segment handoff match the selected step.
+
+Positioning:
+- This closes the discrete active-step segment handoff needed before renderer-side step playback.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Timeline active step renderer startup apply
 
 Scope:

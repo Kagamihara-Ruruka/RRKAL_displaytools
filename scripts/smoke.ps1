@@ -91,6 +91,9 @@ if ($launchPacket.timeline_playback_plan.schema -ne "rrkal_displaytools.timeline
 if ($launchPacket.timeline_segment_state.schema -ne "rrkal_displaytools.timeline_segment_state.v1") {
     throw "Launch packet timeline segment state schema missing or invalid"
 }
+if ($launchPacket.timeline_segment_state.mode -ne "active_segment_preview") {
+    throw "Launch packet timeline segment state mode missing or invalid"
+}
 if ($launchPacket.timeline_active_step_state.schema -ne "rrkal_displaytools.timeline_active_step_state.v1") {
     throw "Launch packet timeline active step state schema missing or invalid"
 }
@@ -198,6 +201,9 @@ if ($timelineAck.playback_plan.schema -ne "rrkal_displaytools.timeline_playback_
 }
 if ($timelineAck.segment_state.schema -ne "rrkal_displaytools.timeline_segment_state.v1") {
     throw "Renderer timeline ack endpoint segment state missing or invalid"
+}
+if ($timelineAck.segment_state.mode -ne "active_segment_preview") {
+    throw "Renderer timeline ack endpoint segment state mode missing or invalid"
 }
 if ($timelineAck.active_step_state.schema -ne "rrkal_displaytools.timeline_active_step_state.v1") {
     throw "Renderer timeline ack endpoint active step state missing or invalid"

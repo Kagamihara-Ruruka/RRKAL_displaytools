@@ -425,14 +425,15 @@ def timeline_runtime_state_packet(profile: dict[str, object], target_file: str =
     profile_keyframes = profile.get("timeline_keyframes")
     keyframes = [dict(keyframe) for keyframe in profile_keyframes if isinstance(keyframe, dict)] if isinstance(profile_keyframes, list) else []
     timeline_state = timeline_state_packet(profile)
+    active_step_state = timeline_active_step_state_packet(timeline_state, keyframes)
     return {
         "schema": "rrkal_displaytools.timeline_runtime_state.v1",
         "updated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "timeline_state": timeline_state,
         "playback_readiness": timeline_playback_readiness_packet(),
         "playback_plan": timeline_playback_plan_packet(keyframes),
-        "segment_state": timeline_segment_state_packet(keyframes),
-        "active_step_state": timeline_active_step_state_packet(timeline_state, keyframes),
+        "segment_state": timeline_segment_state_packet(keyframes, active_step_state.get("active_index")),
+        "active_step_state": active_step_state,
         "timeline_keyframes": keyframes,
         "source": "scripts/export_launch_packet.py",
         "target_file": target_file,
@@ -498,20 +499,29 @@ def timeline_playback_plan_packet(keyframes: list[dict[str, object]]) -> dict[st
     }
 
 
-def timeline_segment_state_packet(keyframes: list[dict[str, object]]) -> dict[str, object]:
+def timeline_segment_state_packet(
+    keyframes: list[dict[str, object]],
+    active_index: int | None = 0,
+) -> dict[str, object]:
+    keyframes = [keyframe for keyframe in keyframes if isinstance(keyframe, dict)] if isinstance(keyframes, list) else []
+    segment_index = 0
+    if len(keyframes) >= 2 and isinstance(active_index, int):
+        segment_index = max(0, min(active_index, len(keyframes) - 2))
     active_segment = None
     if len(keyframes) >= 2:
         active_segment = {
-            "from_index": 0,
-            "to_index": 1,
-            "from_keyframe_id": str(keyframes[0].get("id", "")),
-            "to_keyframe_id": str(keyframes[1].get("id", "")),
+            "from_index": segment_index,
+            "to_index": segment_index + 1,
+            "from_keyframe_id": str(keyframes[segment_index].get("id", "")),
+            "to_keyframe_id": str(keyframes[segment_index + 1].get("id", "")),
             "interpolatable_fields": ["ocean_material"],
             "discrete_fields": ["style_profile", "layer_visibility", "layer_blend", "pins", "boundary_highlight"],
         }
     return {
         "schema": "rrkal_displaytools.timeline_segment_state.v1",
-        "mode": "first_segment_preview",
+        "mode": "active_segment_preview",
+        "source": "timeline_state.playback.next_index",
+        "active_index": segment_index if active_segment is not None else None,
         "active_segment": active_segment,
         "segment_available": active_segment is not None,
         "segment_count": max(0, len(keyframes) - 1),
@@ -570,6 +580,7 @@ def launch_packet(
     profile_keyframes = profile.get("timeline_keyframes")
     timeline_keyframes = [dict(keyframe) for keyframe in profile_keyframes if isinstance(keyframe, dict)] if isinstance(profile_keyframes, list) else []
     timeline_state = timeline_state_packet(profile)
+    timeline_active_step_state = timeline_active_step_state_packet(timeline_state, timeline_keyframes)
     return {
         "schema": "rrkal_displaytools.launch_packet.v1",
         "created_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -601,8 +612,8 @@ def launch_packet(
         "timeline_state": timeline_state,
         "timeline_playback_readiness": timeline_playback_readiness_packet(),
         "timeline_playback_plan": timeline_playback_plan_packet(timeline_keyframes),
-        "timeline_segment_state": timeline_segment_state_packet(timeline_keyframes),
-        "timeline_active_step_state": timeline_active_step_state_packet(timeline_state, timeline_keyframes),
+        "timeline_segment_state": timeline_segment_state_packet(timeline_keyframes, timeline_active_step_state.get("active_index")),
+        "timeline_active_step_state": timeline_active_step_state,
         "timeline_runtime_state": timeline_runtime_state_packet(profile, timeline_state_file),
         "timeline_runtime_state_file": timeline_state_file,
         "timeline_ack_file": timeline_ack_file,

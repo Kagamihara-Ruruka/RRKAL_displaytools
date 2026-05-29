@@ -2752,13 +2752,16 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         }
 
     def collect_timeline_segment_state(self) -> dict[str, object]:
-        first = self.timeline_keyframes[0] if len(self.timeline_keyframes) >= 1 else None
-        second = self.timeline_keyframes[1] if len(self.timeline_keyframes) >= 2 else None
+        segment_index = 0
+        if len(self.timeline_keyframes) >= 2:
+            segment_index = max(0, min(int(self.timeline_playback_index), len(self.timeline_keyframes) - 2))
+        first = self.timeline_keyframes[segment_index] if len(self.timeline_keyframes) >= 2 else None
+        second = self.timeline_keyframes[segment_index + 1] if len(self.timeline_keyframes) >= 2 else None
         active_segment = None
         if isinstance(first, dict) and isinstance(second, dict):
             active_segment = {
-                "from_index": 0,
-                "to_index": 1,
+                "from_index": segment_index,
+                "to_index": segment_index + 1,
                 "from_keyframe_id": str(first.get("id", "")),
                 "to_keyframe_id": str(second.get("id", "")),
                 "interpolatable_fields": ["ocean_material"],
@@ -2766,7 +2769,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             }
         return {
             "schema": "rrkal_displaytools.timeline_segment_state.v1",
-            "mode": "first_segment_preview",
+            "mode": "active_segment_preview",
+            "source": "timeline_state.playback.next_index",
+            "active_index": segment_index if active_segment is not None else None,
             "active_segment": active_segment,
             "segment_available": active_segment is not None,
             "segment_count": max(0, len(self.timeline_keyframes) - 1),
