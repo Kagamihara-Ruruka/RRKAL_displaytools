@@ -534,6 +534,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             ("Solo 選取圖層", self.solo_selected_layer_visibility),
             ("還原 Solo 前可見性", self.restore_layer_visibility_snapshot),
             ("顯示 layer runtime JSON", self.show_layer_runtime_state),
+            ("顯示 layer pick JSON", self.show_layer_pick_state),
             ("重設 UI 圖層狀態", self.reset_layer_stack_controls),
         )
         layer_actions_layout = QtWidgets.QGridLayout()
@@ -2415,6 +2416,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             text = json.dumps(self.pin_pick_state_payload or {}, ensure_ascii=False, indent=2)
         self.command_text.setPlainText(text)
         self.status.setText(f"已顯示 Pin pick state JSON：{PIN_PICK_STATE_PATH}")
+
+    def show_layer_pick_state(self) -> None:
+        try:
+            text = LAYER_PICK_STATE_PATH.read_text(encoding="utf-8")
+        except OSError:
+            text = json.dumps(self.layer_pick_state_payload or {}, ensure_ascii=False, indent=2)
+        self.command_text.setPlainText(text)
+        self.status.setText(f"已顯示 layer pick state JSON：{LAYER_PICK_STATE_PATH}")
 
     def toggle_selected_layer_visibility(self) -> None:
         key = self.selected_layer_key

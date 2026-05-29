@@ -1,5 +1,18 @@
 ﻿# Development Log
 
+## 2026-05-29 - Layer pick JSON inspector
+
+Scope:
+- Added a Layers panel action to show `renderer_layer_pick_state.json` directly in the central text area.
+- The existing layer runtime JSON inspector remains available for control-state debugging.
+
+Positioning:
+- Researchers can now inspect the raw renderer pick evidence, not only the short Layer pick label.
+- This improves UI observability without adding data governance responsibilities to displaytools.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Boundary closed-ring fill preview
 
 Scope:
