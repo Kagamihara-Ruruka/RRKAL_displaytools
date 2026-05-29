@@ -580,6 +580,80 @@ def layer_renderer_diagnostics_summary_packet(
         "boundary": "Diagnostic summary only; renderer state and RRKAL data governance are not mutated.",
     }
 
+
+def layer_renderer_diagnostics_detail_packet(
+    renderer_summary: dict[str, object] | None,
+    runtime_evidence: dict[str, object] | None,
+    warning_list: dict[str, object] | None,
+    interaction_context: dict[str, object] | None,
+    identity_source: dict[str, object] | None,
+    live_counts: dict[str, object] | None,
+    selected_layer: str | None,
+    source: str,
+) -> dict[str, object]:
+    renderer_summary = renderer_summary if isinstance(renderer_summary, dict) else {}
+    runtime_evidence = runtime_evidence if isinstance(runtime_evidence, dict) else {}
+    warning_list = warning_list if isinstance(warning_list, dict) else {}
+    interaction_context = interaction_context if isinstance(interaction_context, dict) else {}
+    identity_source = identity_source if isinstance(identity_source, dict) else {}
+    live_counts = live_counts if isinstance(live_counts, dict) else {}
+    live_total = sum(int(value) for value in live_counts.values() if isinstance(value, (int, float)))
+    bridges = [
+        {
+            "name": "runtime_ack",
+            "status": "available" if renderer_summary.get("runtime_ack_available") else "waiting",
+            "schema": runtime_evidence.get("schema"),
+            "event": runtime_evidence.get("event") or renderer_summary.get("runtime_ack_event"),
+            "error": runtime_evidence.get("error") or renderer_summary.get("runtime_ack_error"),
+            "frame_index": runtime_evidence.get("frame_index"),
+            "evidence": "renderer ack observed" if renderer_summary.get("runtime_ack_available") else "waiting for renderer ack bridge evidence",
+        },
+        {
+            "name": "layer_pick_state",
+            "status": "available" if renderer_summary.get("pick_context_available") else "waiting",
+            "schema": interaction_context.get("schema"),
+            "pick_event": interaction_context.get("pick_event"),
+            "pick_hit": interaction_context.get("pick_hit"),
+            "renderer_target": interaction_context.get("renderer_target"),
+            "feature_label": interaction_context.get("feature_label"),
+            "evidence": "renderer pick context observed" if renderer_summary.get("pick_context_available") else "waiting for renderer pick bridge evidence",
+        },
+        {
+            "name": "authoritative_identity_source",
+            "status": "configured" if renderer_summary.get("identity_source_configured") else "not_configured",
+            "schema": identity_source.get("schema"),
+            "source_ref": identity_source.get("source_ref"),
+            "displaytools_role": identity_source.get("displaytools_role"),
+            "evidence": "RRKAL source ref configured" if renderer_summary.get("identity_source_configured") else "RRKAL source ref not configured",
+        },
+        {
+            "name": "warning_list",
+            "status": str(warning_list.get("severity") or renderer_summary.get("warning_severity") or "unknown"),
+            "schema": warning_list.get("schema"),
+            "warning_count": warning_list.get("warning_count") or renderer_summary.get("warning_count"),
+            "evidence": warning_list.get("summary_text"),
+        },
+        {
+            "name": "live_control_coverage",
+            "status": "available" if live_total > 0 else "planned",
+            "counts": live_counts,
+            "live_total": live_total,
+            "evidence": "renderer live controls exposed" if live_total > 0 else "no live renderer controls exposed",
+        },
+    ]
+    return {
+        "schema": "rrkal_displaytools.layer_renderer_diagnostics_detail.v1",
+        "source": source,
+        "selected_layer": selected_layer,
+        "summary_schema": renderer_summary.get("schema"),
+        "bridge_count": len(bridges),
+        "bridges": bridges,
+        "attention_required": any(bridge.get("status") in {"waiting", "warning", "error", "not_configured"} for bridge in bridges),
+        "summary_text": ", ".join(f"{bridge.get('name')}={bridge.get('status')}" for bridge in bridges),
+        "copyable_provenance": True,
+        "boundary": "Read-only diagnostics detail; renderer state and RRKAL data governance are not mutated.",
+    }
+
 def layer_capability_matrix_packet(
     source: str,
     selected_layer: str | None = None,
@@ -639,6 +713,16 @@ def layer_capability_matrix_packet(
         selected_layer,
         source,
     )
+    renderer_diagnostics_detail = layer_renderer_diagnostics_detail_packet(
+        renderer_diagnostics_summary,
+        runtime_evidence,
+        runtime_warning_list,
+        runtime_interaction_context,
+        authoritative_identity_source,
+        counts,
+        selected_layer,
+        source,
+    )
     return {
         "schema": "rrkal_displaytools.layer_capability_matrix.v1",
         "source": source,
@@ -652,6 +736,7 @@ def layer_capability_matrix_packet(
         "territory_identity_context": layer_territory_identity_context_packet(runtime_interaction_context, selected_layer, source),
         "authoritative_identity_source": authoritative_identity_source,
         "renderer_diagnostics_summary": renderer_diagnostics_summary,
+        "renderer_diagnostics_detail": renderer_diagnostics_detail,
         "runtime_status_legend": layer_runtime_status_legend_packet(),
         "selected_layer": selected_layer,
         "selected_layer_capabilities": selected,
@@ -999,6 +1084,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "runtime_summary": QtWidgets.QLabel("-"),
             "runtime_warnings": QtWidgets.QLabel("-"),
             "renderer_diagnostics_summary": QtWidgets.QLabel("-"),
+            "renderer_diagnostics_detail": QtWidgets.QLabel("-"),
             "runtime_context": QtWidgets.QLabel("-"),
             "territory_identity": QtWidgets.QLabel("-"),
             "identity_source": QtWidgets.QLabel("-"),
@@ -1017,6 +1103,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         material_form.addRow("Runtime summary", self.layer_property_labels["runtime_summary"])
         material_form.addRow("Runtime warnings", self.layer_property_labels["runtime_warnings"])
         material_form.addRow("Renderer summary", self.layer_property_labels["renderer_diagnostics_summary"])
+        material_form.addRow("Renderer detail", self.layer_property_labels["renderer_diagnostics_detail"])
         material_form.addRow("Runtime context", self.layer_property_labels["runtime_context"])
         material_form.addRow("Territory identity", self.layer_property_labels["territory_identity"])
         material_form.addRow("Identity source", self.layer_property_labels["identity_source"])
@@ -4147,6 +4234,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_property_labels["renderer_diagnostics_summary"].setText(
             str(renderer_diagnostics_summary.get("summary_text", "-")) if isinstance(renderer_diagnostics_summary, dict) else "-"
         )
+        renderer_diagnostics_detail = matrix.get("renderer_diagnostics_detail") if isinstance(matrix, dict) else None
+        self.layer_property_labels["renderer_diagnostics_detail"].setText(
+            str(renderer_diagnostics_detail.get("summary_text", "-")) if isinstance(renderer_diagnostics_detail, dict) else "-"
+        )
         runtime_context = matrix.get("runtime_interaction_context") if isinstance(matrix, dict) else None
         self.layer_property_labels["runtime_context"].setText(
             str(runtime_context.get("summary_text", "-")) if isinstance(runtime_context, dict) else "-"
@@ -4228,6 +4319,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_territory_identity_context_schema": "rrkal_displaytools.layer_territory_identity_context.v1",
             "layer_authoritative_identity_source_schema": "rrkal_displaytools.layer_authoritative_identity_source.v1",
             "layer_renderer_diagnostics_summary_schema": "rrkal_displaytools.layer_renderer_diagnostics_summary.v1",
+            "layer_renderer_diagnostics_detail_schema": "rrkal_displaytools.layer_renderer_diagnostics_detail.v1",
             "runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "runtime_badge_summary": self.collect_layer_capability_matrix().get("runtime_badge_summary"),
             "runtime_warning_list": self.collect_layer_capability_matrix().get("runtime_warning_list"),
@@ -4235,6 +4327,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "territory_identity_context": self.collect_layer_capability_matrix().get("territory_identity_context"),
             "authoritative_identity_source": self.collect_layer_capability_matrix().get("authoritative_identity_source"),
             "renderer_diagnostics_summary": self.collect_layer_capability_matrix().get("renderer_diagnostics_summary"),
+            "renderer_diagnostics_detail": self.collect_layer_capability_matrix().get("renderer_diagnostics_detail"),
             "diagnostics_text": diagnostics_text,
             "runtime_ack_file": str(LAYER_RUNTIME_ACK_PATH),
             "runtime_ack": self.layer_runtime_ack_payload,
@@ -4762,6 +4855,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_territory_identity_context": self.collect_layer_capability_matrix().get("territory_identity_context"),
             "layer_authoritative_identity_source": self.collect_layer_capability_matrix().get("authoritative_identity_source"),
             "layer_renderer_diagnostics_summary": self.collect_layer_capability_matrix().get("renderer_diagnostics_summary"),
+            "layer_renderer_diagnostics_detail": self.collect_layer_capability_matrix().get("renderer_diagnostics_detail"),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),

@@ -17754,6 +17754,80 @@ def layer_renderer_diagnostics_summary_packet(
         "boundary": "Diagnostic summary only; renderer state and RRKAL data governance are not mutated.",
     }
 
+
+def layer_renderer_diagnostics_detail_packet(
+    renderer_summary: dict[str, object] | None,
+    runtime_evidence: dict[str, object] | None,
+    warning_list: dict[str, object] | None,
+    interaction_context: dict[str, object] | None,
+    identity_source: dict[str, object] | None,
+    live_counts: dict[str, object] | None,
+    selected_layer: str | None,
+    source: str,
+) -> dict[str, object]:
+    renderer_summary = renderer_summary if isinstance(renderer_summary, dict) else {}
+    runtime_evidence = runtime_evidence if isinstance(runtime_evidence, dict) else {}
+    warning_list = warning_list if isinstance(warning_list, dict) else {}
+    interaction_context = interaction_context if isinstance(interaction_context, dict) else {}
+    identity_source = identity_source if isinstance(identity_source, dict) else {}
+    live_counts = live_counts if isinstance(live_counts, dict) else {}
+    live_total = sum(int(value) for value in live_counts.values() if isinstance(value, (int, float)))
+    bridges = [
+        {
+            "name": "runtime_ack",
+            "status": "available" if renderer_summary.get("runtime_ack_available") else "waiting",
+            "schema": runtime_evidence.get("schema"),
+            "event": runtime_evidence.get("event") or renderer_summary.get("runtime_ack_event"),
+            "error": runtime_evidence.get("error") or renderer_summary.get("runtime_ack_error"),
+            "frame_index": runtime_evidence.get("frame_index"),
+            "evidence": "renderer ack observed" if renderer_summary.get("runtime_ack_available") else "waiting for renderer ack bridge evidence",
+        },
+        {
+            "name": "layer_pick_state",
+            "status": "available" if renderer_summary.get("pick_context_available") else "waiting",
+            "schema": interaction_context.get("schema"),
+            "pick_event": interaction_context.get("pick_event"),
+            "pick_hit": interaction_context.get("pick_hit"),
+            "renderer_target": interaction_context.get("renderer_target"),
+            "feature_label": interaction_context.get("feature_label"),
+            "evidence": "renderer pick context observed" if renderer_summary.get("pick_context_available") else "waiting for renderer pick bridge evidence",
+        },
+        {
+            "name": "authoritative_identity_source",
+            "status": "configured" if renderer_summary.get("identity_source_configured") else "not_configured",
+            "schema": identity_source.get("schema"),
+            "source_ref": identity_source.get("source_ref"),
+            "displaytools_role": identity_source.get("displaytools_role"),
+            "evidence": "RRKAL source ref configured" if renderer_summary.get("identity_source_configured") else "RRKAL source ref not configured",
+        },
+        {
+            "name": "warning_list",
+            "status": str(warning_list.get("severity") or renderer_summary.get("warning_severity") or "unknown"),
+            "schema": warning_list.get("schema"),
+            "warning_count": warning_list.get("warning_count") or renderer_summary.get("warning_count"),
+            "evidence": warning_list.get("summary_text"),
+        },
+        {
+            "name": "live_control_coverage",
+            "status": "available" if live_total > 0 else "planned",
+            "counts": live_counts,
+            "live_total": live_total,
+            "evidence": "renderer live controls exposed" if live_total > 0 else "no live renderer controls exposed",
+        },
+    ]
+    return {
+        "schema": "rrkal_displaytools.layer_renderer_diagnostics_detail.v1",
+        "source": source,
+        "selected_layer": selected_layer,
+        "summary_schema": renderer_summary.get("schema"),
+        "bridge_count": len(bridges),
+        "bridges": bridges,
+        "attention_required": any(bridge.get("status") in {"waiting", "warning", "error", "not_configured"} for bridge in bridges),
+        "summary_text": ", ".join(f"{bridge.get('name')}={bridge.get('status')}" for bridge in bridges),
+        "copyable_provenance": True,
+        "boundary": "Read-only diagnostics detail; renderer state and RRKAL data governance are not mutated.",
+    }
+
 def layer_capability_matrix_packet() -> dict[str, object]:
     aliases = {
         "show_grid": "grid",
@@ -17877,6 +17951,16 @@ def layer_capability_matrix_packet() -> dict[str, object]:
         None,
         "taichi_global_bathymetry.renderer_capabilities",
     )
+    renderer_diagnostics_detail = layer_renderer_diagnostics_detail_packet(
+        renderer_diagnostics_summary,
+        runtime_evidence_summary,
+        runtime_warning_list,
+        runtime_interaction_context,
+        authoritative_identity_source,
+        counts,
+        None,
+        "taichi_global_bathymetry.renderer_capabilities",
+    )
     return {
         "schema": "rrkal_displaytools.layer_capability_matrix.v1",
         "source": "taichi_global_bathymetry.renderer_capabilities",
@@ -17914,6 +17998,7 @@ def layer_capability_matrix_packet() -> dict[str, object]:
         ),
         "authoritative_identity_source": authoritative_identity_source,
         "renderer_diagnostics_summary": renderer_diagnostics_summary,
+        "renderer_diagnostics_detail": renderer_diagnostics_detail,
         "runtime_status_legend": layer_runtime_status_legend_packet(),
         "selected_layer": None,
         "selected_layer_capabilities": None,

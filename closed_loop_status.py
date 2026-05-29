@@ -55,6 +55,7 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "renderer capabilities layer_territory_identity_context",
                     "renderer capabilities layer_authoritative_identity_source",
                     "renderer capabilities layer_renderer_diagnostics_summary",
+                    "renderer capabilities layer_renderer_diagnostics_detail",
                 ],
             },
             {
@@ -81,6 +82,7 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "launch_packet layer_territory_identity_context",
                     "launch_packet layer_authoritative_identity_source",
                     "launch_packet layer_renderer_diagnostics_summary",
+                    "launch_packet layer_renderer_diagnostics_detail",
                     "launch_packet layer_undo",
                     "launch_packet session_journal",
                     "launch_packet document_undo",
