@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Timeline active step renderer startup apply
+
+Scope:
+- Renderer startup Timeline apply now selects the keyframe identified by `timeline_active_step_state` instead of always selecting the first valid keyframe.
+- `timeline_first_keyframe_apply` now includes the active step packet and selected active index, while keeping the existing schema for compatibility.
+- Smoke now gates the nested active step packet in the renderer Timeline ack endpoint.
+
+Positioning:
+- This closes the discrete startup keyframe selection loop before adding inter-keyframe interpolation or animation export.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Timeline active step state contract
 
 Scope:

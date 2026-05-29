@@ -2723,6 +2723,7 @@ def timeline_ack_payload_from_state_file(timeline_state_file: str | Path | None)
         keyframe_count = len(runtime_keyframes)
     playback = timeline_state.get("playback")
     playback = playback if isinstance(playback, dict) else {}
+    active_step_state = timeline_active_step_state_packet(timeline_state, runtime_keyframes)
     return {
         "schema": "rrkal_displaytools.renderer_timeline_ack.v1",
         "updated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -2735,11 +2736,12 @@ def timeline_ack_payload_from_state_file(timeline_state_file: str | Path | None)
         "playback_readiness": timeline_playback_readiness_packet(),
         "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
         "segment_state": timeline_segment_state_packet(runtime_keyframes),
-        "active_step_state": timeline_active_step_state_packet(timeline_state, runtime_keyframes),
+        "active_step_state": active_step_state,
         "first_keyframe_apply": timeline_first_keyframe_apply_preview_packet(
             runtime_keyframes,
             applied=False,
             reason="ack_endpoint_does_not_instantiate_renderer",
+            active_step_state=active_step_state,
         ),
         "applies": ["input_acknowledgement"],
         "pending": [
@@ -2875,18 +2877,27 @@ def timeline_first_keyframe_apply_preview_packet(
     keyframes: list[object] | None = None,
     applied: bool = False,
     reason: str = "ack_endpoint_preview_only",
+    active_step_state: dict[str, object] | None = None,
 ) -> dict[str, object]:
-    keyframes = keyframes if isinstance(keyframes, list) else []
-    first = next((keyframe for keyframe in keyframes if isinstance(keyframe, dict)), None)
+    keyframes = [keyframe for keyframe in keyframes if isinstance(keyframe, dict)] if isinstance(keyframes, list) else []
+    active_step_state = active_step_state if isinstance(active_step_state, dict) else None
+    selected_index = 0
+    if active_step_state is not None:
+        active_index = active_step_state.get("active_index")
+        if isinstance(active_index, int) and 0 <= active_index < len(keyframes):
+            selected_index = active_index
+    first = keyframes[selected_index] if keyframes else None
     snapshot = first.get("layer_stack_snapshot") if isinstance(first, dict) else None
     layers = snapshot.get("layers") if isinstance(snapshot, dict) else None
     material = first.get("ocean_material") if isinstance(first, dict) else None
     return {
         "schema": "rrkal_displaytools.timeline_first_keyframe_apply.v1",
-        "mode": "renderer_startup_first_keyframe",
+        "mode": "renderer_startup_active_step_keyframe" if active_step_state is not None else "renderer_startup_first_keyframe",
         "applied": bool(applied),
         "available": first is not None,
         "reason": reason,
+        "active_step_state": active_step_state,
+        "active_index": selected_index if first is not None else None,
         "keyframe_id": str(first.get("id", "")) if isinstance(first, dict) else None,
         "detected_scope": {
             "style_profile": bool(first.get("style_profile")) if isinstance(first, dict) else False,
@@ -11305,15 +11316,25 @@ class HybridRenderController:
         state_payload = self.timeline_runtime_state if isinstance(self.timeline_runtime_state, dict) else {}
         runtime_keyframes = state_payload.get("timeline_keyframes")
         runtime_keyframes = runtime_keyframes if isinstance(runtime_keyframes, list) else []
+        timeline_state = state_payload.get("timeline_state")
+        timeline_state = timeline_state if isinstance(timeline_state, dict) else {}
+        active_step_state = timeline_active_step_state_packet(timeline_state, runtime_keyframes)
         result = timeline_first_keyframe_apply_preview_packet(
             runtime_keyframes,
             applied=False,
             reason="no_valid_keyframe",
+            active_step_state=active_step_state,
         )
         if self.timeline_runtime_state_error is not None:
             result["reason"] = self.timeline_runtime_state_error
             return result
-        first = next((keyframe for keyframe in runtime_keyframes if isinstance(keyframe, dict)), None)
+        valid_keyframes = [keyframe for keyframe in runtime_keyframes if isinstance(keyframe, dict)]
+        active_index = active_step_state.get("active_index")
+        first = (
+            valid_keyframes[active_index]
+            if isinstance(active_index, int) and 0 <= active_index < len(valid_keyframes)
+            else None
+        )
         if first is None:
             return result
         changed_style = False
@@ -13506,6 +13527,7 @@ class HybridRenderController:
         keyframe_count = timeline_state.get("keyframe_count")
         if not isinstance(keyframe_count, int):
             keyframe_count = len(runtime_keyframes)
+        active_step_state = timeline_active_step_state_packet(timeline_state, runtime_keyframes)
         payload = {
             "schema": "rrkal_displaytools.renderer_timeline_ack.v1",
             "updated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
@@ -13520,11 +13542,11 @@ class HybridRenderController:
             "playback_readiness": timeline_playback_readiness_packet(),
             "playback_plan": timeline_playback_plan_packet(runtime_keyframes),
             "segment_state": timeline_segment_state_packet(runtime_keyframes),
-            "active_step_state": timeline_active_step_state_packet(timeline_state, runtime_keyframes),
+            "active_step_state": active_step_state,
             "first_keyframe_apply": getattr(
                 self,
                 "timeline_first_keyframe_apply_result",
-                timeline_first_keyframe_apply_preview_packet(runtime_keyframes),
+                timeline_first_keyframe_apply_preview_packet(runtime_keyframes, active_step_state=active_step_state),
             ),
             "applies": ["input_acknowledgement"],
             "pending": [

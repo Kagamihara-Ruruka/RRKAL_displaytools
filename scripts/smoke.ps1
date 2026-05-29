@@ -205,6 +205,9 @@ if ($timelineAck.active_step_state.schema -ne "rrkal_displaytools.timeline_activ
 if ($timelineAck.first_keyframe_apply.schema -ne "rrkal_displaytools.timeline_first_keyframe_apply.v1") {
     throw "Renderer timeline ack endpoint first keyframe apply packet missing or invalid"
 }
+if ($timelineAck.first_keyframe_apply.active_step_state.schema -ne "rrkal_displaytools.timeline_active_step_state.v1") {
+    throw "Renderer timeline first keyframe apply active step state missing or invalid"
+}
 if ($null -eq $timelineAck.first_keyframe_apply.changed.pins) {
     throw "Renderer timeline first keyframe apply pins changed field missing"
 }
