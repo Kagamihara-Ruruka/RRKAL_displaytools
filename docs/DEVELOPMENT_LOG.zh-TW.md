@@ -499,3 +499,15 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Qt Studio menu and tools dock
+
+Scope:
+- Added a menu bar to `rrkal_displaytools_qt_panel.py` with File, Renderer, Window, and Help menus.
+- Added a left-side `Tools` dock with quick actions for baseline/maritime/parchment/tactical presets, smoke, capabilities, and layer manifest.
+
+Positioning:
+- This moves the Qt frontend closer to Photoshop's workspace structure: menu bar, tool dock, central preview, layer/properties panels.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

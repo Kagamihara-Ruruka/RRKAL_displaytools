@@ -107,6 +107,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.checks: dict[str, QtWidgets.QCheckBox] = {}
         self.template_paths: list[Path] = []
         self._build_ui()
+        self._build_menu_bar()
+        self._build_tool_dock()
         self.process_timer = QtCore.QTimer(self)
         self.process_timer.setInterval(1500)
         self.process_timer.timeout.connect(self.update_process_status)
@@ -296,6 +298,55 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             QPlainTextEdit { font-family: Consolas, 'Cascadia Mono', monospace; }
             """
         )
+
+    def _build_menu_bar(self) -> None:
+        file_menu = self.menuBar().addMenu("File")
+        file_menu.addAction("Save Profile", self.save_profile_dialog)
+        file_menu.addAction("Load Profile", self.load_profile_dialog)
+        file_menu.addAction("Export Launch Packet", self.export_launch_packet_dialog)
+        file_menu.addSeparator()
+        file_menu.addAction("Exit", self.close)
+
+        renderer_menu = self.menuBar().addMenu("Renderer")
+        renderer_menu.addAction("Launch", self.launch_renderer)
+        renderer_menu.addAction("Apply and Restart", self.restart_renderer)
+        renderer_menu.addAction("Stop", self.stop_renderer)
+        renderer_menu.addSeparator()
+        renderer_menu.addAction("Capabilities JSON", self.show_renderer_capabilities)
+        renderer_menu.addAction("Layer Manifest JSON", self.show_layer_manifest)
+
+        window_menu = self.menuBar().addMenu("Window")
+        window_menu.addAction("Open Template Folder", self.open_template_dir)
+        window_menu.addAction("Open Local Profile Folder", self.open_local_profile_dir)
+
+        help_menu = self.menuBar().addMenu("Help")
+        help_menu.addAction("Smoke Check", self.run_smoke_check)
+
+    def _build_tool_dock(self) -> None:
+        dock = QtWidgets.QDockWidget("Tools", self)
+        dock.setObjectName("toolsDock")
+        dock.setAllowedAreas(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea | QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
+        tools = QtWidgets.QWidget(dock)
+        layout = QtWidgets.QVBoxLayout(tools)
+        layout.setContentsMargins(8, 8, 8, 8)
+        tool_actions = (
+            ("Baseline", self.apply_baseline),
+            ("Maritime", self.apply_maritime),
+            ("Parchment", self.apply_parchment),
+            ("Tactical", self.apply_tactical),
+            ("Smoke", self.run_smoke_check),
+            ("Caps", self.show_renderer_capabilities),
+            ("Layers", self.show_layer_manifest),
+        )
+        for label, callback in tool_actions:
+            button = QtWidgets.QToolButton()
+            button.setText(label)
+            button.setToolButtonStyle(QtCore.Qt.ToolButtonStyle.ToolButtonTextOnly)
+            button.clicked.connect(callback)
+            layout.addWidget(button)
+        layout.addStretch(1)
+        dock.setWidget(tools)
+        self.addDockWidget(QtCore.Qt.DockWidgetArea.LeftDockWidgetArea, dock)
 
     def _group(self, title: str) -> QtWidgets.QGroupBox:
         return QtWidgets.QGroupBox(title)
