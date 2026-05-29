@@ -1,5 +1,17 @@
 ﻿# Development Log
 
+## 2026-05-29 - Qt panel operator shortcuts
+
+Scope:
+- Added command-copy support to `rrkal_displaytools_qt_panel.py`.
+- Added shortcuts to open the repo-shared `profiles/` directory and local `state/ui_profiles/` directory.
+
+Positioning:
+- This improves cross-machine launch debugging and profile handoff without changing renderer behavior.
+
+Validation:
+- Not run; no test/validation requested.
+
 ## 2026-05-29 - Repo-shared Qt profile templates
 
 Scope:

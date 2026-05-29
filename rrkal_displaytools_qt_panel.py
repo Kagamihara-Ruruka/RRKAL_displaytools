@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 try:
-    from PyQt6 import QtCore, QtWidgets
+    from PyQt6 import QtCore, QtGui, QtWidgets
 except ImportError as exc:
     raise SystemExit(
         "PyQt6 is required for the Qt control panel. Install project dependencies with: "
@@ -185,20 +185,29 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
 
         actions = QtWidgets.QHBoxLayout()
         refresh_button = QtWidgets.QPushButton("刷新命令")
+        copy_button = QtWidgets.QPushButton("複製命令")
         save_button = QtWidgets.QPushButton("儲存配置")
         load_button = QtWidgets.QPushButton("載入配置")
+        open_templates_button = QtWidgets.QPushButton("模板目錄")
+        open_local_profiles_button = QtWidgets.QPushButton("本機配置")
         launch_button = QtWidgets.QPushButton("啟動地球儀")
         restart_button = QtWidgets.QPushButton("套用並重啟")
         stop_button = QtWidgets.QPushButton("停止本面板啟動的程序")
         refresh_button.clicked.connect(self.refresh_command_preview)
+        copy_button.clicked.connect(self.copy_command_to_clipboard)
         save_button.clicked.connect(self.save_profile_dialog)
         load_button.clicked.connect(self.load_profile_dialog)
+        open_templates_button.clicked.connect(self.open_template_dir)
+        open_local_profiles_button.clicked.connect(self.open_local_profile_dir)
         launch_button.clicked.connect(self.launch_renderer)
         restart_button.clicked.connect(self.restart_renderer)
         stop_button.clicked.connect(self.stop_renderer)
         actions.addWidget(refresh_button)
+        actions.addWidget(copy_button)
         actions.addWidget(save_button)
         actions.addWidget(load_button)
+        actions.addWidget(open_templates_button)
+        actions.addWidget(open_local_profiles_button)
         actions.addWidget(launch_button)
         actions.addWidget(restart_button)
         actions.addWidget(stop_button)
@@ -348,6 +357,23 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def refresh_command_preview(self) -> None:
         self.command_text.setPlainText(subprocess.list2cmdline(self.build_command()))
+
+    @QtCore.pyqtSlot()
+    def copy_command_to_clipboard(self) -> None:
+        QtWidgets.QApplication.clipboard().setText(self.command_text.toPlainText())
+        self.status.setText("已複製目前啟動命令")
+
+    @QtCore.pyqtSlot()
+    def open_template_dir(self) -> None:
+        PROFILE_TEMPLATE_DIR.mkdir(parents=True, exist_ok=True)
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(str(PROFILE_TEMPLATE_DIR)))
+        self.status.setText(f"已開啟模板目錄：{PROFILE_TEMPLATE_DIR}")
+
+    @QtCore.pyqtSlot()
+    def open_local_profile_dir(self) -> None:
+        PROFILE_DIR.mkdir(parents=True, exist_ok=True)
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(str(PROFILE_DIR)))
+        self.status.setText(f"已開啟本機配置目錄：{PROFILE_DIR}")
 
     @QtCore.pyqtSlot()
     def save_profile_dialog(self) -> None:
