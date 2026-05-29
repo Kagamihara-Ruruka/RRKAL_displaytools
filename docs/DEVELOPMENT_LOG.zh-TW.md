@@ -1,5 +1,18 @@
 # Development Log
 
+## 2026-05-29 - Live preview status wording cleanup
+
+Scope:
+- Capability summary no longer lists embedded live preview as unfinished.
+- Module boundaries now mark Qt Canvas Preview state/static thumbnail/file-based live renderer frame as closed.
+- Remaining renderer preview pending item is narrowed to low-latency IPC/GPU texture streaming.
+
+Positioning:
+- This removes status drift after the file-based live preview loop was closed.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Active layer diagnostics capability
 
 Scope:

@@ -77,5 +77,6 @@
 - Selected-layer semantic target：closed.
 - Selected-layer picking for Pin, traffic, boundary line, hydrology line：closed.
 - Boundary closed-ring fill preview：partial closed loop.
+- Qt Canvas Preview state / static thumbnail / file-based live renderer frame：closed.
 - Full territory feature identity and open-line area inference：pending.
-- Embedded renderer thumbnail in Qt panel：pending.
+- Low-latency IPC/GPU texture renderer preview：pending.
