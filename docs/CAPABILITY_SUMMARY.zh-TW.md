@@ -394,3 +394,8 @@
 
 - Qt Actions now includes `Clone ready`, which displays the live `cross_machine_clone_readiness` payload in the JSON preview pane.
 - Cross-machine users can inspect portable command, profile launch readiness and module boundary readiness from Qt without reading raw launch packets.
+
+### 2026-05-30 Qt contract inspector tooltips
+
+- The Qt Actions inspector buttons now include tooltips and accessible descriptions for Profile replay, Ocean port, Hydro LOD, Style routes, Module seams and Clone ready.
+- This makes the smoke-gated JSON inspection surface easier to understand for researchers using the panel directly.

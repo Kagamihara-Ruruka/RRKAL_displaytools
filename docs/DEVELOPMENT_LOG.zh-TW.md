@@ -230,6 +230,20 @@ Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
 
+## 2026-05-30 - Qt contract inspector tooltips
+
+Scope:
+- Added tooltips and accessible descriptions for the Qt Actions inspector buttons: `Profile replay`, `Ocean port`, `Hydro LOD`, `Style routes`, `Module seams` and `Clone ready`.
+- Smoke verifies the tooltip text and accessible-description hook are present.
+- Closed-loop evidence now records the tooltip surface for the contract inspectors.
+
+Decision:
+- The JSON inspection actions should be understandable to researchers from the UI itself, not only from docs or commit notes.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+
 ## 2026-05-30 - Qt Clone readiness JSON action
 
 Scope:

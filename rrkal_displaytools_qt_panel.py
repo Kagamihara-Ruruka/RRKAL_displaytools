@@ -2593,6 +2593,16 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         launch_button = QtWidgets.QPushButton("啟動地球儀")
         restart_button = QtWidgets.QPushButton("套用並重啟")
         stop_button = QtWidgets.QPushButton("停止本面板啟動的程序")
+        for button, tooltip in (
+            (profile_replay_button, "Inspect portable UI/profile replay coverage JSON."),
+            (ocean_port_button, "Inspect scalar ocean material and sea-state handoff JSON."),
+            (hydro_lod_button, "Inspect hydrology layer and LOD hook readiness JSON."),
+            (style_routes_button, "Inspect parchment and tactical style renderer route JSON."),
+            (module_seams_button, "Inspect future module extraction seam registry JSON."),
+            (clone_ready_button, "Inspect cross-machine clone readiness JSON."),
+        ):
+            button.setToolTip(tooltip)
+            button.setAccessibleDescription(tooltip)
         refresh_button.clicked.connect(self.refresh_command_preview)
         copy_button.clicked.connect(self.copy_command_to_clipboard)
         copy_portable_button.clicked.connect(self.copy_portable_command_to_clipboard)

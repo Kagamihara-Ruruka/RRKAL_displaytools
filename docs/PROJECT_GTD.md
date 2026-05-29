@@ -194,3 +194,4 @@ Last updated: 2026-05-29
 - 2026-05-30: Added Qt `Style routes` action for inspecting parchment/tactical style renderer entries and routes JSON directly in the panel.
 - 2026-05-30: Added Qt `Module seams` action for inspecting future extraction/module boundary registry JSON directly in the panel.
 - 2026-05-30: Added Qt `Clone ready` action for inspecting cross-machine clone readiness JSON directly in the panel.
+- 2026-05-30: Added tooltips/accessibility descriptions for Qt contract inspector buttons so researchers can understand each JSON inspection surface.

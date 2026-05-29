@@ -1683,6 +1683,12 @@ if ($qtPanelSource -notlike "*show_cross_machine_clone_readiness*") {
 if ($qtPanelSource -notlike "*Clone ready*") {
     throw "Qt Clone ready action button is missing"
 }
+if ($qtPanelSource -notlike "*Inspect portable UI/profile replay coverage JSON*") {
+    throw "Qt contract inspector tooltips are missing"
+}
+if ($qtPanelSource -notlike "*setAccessibleDescription*") {
+    throw "Qt contract inspector accessible descriptions are missing"
+}
 if ($qtPanelSource -notlike "*saved_state_groups*") {
     throw "Qt profile UI state replay saved groups are missing"
 }
