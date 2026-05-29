@@ -41,6 +41,7 @@ $summary = [ordered]@{
         layer_operator_groups = $launchPacket.layer_operator_groups.schema
         layer_research_workflow = $launchPacket.layer_research_workflow.schema
         boundary_emphasis_control = $launchPacket.boundary_emphasis_control.schema
+        cursor_geodesy_readout = $launchPacket.cursor_geodesy_readout.schema
         style_renderer_entries = $launchPacket.style_renderer_entries.schema
         style_profile_renderer_routes = $launchPacket.style_profile_renderer_routes.schema
         module_boundary_registry = $launchPacket.module_boundary_registry.schema
@@ -81,6 +82,15 @@ $summary = [ordered]@{
         runtime_warning_count = $launchPacket.layer_research_workflow.runtime_warning_count
         remediation_hint_count = $launchPacket.layer_research_workflow.remediation_hint_count
         qt_surface = $launchPacket.layer_research_workflow.qt_surface
+    }
+    cursor_geodesy_readout = @{
+        launch_packet_schema = $launchPacket.cursor_geodesy_readout.schema
+        renderer_capabilities_schema = $capabilities.cursor_geodesy_readout.schema
+        status = $launchPacket.cursor_geodesy_readout.status
+        projection_method = $launchPacket.cursor_geodesy_readout.projection_method
+        event_position_guard = $launchPacket.cursor_geodesy_readout.event_position_guard
+        backend_raycast_status = $launchPacket.cursor_geodesy_readout.backend_raycast_status
+        qt_surface = $launchPacket.cursor_geodesy_readout.qt_surface
     }
     boundary_emphasis_control = @{
         launch_packet_schema = $launchPacket.boundary_emphasis_control.schema

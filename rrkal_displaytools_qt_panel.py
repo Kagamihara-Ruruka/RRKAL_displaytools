@@ -1528,6 +1528,30 @@ def boundary_emphasis_control_packet(
     }
 
 
+def cursor_geodesy_readout_packet(
+    latitude: float | None,
+    longitude: float | None,
+    source: str,
+) -> dict[str, object]:
+    has_position = isinstance(latitude, (int, float)) and isinstance(longitude, (int, float))
+    return {
+        "schema": "rrkal_displaytools.cursor_geodesy_readout.v1",
+        "source": source,
+        "status": "ready",
+        "last_known_position_available": has_position,
+        "latitude": float(latitude) if isinstance(latitude, (int, float)) else None,
+        "longitude": float(longitude) if isinstance(longitude, (int, float)) else None,
+        "units": "degrees",
+        "coordinate_order": "latitude_longitude",
+        "input_surface": "Qt canvas preview mouse move",
+        "projection_method": "viewport_equirectangular_preview_estimate",
+        "event_position_guard": "QMouseEvent.position with QMouseEvent.pos fallback",
+        "qt_surface": "Canvas meta label and launch packet",
+        "backend_raycast_status": "queued_renderer_globe_intersection",
+        "researcher_note": "Canvas preview gives immediate lon/lat feedback; final globe raycast should be handled by renderer backend when closed.",
+    }
+
+
 def layer_capability_matrix_packet(
     source: str,
     selected_layer: str | None = None,
@@ -2891,7 +2915,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 self.open_boundary_emphasis_dialog(layer_key)
                 return True
         if watched is self.canvas_preview_label and event.type() == QtCore.QEvent.Type.MouseMove:
-            position = event.position()
+            position = self.qt_event_position(event)
+            if position is None:
+                return super().eventFilter(watched, event)
             width = max(1, self.canvas_preview_label.width() if self.canvas_preview_label is not None else 1)
             height = max(1, self.canvas_preview_label.height() if self.canvas_preview_label is not None else 1)
             x_ratio = min(max(position.x() / width, 0.0), 1.0)
@@ -2901,13 +2927,31 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.refresh_canvas_preview()
         if watched is self.canvas_preview_label and event.type() == QtCore.QEvent.Type.MouseButtonPress:
             if self.active_tool == "select" and event.button() == QtCore.Qt.MouseButton.LeftButton:
-                key = self.canvas_layer_hit_key(float(event.position().y()))
+                position = self.qt_event_position(event)
+                if position is None:
+                    return super().eventFilter(watched, event)
+                key = self.canvas_layer_hit_key(float(position.y()))
                 if key is not None:
                     label = next((text for layer_key, text in LAYER_LABELS if layer_key == key), key)
                     self.select_layer(key)
                     self.status.setText(f"Canvas Select 命中圖層：{label}")
                     return True
         return super().eventFilter(watched, event)
+
+    def qt_event_position(self, event: QtCore.QEvent) -> object | None:
+        position_getter = getattr(event, "position", None)
+        if callable(position_getter):
+            try:
+                return position_getter()
+            except RuntimeError:
+                return None
+        pos_getter = getattr(event, "pos", None)
+        if callable(pos_getter):
+            try:
+                return pos_getter()
+            except RuntimeError:
+                return None
+        return None
 
     def build_command(self) -> list[str]:
         self.write_timeline_runtime_state()
@@ -3087,6 +3131,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "layer_research_workflow": self.collect_layer_research_workflow(),
             "boundary_emphasis_control": self.collect_boundary_emphasis_control(),
+            "cursor_geodesy_readout": self.collect_cursor_geodesy_readout(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
             "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
             "module_boundary_registry": self.collect_module_boundary_registry(),
@@ -3166,6 +3211,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "renderer_thumbnail_path": self.renderer_thumbnail_profile_path(),
             "preview_frame_path": str(RENDERER_PREVIEW_FRAME_PATH.relative_to(ROOT)),
             "preview_frame_interval_s": RENDERER_PREVIEW_FRAME_INTERVAL_S,
+            "cursor_latitude": self.cursor_latitude,
+            "cursor_longitude": self.cursor_longitude,
+            "cursor_units": "degrees",
             "renderer_sync": renderer_sync,
         }
 
@@ -3266,6 +3314,13 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         return boundary_emphasis_control_packet(
             state if isinstance(state, dict) else None,
             self.selected_layer_key,
+            "rrkal_displaytools_qt_panel",
+        )
+
+    def collect_cursor_geodesy_readout(self) -> dict[str, object]:
+        return cursor_geodesy_readout_packet(
+            self.cursor_latitude,
+            self.cursor_longitude,
             "rrkal_displaytools_qt_panel",
         )
 
@@ -6084,6 +6139,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "layer_research_workflow": self.collect_layer_research_workflow(),
             "boundary_emphasis_control": self.collect_boundary_emphasis_control(),
+            "cursor_geodesy_readout": self.collect_cursor_geodesy_readout(),
             "style_renderer_entries": self.collect_style_renderer_entries(),
             "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
             "module_boundary_registry": self.collect_module_boundary_registry(),

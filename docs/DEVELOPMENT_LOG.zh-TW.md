@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-05-30 - Cursor geodesy readout
+
+- Added `rrkal_displaytools.cursor_geodesy_readout.v1` for canvas mouse-position lon/lat readout, with explicit `position()/pos()` Qt event guard evidence.
+- Launch packets, renderer capabilities, handoff inspection and smoke now expose the cursor geodesy contract; renderer globe raycast remains queued as backend work.
+- Smoke: PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Boundary emphasis row double-click
 
 - Routed boundary-capable layer row double-clicks to `Boundary emphasis controls...` and hardened the slot for Qt `clicked(bool)` delivery.

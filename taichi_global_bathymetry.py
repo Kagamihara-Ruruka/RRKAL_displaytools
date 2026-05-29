@@ -18651,6 +18651,25 @@ def layer_research_workflow_packet(
     }
 
 
+def cursor_geodesy_readout_packet(source: str) -> dict[str, object]:
+    return {
+        "schema": "rrkal_displaytools.cursor_geodesy_readout.v1",
+        "source": source,
+        "status": "ready",
+        "last_known_position_available": False,
+        "latitude": None,
+        "longitude": None,
+        "units": "degrees",
+        "coordinate_order": "latitude_longitude",
+        "input_surface": "Qt canvas preview mouse move",
+        "projection_method": "viewport_equirectangular_preview_estimate",
+        "event_position_guard": "QMouseEvent.position with QMouseEvent.pos fallback",
+        "qt_surface": "Canvas meta label and launch packet",
+        "backend_raycast_status": "queued_renderer_globe_intersection",
+        "researcher_note": "Canvas preview gives immediate lon/lat feedback; final globe raycast should be handled by renderer backend when closed.",
+    }
+
+
 def boundary_emphasis_control_packet(
     state: dict[str, object] | None,
     selected_layer: str | None,
@@ -18946,6 +18965,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
         "layer_operator_groups": layer_operator_groups_packet(layer_operator_shortcuts_packet("taichi_global_bathymetry.renderer_capabilities"), "taichi_global_bathymetry.renderer_capabilities"),
         "layer_research_workflow": layer_research_workflow_packet(None, None, layer_operator_groups_packet(layer_operator_shortcuts_packet("taichi_global_bathymetry.renderer_capabilities"), "taichi_global_bathymetry.renderer_capabilities"), layer_capability_matrix_packet(), "taichi_global_bathymetry.renderer_capabilities"),
         "boundary_emphasis_control": boundary_emphasis_control_packet(None, None, "taichi_global_bathymetry.renderer_capabilities"),
+        "cursor_geodesy_readout": cursor_geodesy_readout_packet("taichi_global_bathymetry.renderer_capabilities"),
         "style_renderer_entries": style_renderer_entries_packet("taichi_global_bathymetry.renderer_capabilities"),
         "style_profile_renderer_routes": style_profile_renderer_routes_packet(style_renderer_entries_packet("taichi_global_bathymetry.renderer_capabilities"), "taichi_global_bathymetry.renderer_capabilities"),
         "module_boundary_registry": module_boundary_registry_packet("taichi_global_bathymetry.renderer_capabilities"),

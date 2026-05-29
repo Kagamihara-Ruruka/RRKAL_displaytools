@@ -518,6 +518,15 @@ if ($launchPacket.canvas_preview.preview_frame_path -ne "state/renderer_preview_
 if ([double]$launchPacket.canvas_preview.preview_frame_interval_s -le 0) {
     throw "Launch packet canvas_preview preview_frame_interval_s missing or invalid"
 }
+if ($launchPacket.cursor_geodesy_readout.schema -ne "rrkal_displaytools.cursor_geodesy_readout.v1") {
+    throw "Launch packet cursor_geodesy_readout schema missing or invalid"
+}
+if ($launchPacket.cursor_geodesy_readout.event_position_guard -ne "QMouseEvent.position with QMouseEvent.pos fallback") {
+    throw "Launch packet cursor_geodesy_readout event guard missing"
+}
+if ($launchPacket.cursor_geodesy_readout.backend_raycast_status -ne "queued_renderer_globe_intersection") {
+    throw "Launch packet cursor_geodesy_readout backend raycast status mismatch"
+}
 $timelineExportDir = Join-Path $env:TEMP "rrkal_displaytools_smoke_timeline_export"
 $timelineExportGif = Join-Path $timelineExportDir "smoke.gif"
 $timelineExportMp4 = Join-Path $timelineExportDir "smoke.mp4"
@@ -681,6 +690,15 @@ if ($capabilities.layer_research_workflow.schema -ne "rrkal_displaytools.layer_r
 }
 if ($capabilities.layer_research_workflow.status -ne "ready") {
     throw "Renderer layer_research_workflow not ready"
+}
+if ($capabilities.cursor_geodesy_readout.schema -ne "rrkal_displaytools.cursor_geodesy_readout.v1") {
+    throw "Renderer cursor_geodesy_readout schema missing or invalid"
+}
+if ($capabilities.cursor_geodesy_readout.projection_method -ne "viewport_equirectangular_preview_estimate") {
+    throw "Renderer cursor_geodesy_readout projection method mismatch"
+}
+if ($capabilities.cursor_geodesy_readout.backend_raycast_status -ne "queued_renderer_globe_intersection") {
+    throw "Renderer cursor_geodesy_readout backend raycast status mismatch"
 }
 if ($capabilities.boundary_emphasis_control.schema -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
     throw "Renderer boundary_emphasis_control schema missing or invalid"
@@ -978,6 +996,18 @@ if ($handoff.layer_research_workflow.renderer_capabilities_schema -ne "rrkal_dis
 }
 if ($handoff.layer_research_workflow.qt_surface -ne "Layers dock research workflow label") {
     throw "Handoff inspection layer_research_workflow Qt surface mismatch"
+}
+if ($handoff.launch_packet_contracts.cursor_geodesy_readout -ne "rrkal_displaytools.cursor_geodesy_readout.v1") {
+    throw "Handoff inspection cursor_geodesy_readout launch contract missing or invalid"
+}
+if ($handoff.cursor_geodesy_readout.launch_packet_schema -ne "rrkal_displaytools.cursor_geodesy_readout.v1") {
+    throw "Handoff inspection cursor_geodesy_readout launch schema missing or invalid"
+}
+if ($handoff.cursor_geodesy_readout.renderer_capabilities_schema -ne "rrkal_displaytools.cursor_geodesy_readout.v1") {
+    throw "Handoff inspection cursor_geodesy_readout renderer schema missing or invalid"
+}
+if ($handoff.cursor_geodesy_readout.event_position_guard -ne "QMouseEvent.position with QMouseEvent.pos fallback") {
+    throw "Handoff inspection cursor_geodesy_readout event guard missing"
 }
 if ($handoff.launch_packet_contracts.boundary_emphasis_control -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
     throw "Handoff inspection boundary_emphasis_control launch contract missing or invalid"

@@ -309,6 +309,29 @@ def canvas_preview_packet(profile: dict[str, object]) -> dict[str, object]:
     return dict(DEFAULT_CANVAS_PREVIEW)
 
 
+def cursor_geodesy_readout_packet(canvas_preview: dict[str, object] | None, source: str) -> dict[str, object]:
+    canvas_preview = canvas_preview if isinstance(canvas_preview, dict) else {}
+    latitude = canvas_preview.get("cursor_latitude")
+    longitude = canvas_preview.get("cursor_longitude")
+    has_position = isinstance(latitude, (int, float)) and isinstance(longitude, (int, float))
+    return {
+        "schema": "rrkal_displaytools.cursor_geodesy_readout.v1",
+        "source": source,
+        "status": "ready",
+        "last_known_position_available": has_position,
+        "latitude": float(latitude) if isinstance(latitude, (int, float)) else None,
+        "longitude": float(longitude) if isinstance(longitude, (int, float)) else None,
+        "units": "degrees",
+        "coordinate_order": "latitude_longitude",
+        "input_surface": "Qt canvas preview mouse move",
+        "projection_method": "viewport_equirectangular_preview_estimate",
+        "event_position_guard": "QMouseEvent.position with QMouseEvent.pos fallback",
+        "qt_surface": "Canvas meta label and launch packet",
+        "backend_raycast_status": "queued_renderer_globe_intersection",
+        "researcher_note": "Canvas preview gives immediate lon/lat feedback; final globe raycast should be handled by renderer backend when closed.",
+    }
+
+
 def boundary_highlight_packet(profile: dict[str, object]) -> dict[str, object] | None:
     merged = dict(DEFAULT_BOUNDARY_HIGHLIGHT)
     payload = profile.get("boundary_highlight")
@@ -2442,6 +2465,7 @@ def launch_packet(
         "ocean_material_control_port": ocean_material_control_port_packet(profile.get("ocean_material") if isinstance(profile.get("ocean_material"), dict) else None, "scripts.export_launch_packet"),
         "layer_capability_matrix": layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref),
         "canvas_preview": canvas_preview_packet(profile),
+        "cursor_geodesy_readout": cursor_geodesy_readout_packet(canvas_preview_packet(profile), "scripts.export_launch_packet"),
         "boundary_highlight": boundary_highlight_packet(profile),
         "active_layer_diagnostics": active_layer_diagnostics_packet(profile, rrkal_data_manifest_ref),
         "layer_undo": layer_undo_packet(),
