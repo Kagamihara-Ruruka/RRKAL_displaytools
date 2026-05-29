@@ -2448,6 +2448,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_pick_state_label = QtWidgets.QLabel(f"Layer pick: waiting for {LAYER_PICK_STATE_PATH.name}")
         self.layer_pick_state_label.setWordWrap(True)
         layers_layout.addWidget(self.layer_pick_state_label)
+        self.layer_workflow_hint_label = QtWidgets.QLabel(
+            "Layer workflow: click a row to select the active research layer; double-click Boundary/領海/EEZ/公海 rows "
+            "or use Emphasis to open mask controls; identity warning badges mean preview/source-property identity only, "
+            "not authoritative polygon/EEZ resolution."
+        )
+        self.layer_workflow_hint_label.setObjectName("layerWorkflowHint")
+        self.layer_workflow_hint_label.setWordWrap(True)
+        layers_layout.addWidget(self.layer_workflow_hint_label)
         demo = QtWidgets.QCheckBox("閉環展示 preset（會覆蓋部分設定）")
         demo.stateChanged.connect(self.refresh_command_preview)
         self.checks["demo_closed_loop"] = demo
@@ -2591,6 +2599,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             QPlainTextEdit { font-family: Consolas, 'Cascadia Mono', monospace; }
             QLabel#navigatorPreview { background: #202832; color: #d8e6f3; border: 1px dashed #8aa0b6; }
             QLabel#layerHeader { color: #587087; font-size: 8.5pt; font-weight: 700; }
+            QLabel#layerWorkflowHint { color: #405466; background: #eef5f8; border: 1px solid #b7c9d6; border-radius: 8px; padding: 6px 8px; }
             QWidget#layerRow { border-bottom: 1px solid #d6e0ea; }
             QWidget#layerRow[selected="true"] { background: #dceeff; border: 1px solid #5b8db8; }
             QLabel#selectedLayer { color: #23435f; font-weight: 700; padding-top: 6px; }

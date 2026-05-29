@@ -3238,3 +3238,17 @@ Decision:
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
+
+## 2026-05-30 - Qt Layers workflow hint
+
+Scope:
+- Added a visible `layerWorkflowHint` callout to the Qt Layers dock.
+- The hint explains row selection, Boundary/territorial sea/EEZ/high-seas double-click or Emphasis action, and the meaning of identity warning badges.
+- Smoke now verifies the visible workflow hint, row-selection wording and non-authoritative identity warning wording.
+
+Decision:
+- Layer control should be operable by researchers without reading implementation notes; the UI needs to explain selection and Boundary emphasis workflows directly beside the layer stack.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+

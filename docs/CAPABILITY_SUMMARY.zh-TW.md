@@ -329,3 +329,8 @@
 
 - Closed-loop status now lists `boundary_identity_warning_handoff` for the warning/provenance loop across Qt, Canvas Preview, launch packet, handoff inspection and smoke.
 - The closed-loop note keeps authoritative polygon/EEZ identity and open-line area inference explicitly pending.
+
+### 2026-05-30 Qt Layers workflow hint
+
+- Layers dock now includes a visible workflow hint for selecting active research layers and opening Boundary emphasis controls.
+- The hint clarifies that identity warning badges indicate preview/source-property identity, not authoritative polygon/EEZ resolution.

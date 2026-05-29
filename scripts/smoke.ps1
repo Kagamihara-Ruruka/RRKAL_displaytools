@@ -1632,6 +1632,15 @@ if ($qtPanelSource -notlike "*Boundary ack history*") {
 if ($qtPanelSource -notlike "*boundary_highlight_ack_history*") {
     throw "Qt panel boundary ack history provenance missing"
 }
+if ($qtPanelSource -notlike "*layerWorkflowHint*") {
+    throw "Qt Layers workflow hint is missing"
+}
+if ($qtPanelSource -notlike "*click a row to select the active research layer*") {
+    throw "Qt Layers workflow row-selection hint is missing"
+}
+if ($qtPanelSource -notlike "*not authoritative polygon/EEZ resolution*") {
+    throw "Qt Layers workflow identity warning hint is missing"
+}
 
 $rendererSource = Get-Content -Raw -Encoding UTF8 taichi_global_bathymetry.py
 if ($rendererSource -notlike "*last_layer_pick_screen*") {
