@@ -2793,3 +2793,17 @@ Decision:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Qt cursor geodesy bridge readback
+
+Scope:
+- Added a Qt timer that reads renderer cursor geodesy state/ack files.
+- Canvas Preview now surfaces renderer cursor hit/miss, lat/lon, event, frame, and update time.
+- Provenance and canvas preview state now include renderer cursor geodesy state/ack payloads.
+- Smoke now gates the Qt cursor geodesy bridge label, refresh hook, and provenance payload.
+
+Decision:
+- Qt readback remains file-based to match the existing renderer state bridges and keep GPU/IPC texture streaming deferred.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

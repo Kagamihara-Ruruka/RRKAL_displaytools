@@ -1404,6 +1404,15 @@ if ($qtPanelSource -like "*Boundary emphasis: UI ready, renderer mask hook queue
 if ($qtPanelSource -notlike "*Boundary emphasis: UI ready, renderer bridge wired*") {
     throw "Qt boundary emphasis label missing renderer bridge wired status"
 }
+if ($qtPanelSource -notlike "*refresh_cursor_geodesy_bridge_state*") {
+    throw "Qt panel cursor geodesy bridge refresh hook missing"
+}
+if ($qtPanelSource -notlike "*Renderer cursor geodesy: waiting for state/ack*") {
+    throw "Qt panel cursor geodesy bridge label missing"
+}
+if ($qtPanelSource -notlike "*renderer_cursor_geodesy_state*") {
+    throw "Qt panel cursor geodesy provenance payload missing"
+}
 
 $scripts = Get-ChildItem scripts -Filter *.ps1
 foreach ($script in $scripts) {

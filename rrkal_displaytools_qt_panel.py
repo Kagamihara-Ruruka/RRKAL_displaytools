@@ -1936,12 +1936,17 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.research_pins: list[dict[str, object]] = []
         self.canvas_preview_label: QtWidgets.QLabel | None = None
         self.canvas_meta_label: QtWidgets.QLabel | None = None
+        self.cursor_geodesy_bridge_label: QtWidgets.QLabel | None = None
         self.canvas_preview_mode = "state"
         self.renderer_thumbnail_path: Path | None = None
         self.renderer_thumbnail_mtime_ns: int | None = None
         self.canvas_zoom_slider: QtWidgets.QSlider | None = None
         self.cursor_latitude: float | None = None
         self.cursor_longitude: float | None = None
+        self.cursor_geodesy_state_mtime_ns: int | None = CURSOR_GEODESY_STATE_PATH.stat().st_mtime_ns if CURSOR_GEODESY_STATE_PATH.exists() else None
+        self.cursor_geodesy_ack_mtime_ns: int | None = CURSOR_GEODESY_ACK_PATH.stat().st_mtime_ns if CURSOR_GEODESY_ACK_PATH.exists() else None
+        self.cursor_geodesy_state_payload: dict[str, object] | None = None
+        self.cursor_geodesy_ack_payload: dict[str, object] | None = None
         self.provenance_text: QtWidgets.QPlainTextEdit | None = None
         self.docks: dict[str, QtWidgets.QDockWidget] = {}
         self.template_paths: list[Path] = []
@@ -1987,6 +1992,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.timeline_ack_timer.setInterval(1000)
         self.timeline_ack_timer.timeout.connect(self.refresh_timeline_ack_state)
         self.timeline_ack_timer.start()
+        self.cursor_geodesy_bridge_timer = QtCore.QTimer(self)
+        self.cursor_geodesy_bridge_timer.setInterval(800)
+        self.cursor_geodesy_bridge_timer.timeout.connect(self.refresh_cursor_geodesy_bridge_state)
+        self.cursor_geodesy_bridge_timer.start()
         self.apply_baseline()
         self.refresh_template_list()
         if initial_profile is not None:
@@ -2411,6 +2420,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.canvas_meta_label.setObjectName("canvasMeta")
         self.canvas_meta_label.setWordWrap(True)
         command_layout.addWidget(self.canvas_meta_label)
+        self.cursor_geodesy_bridge_label = QtWidgets.QLabel("Renderer cursor geodesy: waiting for state/ack")
+        self.cursor_geodesy_bridge_label.setObjectName("canvasMeta")
+        self.cursor_geodesy_bridge_label.setWordWrap(True)
+        command_layout.addWidget(self.cursor_geodesy_bridge_label)
         zoom_row = QtWidgets.QHBoxLayout()
         zoom_row.addWidget(QtWidgets.QLabel("Canvas zoom"))
         self.canvas_zoom_slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
@@ -3293,6 +3306,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "cursor_latitude": self.cursor_latitude,
             "cursor_longitude": self.cursor_longitude,
             "cursor_units": "degrees",
+            "renderer_cursor_geodesy_state_file": str(CURSOR_GEODESY_STATE_PATH),
+            "renderer_cursor_geodesy_ack_file": str(CURSOR_GEODESY_ACK_PATH),
+            "renderer_cursor_geodesy_state": self.cursor_geodesy_state_payload,
+            "renderer_cursor_geodesy_ack": self.cursor_geodesy_ack_payload,
             "renderer_sync": renderer_sync,
         }
 
@@ -3850,6 +3867,66 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"Renderer input ack: pins={pin_count}, selected={selected_pin_id}, "
             f"selected_exists={selected_exists}, updated={updated_at}"
         )
+
+    def cursor_geodesy_bridge_text(self) -> str:
+        state = self.cursor_geodesy_state_payload if isinstance(self.cursor_geodesy_state_payload, dict) else {}
+        ack = self.cursor_geodesy_ack_payload if isinstance(self.cursor_geodesy_ack_payload, dict) else {}
+        error = ack.get("error")
+        if error:
+            return f"Renderer cursor geodesy: ack error={error}"
+        if not state and not ack:
+            return f"Renderer cursor geodesy: waiting for {CURSOR_GEODESY_STATE_PATH.name}"
+        event = str(ack.get("event") or state.get("event") or "-")
+        frame = ack.get("frame_index", state.get("frame_index", "-"))
+        updated = str(ack.get("updated_at_utc") or state.get("updated_at_utc") or "-")
+        hit = state.get("hit", ack.get("hit"))
+        latitude = state.get("latitude", ack.get("latitude"))
+        longitude = state.get("longitude", ack.get("longitude"))
+        if hit is True and isinstance(latitude, (int, float)) and isinstance(longitude, (int, float)):
+            return f"Renderer cursor geodesy: hit lat={float(latitude):.4f}, lon={float(longitude):.4f}, event={event}, frame={frame}, updated={updated}"
+        if hit is False:
+            return f"Renderer cursor geodesy: outside globe, event={event}, frame={frame}, updated={updated}"
+        return f"Renderer cursor geodesy: state pending, event={event}, frame={frame}, updated={updated}"
+
+    def refresh_cursor_geodesy_bridge_label(self) -> None:
+        if self.cursor_geodesy_bridge_label is not None:
+            self.cursor_geodesy_bridge_label.setText(self.cursor_geodesy_bridge_text())
+
+    def refresh_cursor_geodesy_bridge_state(self) -> None:
+        changed = False
+        for path, mtime_attr, payload_attr in (
+            (CURSOR_GEODESY_STATE_PATH, "cursor_geodesy_state_mtime_ns", "cursor_geodesy_state_payload"),
+            (CURSOR_GEODESY_ACK_PATH, "cursor_geodesy_ack_mtime_ns", "cursor_geodesy_ack_payload"),
+        ):
+            try:
+                stat = path.stat()
+            except FileNotFoundError:
+                if getattr(self, mtime_attr) is not None:
+                    setattr(self, mtime_attr, None)
+                    setattr(self, payload_attr, None)
+                    changed = True
+                continue
+            except OSError as exc:
+                if self.cursor_geodesy_bridge_label is not None:
+                    self.cursor_geodesy_bridge_label.setText(f"Renderer cursor geodesy read failed: {exc}")
+                return
+            if stat.st_mtime_ns == getattr(self, mtime_attr):
+                continue
+            next_mtime_ns = stat.st_mtime_ns
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                if self.cursor_geodesy_bridge_label is not None:
+                    self.cursor_geodesy_bridge_label.setText(f"Renderer cursor geodesy parse failed: {exc}")
+                return
+            setattr(self, mtime_attr, next_mtime_ns)
+            if isinstance(payload, dict):
+                setattr(self, payload_attr, payload)
+                changed = True
+        if changed:
+            self.refresh_cursor_geodesy_bridge_label()
+            self.refresh_canvas_preview()
+            self.refresh_research_provenance()
 
     def current_pin_label_mode(self) -> str:
         if self.pin_label_mode_combo is None:
@@ -6111,6 +6188,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             if self.cursor_latitude is not None and self.cursor_longitude is not None
             else "move mouse over canvas"
         )
+        renderer_cursor_text = self.cursor_geodesy_bridge_text()
         style = self.style_combo.currentText() if hasattr(self, "style_combo") else "-"
         topo = self.topo_combo.currentText() if hasattr(self, "topo_combo") else "-"
         data_mode = self.data_combo.currentText() if hasattr(self, "data_combo") else "-"
@@ -6133,12 +6211,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"Selected pin: {selected_pin_text}\n"
             f"Pin markers: {pin_markers}\n"
             f"Cursor estimate: {cursor_text}\n\n"
+            f"{renderer_cursor_text}\n\n"
             "Qt state preview; renderer state sync and pick bridges are live. Use Renderer thumbnail or Live preview for renderer pixels."
         )
         self.canvas_meta_label.setText(
             f"Canvas state mirrors Qt UI only：active tool={self.active_tool}, "
             f"target layer={self.selected_layer_key or '-'}, style={style}, visible_layers={visible}, "
             f"selected_pin={self.selected_pin_id or '-'}, cursor={cursor_text}, "
+            f"renderer_cursor_bridge={renderer_cursor_text}, "
             f"boundary_highlight={'on' if self.boundary_highlight_state.get('enabled') else 'off'}."
         )
         self.refresh_research_provenance()
@@ -6260,6 +6340,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "cursor_geodesy_readout": self.collect_cursor_geodesy_readout(),
             "cursor_geodesy_state_file": str(CURSOR_GEODESY_STATE_PATH),
             "cursor_geodesy_ack_file": str(CURSOR_GEODESY_ACK_PATH),
+            "cursor_geodesy_state": self.cursor_geodesy_state_payload,
+            "cursor_geodesy_ack": self.cursor_geodesy_ack_payload,
             "style_renderer_entries": self.collect_style_renderer_entries(),
             "style_profile_renderer_routes": self.collect_style_profile_renderer_routes(),
             "module_boundary_registry": self.collect_module_boundary_registry(),

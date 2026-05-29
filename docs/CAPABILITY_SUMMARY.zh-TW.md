@@ -162,3 +162,9 @@
 - Renderer mouse press/move events now write `state/renderer_cursor_geodesy_state.json` and `state/renderer_cursor_geodesy_ack.json`.
 - Qt launcher and no-GUI launch packets pass `--cursor-geodesy-state-file` and `--cursor-geodesy-ack-file`.
 - Launch packets, renderer capabilities, handoff inspection, and smoke expose `renderer_mouse_state_wired` for the cursor geodesy bridge.
+
+### 2026-05-30 Qt cursor geodesy bridge readback
+
+- Qt Canvas Preview now reads renderer cursor geodesy state/ack files and shows hit/miss, lat/lon, event, frame, and update time.
+- Research provenance records renderer cursor geodesy state and ack payloads alongside the UI cursor estimate.
+- Smoke gates the Qt label, refresh hook, and provenance payload for this bridge.
