@@ -170,3 +170,4 @@ Last updated: 2026-05-29
 - 2026-05-30: Added Pin coordinate source metadata and list-row source summaries.
 - 2026-05-30: Added visible Pin projection rotation/occlusion note to the Qt Pin panel.
 - 2026-05-30: Added Pin/Boundary UI affordance fields to handoff inspection and fixed the Windows setup GitHub clone URL.
+- 2026-05-30: Updated profile schema docs for Pin coordinate source, Boundary emphasis alignment and Timeline keyframe preservation.

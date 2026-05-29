@@ -32,8 +32,10 @@ rrkal_displaytools.qt_panel_profile.v1
 | `tool_state` | object | optional | Qt tool palette 的 UI-only state。 |
 | `pins` | array | optional | 科研標記清單。 |
 | `boundary_highlight` | object | optional | 疆域/領海/EEZ hover 強調遮罩控制。 |
+| `boundary_emphasis_control` | object | optional | Layers dock Boundary emphasis dialog 的 UI profile state。 |
 | `canvas_preview` | object | optional | 中央 Canvas Preview 模式、static renderer thumbnail 或 live renderer frame stream 參考。 |
 | `timeline_export` | object | optional | Timeline renderer export UI 狀態，只準備 renderer flags 與本機輸出路徑。 |
+| `timeline_keyframes` | array | optional | Timeline keyframe 清單，可保存 pins、boundary highlight 與 boundary emphasis control。 |
 
 ## `renderer`
 
@@ -167,9 +169,14 @@ rrkal_displaytools.qt_panel_profile.v1
 | `type` | string | `Observation`、`Sample Site`、`Anomaly`、`Reference` 或 `Event`。 |
 | `label` | string | 標記名稱。 |
 | `note` | string | 標記備註。 |
-| `placement` | string | 目前通常是 `manual_lat_lon`，代表以手動經緯度建立；地球點擊定位後端尚未接。 |
+| `latitude` | string | Pin 編輯欄中的緯度文字。 |
+| `longitude` | string | Pin 編輯欄中的經度文字。 |
+| `label_priority` | integer 0-100 | Renderer label 排版優先度。 |
+| `placement` | string | 與 `coordinate_source` 相同；目前支援 `manual_lat_lon`、`renderer_globe_raycast`、`qt_canvas_estimate`。 |
+| `coordinate_source` | string | Pin 座標來源：手動輸入、renderer globe raycast 或 Qt canvas estimate fallback。 |
+| `coordinate_source_label` | string | 給 UI / handoff 顯示的人類可讀座標來源。 |
 
-目前 `tool_state` 不會直接改 renderer。Brush / Mask 暫不納入本輪 UI；Select 用於指定 active layer，Pin 用於先保存科研標記意圖，後續再接 canvas/globe hit-test。
+目前 `tool_state` 不會直接改 renderer。Brush / Mask 暫不納入本輪 UI；Select 用於指定 active layer，Pin 用於保存科研標記意圖。Pin cursor fill 會優先使用 renderer globe raycast，沒有 renderer hit 時才 fallback 到 Qt Canvas estimate。
 
 ## `pins`
 
@@ -189,7 +196,9 @@ Renderer overlay 接上後，Pin 不應是螢幕固定標籤，而應是 geodeti
 | `longitude` | number -180..180 | 經度。 |
 | `label_priority` | integer 0-100 | 可選，renderer label layout 優先度；selected Pin 仍會優先於一般 Pin。 |
 | `target_layer` | string or null | 可選，建立 pin 時的 active layer。 |
-| `placement` | string | 目前為 `manual_lat_lon`；後續會加入滑鼠位置反推經緯度的 `cursor_lat_lon` 流程。 |
+| `placement` | string | 與 `coordinate_source` 相同；支援 `manual_lat_lon`、`renderer_globe_raycast`、`qt_canvas_estimate`。 |
+| `coordinate_source` | string | 建立此 Pin 時的座標來源。 |
+| `coordinate_source_label` | string | Pin list / handoff 使用的人類可讀來源，例如 `Renderer globe raycast`。 |
 
 ## `boundary_highlight`
 
@@ -212,6 +221,29 @@ Renderer overlay 接上後，Pin 不應是螢幕固定標籤，而應是 geodeti
 
 目前 Qt 已提供 Properties 入口與圖層列雙擊對話框，並會把設定寫入 profile、launch packet、Canvas Preview 與 provenance。Renderer 已接 hover outline/glow、closed-ring fill preview、contrast/gamma/fill tone 與 identity-status handoff；下一步是 authoritative polygon territory identity 與 open-line area inference。
 
+## `boundary_emphasis_control`
+
+可選。此欄位保存 Layers dock `Boundary emphasis controls...` 對話框的 UI profile state，並映射到 `boundary_highlight` renderer bridge。圖層列的 Boundary/EEZ 類 row 會顯示 `Emphasis` action badge，雙擊可打開同一對話框。
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `schema` | string | 固定為 `rrkal_displaytools.boundary_emphasis_control.v1`。 |
+| `target_mode` | string | `auto_selected_boundary_layer`、`country_boundary`、`territorial_sea`、`exclusive_economic_zone` 或 `maritime_boundary`。 |
+| `target_layer_key` | string or null | 由 `target_mode` 解析出的 Qt layer key。 |
+| `selected_layer_matches_target` | boolean | 目前 active layer 是否與 emphasis target 對齊。 |
+| `target_alignment` | string | `selected_layer_matches_target`、`selected_layer_differs_from_target`、`selected_layer_not_boundary_capable` 或 `no_selected_layer`。 |
+| `target_alignment_label` | string | Canvas Preview / Layers dock 顯示的人類可讀對齊狀態。 |
+| `color_rgb` | array | 三個 0-255 integer。 |
+| `contrast` | number | UI slider 值，預設約 `1.35`。 |
+| `opacity` | number | UI slider 值，0.0 到 1.0。 |
+| `gamma` | number | UI slider 值，預設 `1.0`。 |
+| `breathing_enabled` | boolean | 是否啟用呼吸效果。 |
+| `breathing_period_s` | number | 呼吸週期秒數。 |
+| `dialog_feedback` | array | 目前包含 `rgb_swatch`、`live_numeric_readout`、`renderer_bridge_summary`。 |
+| `value_preview_fields` | array | 對話框 live preview 與 handoff 應顯示的主要欄位。 |
+
+此欄位是 displaytools UI/renderer bridge contract；authoritative polygon territory identity、EEZ identity source 與 open-line area inference 仍屬後續資料/幾何閉環。
+
 ## `canvas_preview`
 
 可選。此欄位保存中央 Canvas Preview 的 UI 狀態，讓 profile / launch packet 可重現操作者當時是在看 Qt state preview、最近一次 renderer output static thumbnail，或 renderer 寫出的 file-based live preview frame。
@@ -223,6 +255,10 @@ Renderer overlay 接上後，Pin 不應是螢幕固定標籤，而應是 geodeti
 | `renderer_thumbnail_path` | string or null | 可選的 renderer PNG 相對路徑，例如 `state/showcase/quick_smoke.png` 或 `state/renderer_preview_frame.png`。`thumbnail` 載入時若不存在，Qt 會 fallback 到最近的 `state/showcase/*.png`；`live_file_stream` 會等待 renderer 寫出 live preview frame。 |
 | `preview_frame_path` | string or null | live preview renderer frame 的預設本機路徑，目前為 `state/renderer_preview_frame.png`。 |
 | `preview_frame_interval_s` | number | live preview file stream 的建議寫入間隔秒數，目前 Qt 預設為 `0.75`。 |
+| `boundary_emphasis_target_mode` | string | Canvas Preview 顯示的 Boundary emphasis target mode。 |
+| `boundary_emphasis_target_layer` | string or null | Canvas Preview 顯示的解析後 target layer。 |
+| `boundary_emphasis_target_alignment` | string | Canvas Preview provenance 中保存的 target alignment id。 |
+| `boundary_emphasis_target_alignment_label` | string | Canvas Preview 顯示的人類可讀 target alignment。 |
 | `renderer_sync` | string | `state` 為 UI-only preview；`thumbnail` 為 static renderer output contract；`live_file_stream` 為 file-based live renderer frame stream。 |
 
 ## `timeline_export`
@@ -243,6 +279,26 @@ Renderer overlay 接上後，Pin 不應是螢幕固定標籤，而應是 geodeti
 | `mp4_file` | string | MP4 video 輸出路徑。 |
 | `applies` | array | 目前包含 Qt/No-GUI export controls 與 renderer Timeline export CLI。 |
 | `boundary` | string | 明確標示此欄位不負責 RRKAL data governance。 |
+
+## `timeline_keyframes`
+
+可選。Timeline keyframes 是 Qt-first 展示與 renderer handoff 的離散狀態序列。每個 keyframe 可包含：
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `schema` | string | 固定為 `rrkal_displaytools.timeline_keyframe.v1`。 |
+| `id` | string | Keyframe id，例如 `kf_001`。 |
+| `style_profile` | string | Keyframe 對應的 renderer style。 |
+| `renderer` | object | style/topo/data/尺寸等 renderer launch state。 |
+| `ocean_material` | object | wave strength、roughness、foam scalar controls。 |
+| `camera` | object | yaw、pitch、zoom；renderer 可做 camera keyframe/interpolation handoff。 |
+| `selected_layer` | string or null | Keyframe 當下 active layer。 |
+| `layer_stack_snapshot` | object | visibility、lock、opacity、blend、selected layer snapshot。 |
+| `pins` | array | Keyframe 當下 Pin 清單，含 coordinate source metadata。 |
+| `boundary_highlight` | object | Keyframe 當下 renderer boundary highlight mask state。 |
+| `boundary_emphasis_control` | object | Keyframe 當下 Boundary emphasis target/color/contrast/opacity/gamma/breathing UI state。 |
+
+Timeline playback plan 目前把 style、layer visibility/blend、pins、boundary highlight、boundary emphasis control 視為 discrete keyframe fields；ocean material、camera 與 layer opacity 有獨立 interpolation/handoff contract。
 
 ## Handoff rules
 

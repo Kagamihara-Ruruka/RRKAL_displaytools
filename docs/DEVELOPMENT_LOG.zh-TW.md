@@ -3086,3 +3086,17 @@ Decision:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Profile schema Pin/Boundary/Timeline fields
+
+Scope:
+- Profile schema docs now describe Pin coordinate source metadata in `tool_state.pin` and saved `pins` records.
+- Added `boundary_emphasis_control` schema documentation, including target alignment, dialog feedback and value preview fields.
+- Canvas Preview schema docs now include Boundary emphasis target alignment provenance fields.
+- Timeline keyframe docs now state that keyframes preserve Pins, Boundary highlight and Boundary emphasis control as discrete replay fields.
+
+Decision:
+- Cross-machine profile users need the schema docs to match the current Qt-first UI, launch packet and renderer handoff behavior without reading source code.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

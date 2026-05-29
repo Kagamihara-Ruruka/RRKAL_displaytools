@@ -273,3 +273,8 @@
 - Handoff inspection now reports Pin coordinate-source fields, supported coordinate sources, Qt Pin affordances and projection note text.
 - Handoff inspection now reports Boundary emphasis dialog feedback and target-alignment fields.
 - Windows setup clone URL now uses `Kagamihara-Ruruka`.
+
+### 2026-05-30 Profile schema Pin/Boundary/Timeline fields
+
+- Profile schema now documents Pin coordinate source metadata, Boundary emphasis target alignment and Timeline boundary-emphasis keyframe preservation.
+- Canvas Preview profile docs now include Boundary emphasis target alignment provenance fields.
