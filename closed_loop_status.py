@@ -195,10 +195,12 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "maritime property key identity",
                     "boundary identity-status handoff",
                     "boundary identity source hint handoff",
+                    "boundary identity source hint summary",
                 ],
                 "pending": ["authoritative_polygon_territory_identity", "open_line_area_inference"],
                 "identity_source_hint": "current preview identity uses source properties / maritime keys / closed rings; authoritative polygon and open-line inference remain pending",
                 "open_line_area_inference_status": "pending_backend_geometry_closure",
+                "identity_source_hint_summary": "preview/source-property identity only; authoritative polygon and open-line geometry closure remain pending",
                 "evidence": ["boundary-highlight-json", "boundary-highlight-ack-file"],
             },
             {
@@ -335,5 +337,6 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
         ],
         "external_dependencies": ["RRKAL data manifest validation/ingest/governance"],
     }
+
 
 

@@ -174,3 +174,4 @@ Last updated: 2026-05-29
 - 2026-05-30: Refreshed renderer `ui_handoff_contracts` with cursor geodesy, Pin overlay, Boundary emphasis and Boundary ack history.
 - 2026-05-30: Added closed-loop evidence for Pin/Boundary UI handoff and Timeline Boundary emphasis preservation.
 - 2026-05-30: Added boundary identity source hint fields across renderer, Qt, launch packets, closed-loop status and smoke gates so territory/EEZ emphasis provenance remains explicit before backend identity closure.
+- 2026-05-30: Added compact Boundary identity source hint summaries so clone/handoff inspection can show preview sources and pending backend geometry closure without nested JSON expansion.

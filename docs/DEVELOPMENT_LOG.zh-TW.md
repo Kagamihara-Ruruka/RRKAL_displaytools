@@ -3139,3 +3139,17 @@ Decision:
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
+
+## 2026-05-30 - Boundary identity source hint summary
+
+Scope:
+- Added `identity_source_hint_summary` beside the structured Boundary identity hint in renderer, Qt and launch packet contracts.
+- The summary states preview sources, RRKAL-governed authoritative source requirements and open-line inference pending status in one handoff-friendly field.
+- Smoke now checks that the structured hint, pending marker and summary field remain present together.
+
+Decision:
+- Cross-machine inspection should make the scientific/legal provenance boundary readable without requiring users to expand nested JSON.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+

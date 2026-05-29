@@ -294,3 +294,8 @@
 - Boundary identity status now carries `identity_source_hint` across renderer, Qt and launch packet contracts.
 - The contract states that current emphasis identity is preview/provenance based, while authoritative polygon identity and open-line area inference remain `pending_backend_geometry_closure` backend closures.
 
+
+### 2026-05-30 Boundary identity source hint summary
+
+- Boundary identity contracts now include `identity_source_hint_summary` for compact handoff display.
+- The summary keeps the UI honest that current identity is preview/source-property based and `pending_backend_geometry_closure` still blocks authoritative open-line inference.
