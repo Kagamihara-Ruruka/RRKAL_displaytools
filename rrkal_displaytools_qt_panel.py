@@ -375,6 +375,44 @@ def hydrology_lod_runtime_evidence_packet(
     }
 
 
+def ocean_material_control_port_packet(
+    material: dict[str, object] | None,
+    source: str,
+) -> dict[str, object]:
+    material = material if isinstance(material, dict) else {}
+
+    def bounded_float(value: object, default: float, lower: float, upper: float) -> float:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            number = default
+        return max(lower, min(number, upper))
+
+    controls = {
+        "wave_strength": bounded_float(material.get("wave_strength"), 0.22, 0.0, 1.0),
+        "roughness": bounded_float(material.get("roughness"), 0.28, 0.02, 1.0),
+        "foam": bounded_float(material.get("foam"), 0.12, 0.0, 1.0),
+    }
+    return {
+        "schema": "rrkal_displaytools.ocean_material_control_port.v1",
+        "source": source,
+        "enabled": bool(material.get("enabled", True)),
+        "material_controls": controls,
+        "renderer_flags": ["--ocean-wave-strength", "--ocean-roughness", "--ocean-foam"],
+        "taichi_uniforms": ["ocean_enabled", "wave_strength", "roughness", "foam", "time_seconds"],
+        "sea_state_port": {
+            "status": "manual_scalar_port_ready",
+            "normalized_fields": ["wave_strength", "roughness", "foam", "timestamp"],
+            "provider_ports": ["manual", "file", "url", "noaa_ww3", "hycom", "copernicus", "local_grid"],
+            "renderer_consumes": ["wave_strength", "roughness", "foam"],
+        },
+        "qt_surface": "Properties dock ocean material controls",
+        "launch_packet_fields": ["ocean_material_control_port", "profile.ocean_material", "command"],
+        "renderer_capability_field": "ocean_material_control_port",
+        "boundary": "Displaytools passes scalar ocean material controls and sea-state handoff fields only; RRKAL/provider modules own discovery, download, import and cache governance.",
+    }
+
+
 if "--list-templates" in sys.argv[1:]:
     print(json.dumps(profile_template_packet(), ensure_ascii=False, indent=2))
     raise SystemExit(0)
@@ -2733,6 +2771,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "timeline_keyframes": self.timeline_keyframes,
         }
 
+    def collect_ocean_material_control_port(self) -> dict[str, object]:
+        return ocean_material_control_port_packet(
+            self.collect_profile().get("ocean_material"),
+            "rrkal_displaytools_qt_panel",
+        )
+
     def collect_launch_packet(self) -> dict[str, object]:
         return {
             "schema": "rrkal_displaytools.launch_packet.v1",
@@ -2765,6 +2809,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_visual_preset_runtime_feedback": self.collect_layer_visual_preset_runtime_feedback(),
             "hydrology_lod_readiness": self.collect_hydrology_lod_readiness(),
             "hydrology_lod_runtime_evidence": self.collect_hydrology_lod_runtime_evidence(),
+            "ocean_material_control_port": self.collect_ocean_material_control_port(),
             "layer_capability_matrix": self.collect_layer_capability_matrix(),
             "layer_runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
@@ -5614,6 +5659,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_visual_preset_runtime_feedback": self.collect_layer_visual_preset_runtime_feedback(),
             "hydrology_lod_readiness": self.collect_hydrology_lod_readiness(),
             "hydrology_lod_runtime_evidence": self.collect_hydrology_lod_runtime_evidence(),
+            "ocean_material_control_port": self.collect_ocean_material_control_port(),
             "layer_capability_matrix": self.collect_layer_capability_matrix(),
             "layer_runtime_evidence_summary": self.collect_layer_capability_matrix().get("runtime_evidence_summary"),
             "layer_runtime_badge_summary": self.collect_layer_capability_matrix().get("runtime_badge_summary"),

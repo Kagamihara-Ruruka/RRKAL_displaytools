@@ -266,6 +266,15 @@ if ($launchPacket.hydrology_lod_runtime_evidence.ack_file -ne "state/renderer_la
 if ($launchPacket.hydrology_lod_runtime_evidence.pick_state_file -ne "state/renderer_layer_pick_state.json") {
     throw "Launch packet hydrology_lod_runtime_evidence pick state file mismatch"
 }
+if ($launchPacket.ocean_material_control_port.schema -ne "rrkal_displaytools.ocean_material_control_port.v1") {
+    throw "Launch packet ocean_material_control_port schema missing or invalid"
+}
+if ($launchPacket.ocean_material_control_port.renderer_flags -notcontains "--ocean-wave-strength") {
+    throw "Launch packet ocean_material_control_port missing wave flag"
+}
+if ($launchPacket.ocean_material_control_port.sea_state_port.normalized_fields -notcontains "wave_strength") {
+    throw "Launch packet ocean_material_control_port sea-state normalized fields missing"
+}
 if ($launchPacket.layer_undo.schema -ne "rrkal_displaytools.layer_stack_undo.v1") {
     throw "Launch packet layer_undo schema missing or invalid"
 }
@@ -649,6 +658,12 @@ if ($capabilities.hydrology_lod_runtime_evidence.schema -ne "rrkal_displaytools.
 if ($capabilities.hydrology_lod_runtime_evidence.qt_surface -ne "Layers dock Hydrology runtime evidence label") {
     throw "Renderer hydrology_lod_runtime_evidence qt surface mismatch"
 }
+if ($capabilities.ocean_material_control_port.schema -ne "rrkal_displaytools.ocean_material_control_port.v1") {
+    throw "Renderer ocean_material_control_port schema missing or invalid"
+}
+if ($capabilities.ocean_material_control_port.taichi_uniforms -notcontains "wave_strength") {
+    throw "Renderer ocean_material_control_port Taichi uniforms missing"
+}
 if ($capabilities.layer_capability_matrix.schema -ne "rrkal_displaytools.layer_capability_matrix.v1") {
     throw "Renderer layer_capability_matrix capability missing or invalid"
 }
@@ -933,6 +948,18 @@ if ($handoff.hydrology_lod_runtime_evidence.renderer_capabilities_schema -ne "rr
 }
 if ($handoff.hydrology_lod_runtime_evidence.ack_file -ne "state/renderer_layer_runtime_ack.json") {
     throw "Handoff inspection hydrology_lod_runtime_evidence ack file mismatch"
+}
+if ($handoff.launch_packet_contracts.ocean_material_control_port -ne "rrkal_displaytools.ocean_material_control_port.v1") {
+    throw "Handoff inspection ocean_material_control_port launch contract missing or invalid"
+}
+if ($handoff.ocean_material_control_port.launch_packet_schema -ne "rrkal_displaytools.ocean_material_control_port.v1") {
+    throw "Handoff inspection ocean_material_control_port launch schema missing or invalid"
+}
+if ($handoff.ocean_material_control_port.renderer_capabilities_schema -ne "rrkal_displaytools.ocean_material_control_port.v1") {
+    throw "Handoff inspection ocean_material_control_port renderer schema missing or invalid"
+}
+if ($handoff.ocean_material_control_port.renderer_flags -notcontains "--ocean-foam") {
+    throw "Handoff inspection ocean_material_control_port renderer flags missing"
 }
 if ($handoff.layer_capability_matrix.schema -ne "rrkal_displaytools.layer_capability_matrix.v1") {
     throw "Handoff inspection layer_capability_matrix summary missing or invalid"

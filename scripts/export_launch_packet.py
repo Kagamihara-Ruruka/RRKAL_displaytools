@@ -1109,6 +1109,44 @@ def hydrology_lod_runtime_evidence_packet(
     }
 
 
+def ocean_material_control_port_packet(
+    material: dict[str, object] | None,
+    source: str,
+) -> dict[str, object]:
+    material = material if isinstance(material, dict) else {}
+
+    def bounded_float(value: object, default: float, lower: float, upper: float) -> float:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            number = default
+        return max(lower, min(number, upper))
+
+    controls = {
+        "wave_strength": bounded_float(material.get("wave_strength"), 0.22, 0.0, 1.0),
+        "roughness": bounded_float(material.get("roughness"), 0.28, 0.02, 1.0),
+        "foam": bounded_float(material.get("foam"), 0.12, 0.0, 1.0),
+    }
+    return {
+        "schema": "rrkal_displaytools.ocean_material_control_port.v1",
+        "source": source,
+        "enabled": bool(material.get("enabled", True)),
+        "material_controls": controls,
+        "renderer_flags": ["--ocean-wave-strength", "--ocean-roughness", "--ocean-foam"],
+        "taichi_uniforms": ["ocean_enabled", "wave_strength", "roughness", "foam", "time_seconds"],
+        "sea_state_port": {
+            "status": "manual_scalar_port_ready",
+            "normalized_fields": ["wave_strength", "roughness", "foam", "timestamp"],
+            "provider_ports": ["manual", "file", "url", "noaa_ww3", "hycom", "copernicus", "local_grid"],
+            "renderer_consumes": ["wave_strength", "roughness", "foam"],
+        },
+        "qt_surface": "Properties dock ocean material controls",
+        "launch_packet_fields": ["ocean_material_control_port", "profile.ocean_material", "command"],
+        "renderer_capability_field": "ocean_material_control_port",
+        "boundary": "Displaytools passes scalar ocean material controls and sea-state handoff fields only; RRKAL/provider modules own discovery, download, import and cache governance.",
+    }
+
+
 def layer_operator_shortcuts_packet(
     source: str,
     selected_layer: str | None = None,
@@ -2141,6 +2179,7 @@ def launch_packet(
         "layer_visual_preset_runtime_feedback": layer_visual_preset_runtime_feedback_packet(layer_visual_presets_packet("scripts.export_launch_packet"), None, "scripts.export_launch_packet"),
         "hydrology_lod_readiness": hydrology_lod_readiness_packet("scripts.export_launch_packet", layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref)),
         "hydrology_lod_runtime_evidence": hydrology_lod_runtime_evidence_packet(hydrology_lod_readiness_packet("scripts.export_launch_packet", layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref)), None, None, "scripts.export_launch_packet"),
+        "ocean_material_control_port": ocean_material_control_port_packet(profile.get("ocean_material") if isinstance(profile.get("ocean_material"), dict) else None, "scripts.export_launch_packet"),
         "layer_capability_matrix": layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref),
         "canvas_preview": canvas_preview_packet(profile),
         "boundary_highlight": boundary_highlight_packet(profile),

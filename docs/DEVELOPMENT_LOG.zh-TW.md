@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-05-30 - Ocean material control port
+
+- Added `rrkal_displaytools.ocean_material_control_port.v1` to expose Qt wave/roughness/foam controls, renderer CLI flags, Taichi uniforms and the scalar sea-state handoff boundary.
+- Launch packets, renderer capabilities, handoff inspection and closed-loop evidence now verify the ocean material control port without moving data discovery/cache governance into displaytools.
+- Smoke: PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Hydrology LOD runtime evidence
 
 - Added `rrkal_displaytools.hydrology_lod_runtime_evidence.v1` to connect Hydrology/LOD readiness with renderer layer runtime ack and selected-layer pick evidence.

@@ -46,6 +46,7 @@ $summary = [ordered]@{
         layer_visual_preset_runtime_feedback = $launchPacket.layer_visual_preset_runtime_feedback.schema
         hydrology_lod_readiness = $launchPacket.hydrology_lod_readiness.schema
         hydrology_lod_runtime_evidence = $launchPacket.hydrology_lod_runtime_evidence.schema
+        ocean_material_control_port = $launchPacket.ocean_material_control_port.schema
         layer_undo = $launchPacket.layer_undo.schema
         session_journal = $launchPacket.session_journal.schema
         timeline_state = $launchPacket.timeline_state.schema
@@ -123,6 +124,15 @@ $summary = [ordered]@{
         pick_state_available = $launchPacket.hydrology_lod_runtime_evidence.pick_state_available
         ack_file = $launchPacket.hydrology_lod_runtime_evidence.ack_file
         pick_state_file = $launchPacket.hydrology_lod_runtime_evidence.pick_state_file
+    }
+    ocean_material_control_port = @{
+        launch_packet_schema = $launchPacket.ocean_material_control_port.schema
+        renderer_capabilities_schema = $capabilities.ocean_material_control_port.schema
+        wave_strength = $launchPacket.ocean_material_control_port.material_controls.wave_strength
+        roughness = $launchPacket.ocean_material_control_port.material_controls.roughness
+        foam = $launchPacket.ocean_material_control_port.material_controls.foam
+        sea_state_status = $launchPacket.ocean_material_control_port.sea_state_port.status
+        renderer_flags = $launchPacket.ocean_material_control_port.renderer_flags
     }
     layer_capability_matrix = @{
         schema = $capabilities.layer_capability_matrix.schema
