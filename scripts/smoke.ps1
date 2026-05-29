@@ -43,6 +43,12 @@ if ($launchPacket.layer_filter.available_presets -notcontains "visual_aids") {
 if ($null -eq $launchPacket.layer_filter.first_matched_layer) {
     throw "Launch packet layer_filter first_matched_layer missing"
 }
+if ($launchPacket.layer_group_view.schema -ne "rrkal_displaytools.layer_group_view.v1") {
+    throw "Launch packet layer_group_view schema missing or invalid"
+}
+if ($null -eq $launchPacket.layer_group_view.available_groups.hydrology) {
+    throw "Launch packet layer_group_view hydrology group missing"
+}
 if ($launchPacket.layer_undo.schema -ne "rrkal_displaytools.layer_stack_undo.v1") {
     throw "Launch packet layer_undo schema missing or invalid"
 }
@@ -168,6 +174,9 @@ if ($capabilities.ui_handoff_contracts.schema -ne "rrkal_displaytools.ui_handoff
 }
 if ($capabilities.ui_handoff_contracts.contracts -notcontains "layer_filter") {
     throw "Renderer ui_handoff_contracts layer_filter contract missing"
+}
+if ($capabilities.ui_handoff_contracts.contracts -notcontains "layer_group_view") {
+    throw "Renderer ui_handoff_contracts layer_group_view contract missing"
 }
 if ($capabilities.ui_handoff_contracts.contracts -notcontains "document_undo") {
     throw "Renderer ui_handoff_contracts document_undo contract missing"

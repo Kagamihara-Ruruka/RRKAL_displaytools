@@ -10,6 +10,7 @@ BOUNDARY_HIGHLIGHT_SCHEMA_ID = "rrkal_displaytools.boundary_highlight_mask.v1"
 BOUNDARY_IDENTITY_STATUS_SCHEMA_ID = "rrkal_displaytools.boundary_identity_status.v1"
 CANVAS_PREVIEW_SCHEMA_ID = "rrkal_displaytools.canvas_preview.v1"
 LAYER_FILTER_SCHEMA_ID = "rrkal_displaytools.layer_filter.v1"
+LAYER_GROUP_VIEW_SCHEMA_ID = "rrkal_displaytools.layer_group_view.v1"
 TIMELINE_KEYFRAME_SCHEMA_ID = "rrkal_displaytools.timeline_keyframe.v1"
 
 REQUIRED_PROFILE_TOP_LEVEL = {"schema", "renderer", "ocean_material", "layers"}
@@ -17,6 +18,7 @@ OPTIONAL_PROFILE_TOP_LEVEL = {
     "selected_layer",
     "selected_pin_id",
     "layer_filter",
+    "layer_group_view",
     "layer_stack_ui",
     "tool_state",
     "pins",
@@ -138,6 +140,8 @@ def profile_payload_errors(profile: dict[str, object]) -> list[str]:
                 "selected_layer_visible",
                 "matched_layers",
                 "matched_count",
+                "visible_matched_layers",
+                "visible_matched_count",
                 "total_layers",
                 "boundary",
             }
@@ -165,10 +169,53 @@ def profile_payload_errors(profile: dict[str, object]) -> list[str]:
             selected_layer_visible = layer_filter.get("selected_layer_visible")
             if selected_layer_visible is not None and not isinstance(selected_layer_visible, bool):
                 errors.append("layer_filter.selected_layer_visible must be boolean")
+            visible_matched_layers = layer_filter.get("visible_matched_layers")
+            if visible_matched_layers is not None:
+                if not isinstance(visible_matched_layers, list) or any(not isinstance(item, str) for item in visible_matched_layers):
+                    errors.append("layer_filter.visible_matched_layers must be a list of strings")
+            visible_matched_count = layer_filter.get("visible_matched_count")
+            if visible_matched_count is not None:
+                if not isinstance(visible_matched_count, int) or isinstance(visible_matched_count, bool) or visible_matched_count < 0:
+                    errors.append("layer_filter.visible_matched_count must be a non-negative integer")
             for field in ("matched_count", "total_layers"):
                 value = layer_filter.get(field)
                 if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
                     errors.append(f"layer_filter.{field} must be a non-negative integer")
+    layer_group_view = profile.get("layer_group_view")
+    if layer_group_view is not None:
+        if not isinstance(layer_group_view, dict):
+            errors.append("layer_group_view must be an object")
+        else:
+            allowed_fields = {
+                "schema",
+                "mode",
+                "available_groups",
+                "collapsed_groups",
+                "visible_row_count",
+                "total_layers",
+                "boundary",
+            }
+            for field in sorted(set(layer_group_view) - allowed_fields):
+                errors.append(f"unknown layer_group_view field: {field}")
+            if layer_group_view.get("schema") != LAYER_GROUP_VIEW_SCHEMA_ID:
+                errors.append(f"layer_group_view.schema must be {LAYER_GROUP_VIEW_SCHEMA_ID}")
+            available_groups = layer_group_view.get("available_groups")
+            if available_groups is not None:
+                if not isinstance(available_groups, dict):
+                    errors.append("layer_group_view.available_groups must be an object")
+                else:
+                    for group_id, keys in available_groups.items():
+                        if not isinstance(group_id, str) or not isinstance(keys, list) or any(not isinstance(key, str) for key in keys):
+                            errors.append("layer_group_view.available_groups must map strings to lists of strings")
+                            break
+            collapsed_groups = layer_group_view.get("collapsed_groups")
+            if collapsed_groups is not None:
+                if not isinstance(collapsed_groups, list) or any(not isinstance(item, str) for item in collapsed_groups):
+                    errors.append("layer_group_view.collapsed_groups must be a list of strings")
+            for field in ("visible_row_count", "total_layers"):
+                value = layer_group_view.get(field)
+                if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
+                    errors.append(f"layer_group_view.{field} must be a non-negative integer")
     layer_stack = profile.get("layer_stack_ui")
     if layer_stack is not None:
         if not isinstance(layer_stack, dict):
@@ -438,11 +485,27 @@ def profile_schema_packet() -> dict[str, object]:
                 "selected_layer_visible",
                 "matched_layers",
                 "matched_count",
+                "visible_matched_layers",
+                "visible_matched_count",
                 "total_layers",
                 "boundary",
             ],
             "presets": ["all", "hydrology", "maritime", "traffic", "visual_aids", "custom"],
             "boundary": "Qt Layers row filter only; renderer layer state is unchanged.",
+        },
+        "optional_layer_group_view": {
+            "schema": LAYER_GROUP_VIEW_SCHEMA_ID,
+            "groups": ["hydrology", "maritime", "traffic", "visual_aids"],
+            "fields": [
+                "schema",
+                "mode",
+                "available_groups",
+                "collapsed_groups",
+                "visible_row_count",
+                "total_layers",
+                "boundary",
+            ],
+            "boundary": "Qt Layers row grouping only; renderer layer visibility is unchanged.",
         },
         "optional_layer_stack_ui": {
             "keys": sorted(REQUIRED_LAYER_STACK_KEYS),

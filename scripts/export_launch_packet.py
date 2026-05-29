@@ -246,18 +246,59 @@ def layer_filter_packet(profile: dict[str, object]) -> dict[str, object]:
             or all(part in f"{key} {BOOL_FLAGS[key]} {aliases.get(key, '')}".lower() for part in query_parts)
         )
     ]
+    group_view = layer_group_view_packet(profile, matched_layers)
+    collapsed_groups = set(group_view["collapsed_groups"])
+    group_for_layer = {}
+    for group_id, keys in group_view["available_groups"].items():
+        for key in keys:
+            group_for_layer[key] = group_id
+    visible_matched_layers = [
+        key for key in matched_layers if group_for_layer.get(key) not in collapsed_groups
+    ]
     return {
         "schema": "rrkal_displaytools.layer_filter.v1",
         "mode": "no_gui_export_status",
         "preset": preset if preset else "all",
         "available_presets": ["all", "hydrology", "maritime", "traffic", "visual_aids", "custom"],
         "query": query,
-        "first_matched_layer": matched_layers[0] if matched_layers else None,
-        "selected_layer_visible": str(profile.get("selected_layer", "")) in matched_layers,
+        "first_matched_layer": visible_matched_layers[0] if visible_matched_layers else None,
+        "selected_layer_visible": str(profile.get("selected_layer", "")) in visible_matched_layers,
         "matched_layers": matched_layers,
         "matched_count": len(matched_layers),
+        "visible_matched_layers": visible_matched_layers,
+        "visible_matched_count": len(visible_matched_layers),
         "total_layers": len([key for key in BOOL_FLAGS if key != "demo_closed_loop"]),
-        "boundary": "No-GUI launch packet preserves Qt row-filter state only; renderer layer state is unchanged.",
+        "boundary": "No-GUI launch packet preserves Qt row-filter/collapse state only; renderer layer state is unchanged.",
+    }
+
+
+def layer_group_view_packet(profile: dict[str, object], matched_layers: list[str] | None = None) -> dict[str, object]:
+    groups = {
+        "hydrology": ["lake_layer", "river_layer"],
+        "maritime": ["border_layer", "territorial_sea_layer", "eez_layer", "high_seas_layer"],
+        "traffic": ["aircraft_layer", "pin_layer", "vehicle_icons"],
+        "visual_aids": ["show_grid", "show_stars", "terrain_contours", "scale_bar"],
+    }
+    payload = profile.get("layer_group_view")
+    collapsed = []
+    if isinstance(payload, dict):
+        raw_collapsed = payload.get("collapsed_groups", [])
+        if isinstance(raw_collapsed, list):
+            collapsed = [str(group) for group in raw_collapsed if str(group) in groups]
+    group_for_layer = {}
+    for group_id, keys in groups.items():
+        for key in keys:
+            group_for_layer[key] = group_id
+    candidates = matched_layers if matched_layers is not None else [key for key in BOOL_FLAGS if key != "demo_closed_loop"]
+    visible_rows = [key for key in candidates if group_for_layer.get(key) not in set(collapsed)]
+    return {
+        "schema": "rrkal_displaytools.layer_group_view.v1",
+        "mode": "no_gui_export_status",
+        "available_groups": groups,
+        "collapsed_groups": collapsed,
+        "visible_row_count": len(visible_rows),
+        "total_layers": len([key for key in BOOL_FLAGS if key != "demo_closed_loop"]),
+        "boundary": "No-GUI launch packet preserves Qt row grouping only; renderer visibility is unchanged.",
     }
 
 
@@ -415,6 +456,7 @@ def launch_packet(
         "rrkal_data_manifest_ref": manifest_ref,
         "rrkal_data_manifest_ref_boundary": "Reference-only handoff field; displaytools does not discover, download, validate, import, or govern this manifest.",
         "layer_filter": layer_filter_packet(profile),
+        "layer_group_view": layer_group_view_packet(profile),
         "canvas_preview": canvas_preview_packet(profile),
         "boundary_highlight": boundary_highlight_packet(profile),
         "active_layer_diagnostics": active_layer_diagnostics_packet(profile),

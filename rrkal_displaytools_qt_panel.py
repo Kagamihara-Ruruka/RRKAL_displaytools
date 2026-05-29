@@ -269,6 +269,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_filter_status_label: QtWidgets.QLabel | None = None
         self.layer_filter_text = ""
         self.layer_filter_preset = "all"
+        self.layer_group_collapsed: set[str] = set()
+        self.layer_group_status_label: QtWidgets.QLabel | None = None
         self.history_list: QtWidgets.QListWidget | None = None
         self.document_undo_label: QtWidgets.QLabel | None = None
         self.document_undo_stack: list[dict[str, object]] = []
@@ -556,6 +558,23 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             button.clicked.connect(lambda _checked=False, preset=preset_id: self.apply_layer_filter_preset(preset))
             layer_focus_row.addWidget(button)
         layers_layout.addLayout(layer_focus_row)
+        layer_group_row = QtWidgets.QHBoxLayout()
+        for group_id, label in (
+            ("hydrology", "Hydro"),
+            ("maritime", "Sea"),
+            ("traffic", "Traffic"),
+            ("visual_aids", "Aids"),
+        ):
+            button = QtWidgets.QPushButton(f"Toggle {label}")
+            button.clicked.connect(lambda _checked=False, gid=group_id: self.toggle_layer_group_collapsed(gid))
+            layer_group_row.addWidget(button)
+        expand_all_groups = QtWidgets.QPushButton("Expand groups")
+        expand_all_groups.clicked.connect(self.expand_all_layer_groups)
+        layer_group_row.addWidget(expand_all_groups)
+        layers_layout.addLayout(layer_group_row)
+        self.layer_group_status_label = QtWidgets.QLabel("Layer groups: all expanded")
+        self.layer_group_status_label.setWordWrap(True)
+        layers_layout.addWidget(self.layer_group_status_label)
         self.layer_filter_status_label = QtWidgets.QLabel("Layer filter: all layers")
         self.layer_filter_status_label.setWordWrap(True)
         layers_layout.addWidget(self.layer_filter_status_label)
@@ -1318,6 +1337,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             },
             "layers": {key: check.isChecked() for key, check in self.checks.items()},
             "layer_filter": self.collect_layer_filter_state(),
+            "layer_group_view": self.collect_layer_group_view_state(),
             "selected_layer": self.selected_layer_key,
             "selected_pin_id": self.selected_pin_id,
             "layer_stack_ui": self.collect_layer_stack_ui(),
@@ -1350,6 +1370,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "rrkal_data_manifest_ref_boundary": "Reference-only handoff field; displaytools does not discover, download, validate, import, or govern this manifest.",
             "selected_layer": self.selected_layer_key,
             "layer_filter": self.collect_layer_filter_state(),
+            "layer_group_view": self.collect_layer_group_view_state(),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),
@@ -2027,6 +2048,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         material = profile.get("ocean_material", {})
         layers = profile.get("layers", {})
         layer_filter = profile.get("layer_filter")
+        layer_group_view = profile.get("layer_group_view")
         selected_layer = profile.get("selected_layer")
         selected_pin_id = profile.get("selected_pin_id")
         layer_stack = profile.get("layer_stack_ui")
@@ -2064,6 +2086,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 self.layer_blends[key].setCurrentText(str(value.get("blend_mode", "Normal")))
         if isinstance(layer_filter, dict):
             self.apply_layer_filter_state(layer_filter)
+        if isinstance(layer_group_view, dict):
+            self.apply_layer_group_view_state(layer_group_view)
         if isinstance(selected_layer, str) and selected_layer in self.layer_rows:
             self.select_layer(selected_layer)
         elif isinstance(layer_stack, dict):
@@ -2231,20 +2255,57 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "visual_aids": "aids",
         }.get(preset, self.layer_filter_text)
 
+    def layer_group_definitions(self) -> dict[str, list[str]]:
+        return {
+            "hydrology": ["lake_layer", "river_layer"],
+            "maritime": ["border_layer", "territorial_sea_layer", "eez_layer", "high_seas_layer"],
+            "traffic": ["aircraft_layer", "pin_layer", "vehicle_icons"],
+            "visual_aids": ["show_grid", "show_stars", "terrain_contours", "scale_bar"],
+        }
+
+    def layer_group_for_key(self, key: str) -> str | None:
+        for group_id, keys in self.layer_group_definitions().items():
+            if key in keys:
+                return group_id
+        return None
+
+    def layer_group_allows_row(self, key: str) -> bool:
+        group_id = self.layer_group_for_key(key)
+        return group_id is None or group_id not in self.layer_group_collapsed
+
     def collect_layer_filter_state(self) -> dict[str, object]:
         matched = [key for key, label in LAYER_LABELS if self.layer_filter_matches(key, label)]
+        visible_matches = [key for key in matched if self.layer_group_allows_row(key)]
         return {
             "schema": "rrkal_displaytools.layer_filter.v1",
             "mode": "ui_row_filter",
             "preset": self.layer_filter_preset,
             "available_presets": ["all", "hydrology", "maritime", "traffic", "visual_aids", "custom"],
             "query": self.layer_filter_text,
-            "first_matched_layer": matched[0] if matched else None,
-            "selected_layer_visible": self.selected_layer_key in matched if self.selected_layer_key is not None else False,
+            "first_matched_layer": visible_matches[0] if visible_matches else None,
+            "selected_layer_visible": self.selected_layer_key in visible_matches if self.selected_layer_key is not None else False,
             "matched_layers": matched,
             "matched_count": len(matched),
+            "visible_matched_layers": visible_matches,
+            "visible_matched_count": len(visible_matches),
             "total_layers": len(LAYER_LABELS),
-            "boundary": "Qt Layers row filter only; renderer layer state is not changed by filtering rows.",
+            "boundary": "Qt Layers row filter/collapse only; renderer layer state is not changed by hiding rows.",
+        }
+
+    def collect_layer_group_view_state(self) -> dict[str, object]:
+        groups = self.layer_group_definitions()
+        visible_rows = [
+            key for key, label in LAYER_LABELS
+            if self.layer_filter_matches(key, label) and self.layer_group_allows_row(key)
+        ]
+        return {
+            "schema": "rrkal_displaytools.layer_group_view.v1",
+            "mode": "ui_row_collapse",
+            "available_groups": groups,
+            "collapsed_groups": sorted(self.layer_group_collapsed),
+            "visible_row_count": len(visible_rows),
+            "total_layers": len(LAYER_LABELS),
+            "boundary": "Qt row grouping only; collapsed groups do not change renderer visibility or runtime state.",
         }
 
     def apply_layer_filter_state(self, state: dict[str, object]) -> None:
@@ -2256,6 +2317,13 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.layer_filter_edit.blockSignals(True)
             self.layer_filter_edit.setText(self.layer_filter_text)
             self.layer_filter_edit.blockSignals(False)
+        self.refresh_layer_filter()
+
+    def apply_layer_group_view_state(self, state: dict[str, object]) -> None:
+        groups = self.layer_group_definitions()
+        raw_collapsed = state.get("collapsed_groups", [])
+        if isinstance(raw_collapsed, list):
+            self.layer_group_collapsed = {str(group) for group in raw_collapsed if str(group) in groups}
         self.refresh_layer_filter()
 
     @QtCore.pyqtSlot(str)
@@ -2276,9 +2344,25 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.refresh_research_provenance()
 
     @QtCore.pyqtSlot()
+    def expand_all_layer_groups(self) -> None:
+        self.layer_group_collapsed.clear()
+        self.refresh_layer_filter()
+        self.refresh_research_provenance()
+
+    def toggle_layer_group_collapsed(self, group_id: str) -> None:
+        if group_id not in self.layer_group_definitions():
+            return
+        if group_id in self.layer_group_collapsed:
+            self.layer_group_collapsed.remove(group_id)
+        else:
+            self.layer_group_collapsed.add(group_id)
+        self.refresh_layer_filter()
+        self.refresh_research_provenance()
+
+    @QtCore.pyqtSlot()
     def select_first_filtered_layer(self) -> None:
         for key, label in LAYER_LABELS:
-            if self.layer_filter_matches(key, label):
+            if self.layer_filter_matches(key, label) and self.layer_group_allows_row(key):
                 self.select_layer(key)
                 self.status.setText(f"已選取目前 filter 第一個圖層：{key}")
                 return
@@ -2290,10 +2374,15 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             row = self.layer_rows.get(key)
             if row is None:
                 continue
-            matched = self.layer_filter_matches(key, label)
+            matched = self.layer_filter_matches(key, label) and self.layer_group_allows_row(key)
             row.setVisible(matched)
             if matched:
                 matched_count += 1
+        if self.layer_group_status_label is not None:
+            collapsed = ", ".join(sorted(self.layer_group_collapsed)) or "none"
+            self.layer_group_status_label.setText(
+                f"Layer groups: collapsed={collapsed}; visible_rows={matched_count}/{len(LAYER_LABELS)}"
+            )
         if self.layer_filter_status_label is not None:
             query = self.layer_filter_text or "all"
             selected_state = "visible" if self.collect_layer_filter_state().get("selected_layer_visible") else "hidden"
@@ -3489,6 +3578,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             },
             "active_layer": self.selected_layer_key,
             "layer_filter": self.collect_layer_filter_state(),
+            "layer_group_view": self.collect_layer_group_view_state(),
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),

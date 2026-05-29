@@ -27,6 +27,7 @@ rrkal_displaytools.qt_panel_profile.v1
 | `selected_layer` | string | optional | Qt layer stack 目前選取圖層。 |
 | `selected_pin_id` | string | optional | Qt Pin list 目前選取的科研標記 id。 |
 | `layer_filter` | object | optional | Qt Layers row search/filter 狀態，不改變 renderer layer state。 |
+| `layer_group_view` | object | optional | Qt Layers row group collapse/expand 狀態，不改變 renderer layer state。 |
 | `layer_stack_ui` | object | optional | Qt layer stack 的 UI-only state。 |
 | `tool_state` | object | optional | Qt tool palette 的 UI-only state。 |
 | `pins` | array | optional | 科研標記清單。 |
@@ -108,8 +109,24 @@ rrkal_displaytools.qt_panel_profile.v1
 | `selected_layer_visible` | boolean | 目前 active layer 是否仍在 filter 結果中可見。 |
 | `matched_layers` | array | 符合 query 的 layer key 清單。 |
 | `matched_count` | integer | 符合的 row 數。 |
+| `visible_matched_layers` | array | 同時符合 filter 且未被 group collapse 隱藏的 layer key 清單。 |
+| `visible_matched_count` | integer | 同時符合 filter 且仍顯示的 row 數。 |
 | `total_layers` | integer | 可過濾的 layer row 總數。 |
 | `boundary` | string | 明確標示 filter 只影響 Qt UI row，不影響 renderer state。 |
+
+## `layer_group_view`
+
+可選。此欄位保存 Layers 面板的 row group collapse/expand 狀態；它只影響 Qt row visibility，不會切換 renderer layer visibility、opacity 或 blend。
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `schema` | string | 固定為 `rrkal_displaytools.layer_group_view.v1`。 |
+| `mode` | string | 目前為 `ui_row_collapse` 或 no-GUI export 的 `no_gui_export_status`。 |
+| `available_groups` | object | group id 到 layer key 清單的映射。 |
+| `collapsed_groups` | array | 目前被 collapse 的 group id 清單。 |
+| `visible_row_count` | integer | filter 與 group collapse 後仍顯示的 row 數。 |
+| `total_layers` | integer | 可顯示的 layer row 總數。 |
+| `boundary` | string | 明確標示 group collapse 只影響 Qt UI row，不影響 renderer state。 |
 
 ## `layer_stack_ui`
 

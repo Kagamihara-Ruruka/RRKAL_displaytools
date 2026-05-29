@@ -16496,6 +16496,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "canvas_preview",
                 "active_layer_diagnostics",
                 "layer_filter",
+                "layer_group_view",
                 "layer_undo",
                 "session_journal",
                 "document_undo",

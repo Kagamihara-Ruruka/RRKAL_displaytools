@@ -1,5 +1,19 @@
 # Development Log
 
+## 2026-05-29 - Layer group collapse view
+
+Scope:
+- Layers panel now has group collapse/expand controls for Hydro, Sea, Traffic, and Aids row groups.
+- `layer_group_view` records available groups, collapsed groups, visible row count, and the renderer-state boundary.
+- `layer_filter` now reports visible matched layers after group collapse.
+- Profiles, launch packets, provenance, No-GUI launch export, profile schema, renderer capabilities, closed-loop status, and smoke gates now expose `rrkal_displaytools.layer_group_view.v1`.
+
+Positioning:
+- This adds Photoshop-like layer group navigation for researchers while keeping group collapse separate from renderer visibility.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Layer filter select-first action
 
 Scope:
