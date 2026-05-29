@@ -983,3 +983,19 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Renderer layer runtime acknowledgement
+
+Scope:
+- Qt launch commands now pass `--layer-runtime-ack-file`.
+- Renderer now writes `renderer_layer_runtime_ack.json` after reading a changed layer runtime state file.
+- The ack records state file mtime, state update timestamp, changed layers, renderer-visible layers, frame index, and pending opacity/blend/lock status.
+- Layers panel now polls and displays renderer ack status.
+- Research provenance includes the renderer layer runtime ack payload and file path.
+
+Positioning:
+- This separates "Qt wrote runtime state" from "renderer observed runtime state", improving scientific traceability for live layer sync.
+- The ack currently covers visibility sync; compositor-level opacity/blend and renderer-side lock enforcement remain next.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

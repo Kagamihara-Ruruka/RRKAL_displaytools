@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parent
 PROFILE_TEMPLATE_DIR = ROOT / "profiles"
 PIN_PICK_STATE_PATH = ROOT / "state" / "renderer_pin_pick_state.json"
 LAYER_RUNTIME_STATE_PATH = ROOT / "state" / "renderer_layer_runtime_state.json"
+LAYER_RUNTIME_ACK_PATH = ROOT / "state" / "renderer_layer_runtime_ack.json"
 
 
 def profile_template_packet() -> dict[str, object]:
@@ -134,6 +135,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_runtime_state_write_error: str | None = None
         self.layer_runtime_history: list[str] = []
         self.layer_runtime_history_signature: str | None = None
+        self.layer_runtime_ack_label: QtWidgets.QLabel | None = None
+        self.layer_runtime_ack_mtime_ns: int | None = LAYER_RUNTIME_ACK_PATH.stat().st_mtime_ns if LAYER_RUNTIME_ACK_PATH.exists() else None
+        self.layer_runtime_ack_payload: dict[str, object] | None = None
         self.history_list: QtWidgets.QListWidget | None = None
         self.selected_layer_key: str | None = None
         self.active_tool = "move"
@@ -175,6 +179,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.pin_pick_state_timer.setInterval(800)
         self.pin_pick_state_timer.timeout.connect(self.refresh_renderer_pin_pick_state)
         self.pin_pick_state_timer.start()
+        self.layer_runtime_ack_timer = QtCore.QTimer(self)
+        self.layer_runtime_ack_timer.setInterval(1000)
+        self.layer_runtime_ack_timer.timeout.connect(self.refresh_layer_runtime_ack_state)
+        self.layer_runtime_ack_timer.start()
         self.apply_baseline()
         self.refresh_template_list()
         if initial_profile is not None:
@@ -363,6 +371,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_runtime_state_label = QtWidgets.QLabel(f"Layer runtime bridge: waiting for {LAYER_RUNTIME_STATE_PATH.name}")
         self.layer_runtime_state_label.setWordWrap(True)
         layers_layout.addWidget(self.layer_runtime_state_label)
+        self.layer_runtime_ack_label = QtWidgets.QLabel(f"Renderer ack: waiting for {LAYER_RUNTIME_ACK_PATH.name}")
+        self.layer_runtime_ack_label.setWordWrap(True)
+        layers_layout.addWidget(self.layer_runtime_ack_label)
         demo = QtWidgets.QCheckBox("閉環展示 preset（會覆蓋部分設定）")
         demo.stateChanged.connect(self.refresh_command_preview)
         self.checks["demo_closed_loop"] = demo
@@ -864,6 +875,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 str(PIN_PICK_STATE_PATH),
                 "--layer-runtime-state-file",
                 str(LAYER_RUNTIME_STATE_PATH),
+                "--layer-runtime-ack-file",
+                str(LAYER_RUNTIME_ACK_PATH),
             ]
         )
         pins = self.collect_research_pins()
@@ -937,6 +950,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "pins": self.collect_research_pins(),
             "pin_pick_state_file": str(PIN_PICK_STATE_PATH),
             "layer_runtime_state_file": str(LAYER_RUNTIME_STATE_PATH),
+            "layer_runtime_ack_file": str(LAYER_RUNTIME_ACK_PATH),
             "command": self.build_command(),
             "command_line": subprocess.list2cmdline(self.build_command()),
             "portable_command": self.build_portable_command(),
@@ -1045,6 +1059,50 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.history_list.insertItem(0, entry)
         while self.history_list.count() > 18:
             self.history_list.takeItem(self.history_list.count() - 1)
+
+    def refresh_layer_runtime_ack_state(self) -> None:
+        try:
+            stat = LAYER_RUNTIME_ACK_PATH.stat()
+        except FileNotFoundError:
+            if self.layer_runtime_ack_mtime_ns is not None:
+                self.layer_runtime_ack_mtime_ns = None
+                if self.layer_runtime_ack_label is not None:
+                    self.layer_runtime_ack_label.setText(f"Renderer ack: waiting for {LAYER_RUNTIME_ACK_PATH.name}")
+            return
+        except OSError as exc:
+            if self.layer_runtime_ack_label is not None:
+                self.layer_runtime_ack_label.setText(f"Renderer ack read failed: {exc}")
+            return
+        if stat.st_mtime_ns == self.layer_runtime_ack_mtime_ns:
+            return
+        next_mtime_ns = stat.st_mtime_ns
+        try:
+            payload = json.loads(LAYER_RUNTIME_ACK_PATH.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            if self.layer_runtime_ack_label is not None:
+                self.layer_runtime_ack_label.setText(f"Renderer ack parse failed: {exc}")
+            return
+        self.layer_runtime_ack_mtime_ns = next_mtime_ns
+        if isinstance(payload, dict):
+            self.layer_runtime_ack_payload = payload
+            self.refresh_layer_runtime_ack_label(payload)
+            self.refresh_research_provenance()
+
+    def refresh_layer_runtime_ack_label(self, payload: dict[str, object]) -> None:
+        if self.layer_runtime_ack_label is None:
+            return
+        event = str(payload.get("event", "-"))
+        changed_layers = payload.get("changed_layers", [])
+        changed_count = len(changed_layers) if isinstance(changed_layers, list) else "-"
+        frame_index = payload.get("frame_index", "-")
+        updated_at = str(payload.get("updated_at_utc", "-"))
+        error = payload.get("error")
+        if error:
+            self.layer_runtime_ack_label.setText(f"Renderer ack: event={event}, error={error}, updated={updated_at}")
+            return
+        self.layer_runtime_ack_label.setText(
+            f"Renderer ack: event={event}, changed_layers={changed_count}, frame={frame_index}, updated={updated_at}"
+        )
 
     def current_pin_label_mode(self) -> str:
         if self.pin_label_mode_combo is None:
@@ -1641,6 +1699,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_runtime_state_file": str(LAYER_RUNTIME_STATE_PATH),
             "layer_runtime_state_last_write_utc": self.layer_runtime_state_last_write_utc,
             "layer_runtime_state_write_error": self.layer_runtime_state_write_error,
+            "layer_runtime_ack_file": str(LAYER_RUNTIME_ACK_PATH),
+            "layer_runtime_ack": self.layer_runtime_ack_payload,
             "layer_runtime_history": self.layer_runtime_history[:5],
             "canvas_select_hit_targets": self.canvas_layer_hit_keys(),
             "pin_overlay_boundary": "Pins are geodetic annotations; renderer sync must rotate them with the globe and apply horizon/depth occlusion.",

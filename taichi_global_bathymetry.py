@@ -10316,6 +10316,9 @@ class HybridRenderController:
         self.layer_runtime_state_file = (
             Path(args.layer_runtime_state_file) if getattr(args, "layer_runtime_state_file", None) else None
         )
+        self.layer_runtime_ack_file = (
+            Path(args.layer_runtime_ack_file) if getattr(args, "layer_runtime_ack_file", None) else None
+        )
         self.layer_runtime_state_mtime_ns: int | None = None
         self.layer_runtime_state_last_error: str | None = None
         self.current_pin_projections: list[dict[str, object]] = []
@@ -10459,6 +10462,7 @@ class HybridRenderController:
             self.layer_runtime_state_last_error = "runtime state root is not an object"
             return False
         changed = False
+        changed_layers: list[str] = []
         layers = payload.get("layers")
         if isinstance(layers, dict):
             for layer_id, state in layers.items():
@@ -10467,10 +10471,44 @@ class HybridRenderController:
                 visible = state.get("visible")
                 if isinstance(visible, bool) and self.layer_visible.get(layer_id) != visible:
                     self.set_layer_visible(str(layer_id), bool(visible))
+                    changed_layers.append(str(layer_id))
                     changed = True
         self.layer_runtime_state_mtime_ns = next_mtime_ns
         self.layer_runtime_state_last_error = None
+        self.write_layer_runtime_ack("applied", payload, changed_layers, next_mtime_ns)
         return changed
+
+    def write_layer_runtime_ack(
+        self,
+        event_kind: str,
+        state_payload: dict[str, object] | None,
+        changed_layers: list[str],
+        state_mtime_ns: int | None,
+    ) -> None:
+        if self.layer_runtime_ack_file is None:
+            return
+        visible_layers = [layer_id for layer_id, visible in self.layer_visible.items() if visible]
+        payload = {
+            "schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
+            "updated_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "event": event_kind,
+            "runtime_state_file": str(self.layer_runtime_state_file) if self.layer_runtime_state_file is not None else None,
+            "runtime_state_mtime_ns": state_mtime_ns,
+            "runtime_state_updated_at_utc": state_payload.get("updated_at_utc") if isinstance(state_payload, dict) else None,
+            "changed_layers": changed_layers,
+            "visible_layers": visible_layers,
+            "layer_visible": {layer_id: bool(visible) for layer_id, visible in self.layer_visible.items()},
+            "frame_index": getattr(self, "frame_index", 0),
+            "applies": ["visibility"],
+            "pending": ["opacity", "blend_mode", "lock"],
+            "error": self.layer_runtime_state_last_error,
+            "source": "taichi_global_bathymetry",
+        }
+        try:
+            self.layer_runtime_ack_file.parent.mkdir(parents=True, exist_ok=True)
+            self.layer_runtime_ack_file.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        except OSError as exc:
+            print(f"Unable to write layer runtime ack: {exc}")
 
     def basemap_lod_label(self) -> str:
         decision = self.lod_manager.decision(
@@ -14745,6 +14783,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--pin-pick-radius", type=float, default=float(os.environ.get("PIN_PICK_RADIUS", "18.0")))
     parser.add_argument("--pin-pick-state-file", default=os.environ.get("PIN_PICK_STATE_FILE"))
     parser.add_argument("--layer-runtime-state-file", default=os.environ.get("LAYER_RUNTIME_STATE_FILE"))
+    parser.add_argument("--layer-runtime-ack-file", default=os.environ.get("LAYER_RUNTIME_ACK_FILE"))
 
     parser.add_argument("--adaptive-sampling", action=bool_action, default=parse_bool(os.environ.get("ADAPTIVE_SAMPLING"), True))
     parser.add_argument("--target-fps", type=float, default=float(os.environ.get("TARGET_FPS", "30.0")))
@@ -14896,6 +14935,8 @@ def renderer_capabilities_packet() -> dict[str, object]:
         "layer_runtime_state": {
             "schema": "rrkal_displaytools.layer_runtime_state.v1",
             "control": "layer-runtime-state-file",
+            "ack_control": "layer-runtime-ack-file",
+            "ack_schema": "rrkal_displaytools.renderer_layer_runtime_ack.v1",
             "applies": ["visibility"],
             "pending": ["opacity", "blend_mode", "lock"],
         },
