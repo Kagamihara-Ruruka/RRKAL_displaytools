@@ -3072,3 +3072,17 @@ Decision:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Pin/Boundary handoff inspection summary
+
+Scope:
+- `pin_projection` contract now exposes Pin coordinate source fields, supported coordinate source values, Qt UI affordances, projection note text and Pin list source summary format.
+- `scripts\inspect_handoff.ps1` now reports Pin coordinate-source/projection UI affordances and Boundary emphasis dialog feedback/target-alignment fields.
+- Smoke gates the new handoff inspection fields so another cloned workstation can verify the Pin/Boundary UI loops without opening Qt.
+- Fixed the Windows setup clone URL to `https://github.com/Kagamihara-Ruruka/RRKAL_displaytools.git`.
+
+Decision:
+- Cross-machine users need a read-only handoff check that summarizes the recently landed Pin coordinate provenance, Pin rotation/occlusion note and Boundary emphasis target alignment before starting Qt.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.

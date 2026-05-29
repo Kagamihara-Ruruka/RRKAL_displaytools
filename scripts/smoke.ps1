@@ -1270,6 +1270,18 @@ if ($handoff.pin_overlay.cursor_fill_priority -ne "renderer_cursor_geodesy_state
 if ($handoff.pin_overlay.cursor_fill_sources -notcontains "qt_canvas_estimate") {
     throw "Handoff inspection pin_overlay cursor fill fallback missing"
 }
+if ($handoff.pin_overlay.coordinate_source_fields -notcontains "coordinate_source") {
+    throw "Handoff inspection pin_overlay coordinate source field missing"
+}
+if ($handoff.pin_overlay.coordinate_source_values -notcontains "renderer_globe_raycast") {
+    throw "Handoff inspection pin_overlay renderer coordinate source missing"
+}
+if ($handoff.pin_overlay.qt_ui_affordances -notcontains "projection_rotation_occlusion_note") {
+    throw "Handoff inspection pin_overlay projection note affordance missing"
+}
+if ($handoff.pin_overlay.pin_list_summary_format -ne "source=<coordinate_source_label>") {
+    throw "Handoff inspection pin_overlay list summary format missing"
+}
 if ($handoff.launch_packet_contracts.boundary_emphasis_control -ne "rrkal_displaytools.boundary_emphasis_control.v1") {
     throw "Handoff inspection boundary_emphasis_control launch contract missing or invalid"
 }
@@ -1296,6 +1308,15 @@ if ($handoff.boundary_emphasis_control.renderer_bridge_contract -ne "rrkal_displ
 }
 if ($handoff.boundary_emphasis_control.renderer_controls_mapped -notcontains "alpha") {
     throw "Handoff inspection boundary_emphasis_control alpha bridge mapping missing"
+}
+if ($handoff.boundary_emphasis_control.dialog_feedback -notcontains "rgb_swatch") {
+    throw "Handoff inspection boundary_emphasis_control RGB swatch feedback missing"
+}
+if ($handoff.boundary_emphasis_control.value_preview_fields -notcontains "target_alignment") {
+    throw "Handoff inspection boundary_emphasis_control target alignment preview missing"
+}
+if (-not $handoff.boundary_emphasis_control.target_alignment) {
+    throw "Handoff inspection boundary_emphasis_control target alignment field missing"
 }
 if ($handoff.boundary_emphasis_control.qt_surface -ne "Layers dock boundary emphasis dialog") {
     throw "Handoff inspection boundary_emphasis_control Qt surface mismatch"

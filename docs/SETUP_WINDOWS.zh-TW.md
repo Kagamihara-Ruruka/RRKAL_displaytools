@@ -9,7 +9,7 @@
 ## Clone
 
 ```powershell
-git clone https://github.com/kagamihara-rururka/RRKAL_displaytools.git
+git clone https://github.com/Kagamihara-Ruruka/RRKAL_displaytools.git
 cd RRKAL_displaytools
 ```
 

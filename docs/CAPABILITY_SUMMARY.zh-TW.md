@@ -267,3 +267,9 @@
 ### 2026-05-30 Pin projection rule note
 
 - Pin Annotation now visibly documents that Pins rotate with the globe and are hidden by horizon/depth occlusion when behind the globe.
+
+### 2026-05-30 Pin/Boundary handoff inspection summary
+
+- Handoff inspection now reports Pin coordinate-source fields, supported coordinate sources, Qt Pin affordances and projection note text.
+- Handoff inspection now reports Boundary emphasis dialog feedback and target-alignment fields.
+- Windows setup clone URL now uses `Kagamihara-Ruruka`.
