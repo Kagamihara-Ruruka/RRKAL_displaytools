@@ -791,6 +791,21 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         for key, flag in BOOL_FLAGS.items():
             enabled = self.checks[key].isChecked()
             cmd.append(f"--{flag}" if enabled else f"--no-{flag}")
+        pins = self.collect_research_pins()
+        if pins:
+            cmd.extend(
+                [
+                    "--pin-json",
+                    json.dumps(
+                        {
+                            "pins": pins,
+                            "selected_pin_id": self.selected_pin_id,
+                            "source": "rrkal_displaytools_qt_panel",
+                        },
+                        ensure_ascii=False,
+                    ),
+                ]
+            )
         return cmd
 
     def build_portable_command(self) -> list[str]:

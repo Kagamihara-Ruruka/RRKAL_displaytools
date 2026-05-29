@@ -15,7 +15,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from pin_projection import pin_projection_contract_packet
+from pin_projection import pin_projection_contract_packet, project_pins_to_screen
 try:
     import xarray as xr
 except ImportError:
@@ -2321,6 +2321,71 @@ def alpha_compose(background: np.ndarray, overlay: np.ndarray) -> np.ndarray:
     ).astype(np.uint8)
     out[..., 3] = 255
     return out
+
+
+PIN_MARKER_COLORS = {
+    "Observation": (255, 226, 112, 232),
+    "Sample Site": (88, 214, 141, 232),
+    "Anomaly": (255, 105, 97, 238),
+    "Reference": (126, 188, 255, 232),
+    "Event": (255, 168, 76, 238),
+}
+
+
+def _extract_pin_records(payload: object) -> list[dict[str, object]]:
+    if isinstance(payload, dict):
+        pins = payload.get("pins", [])
+    else:
+        pins = payload
+    if not isinstance(pins, list):
+        return []
+    return [dict(pin) for pin in pins if isinstance(pin, dict)]
+
+
+def load_pin_records(pin_file: str | None, pin_json: str | None) -> list[dict[str, object]]:
+    records: list[dict[str, object]] = []
+    if pin_file:
+        payload = json.loads(Path(pin_file).read_text(encoding="utf-8-sig"))
+        records.extend(_extract_pin_records(payload))
+    if pin_json:
+        records.extend(_extract_pin_records(json.loads(pin_json)))
+    return records
+
+
+def render_pin_overlay(
+    width: int,
+    height: int,
+    projected_pins: list[dict[str, object]],
+    pin_size: int = 9,
+) -> np.ndarray:
+    overlay = np.zeros((height, width, 4), dtype=np.uint8)
+    radius = max(2, int(pin_size) // 2)
+    for pin in projected_pins:
+        if not bool(pin.get("visible", False)):
+            continue
+        try:
+            x = int(round(float(pin["screen_x"])))
+            y = int(round(float(pin["screen_y"])))
+        except (KeyError, TypeError, ValueError):
+            continue
+        color = PIN_MARKER_COLORS.get(str(pin.get("type", "Observation")), PIN_MARKER_COLORS["Observation"])
+        for dy in range(-radius, radius + 1):
+            py = y + dy
+            if py < 0 or py >= height:
+                continue
+            for dx in range(-radius, radius + 1):
+                px = x + dx
+                if px < 0 or px >= width:
+                    continue
+                dist2 = dx * dx + dy * dy
+                if dist2 <= radius * radius or dx == 0 or dy == 0:
+                    alpha = color[3] if dist2 <= radius * radius else 190
+                    overlay[py, px, :3] = color[:3]
+                    overlay[py, px, 3] = max(int(overlay[py, px, 3]), alpha)
+        if 0 <= x < width and 0 <= y < height:
+            overlay[y, x, :3] = (12, 18, 24)
+            overlay[y, x, 3] = 255
+    return overlay
 
 
 def alpha_compose_transparent(background: np.ndarray, overlay: np.ndarray) -> np.ndarray:
@@ -9857,6 +9922,7 @@ class HybridRenderController:
         "high_seas": "High seas",
         "ais": "AIS vessels",
         "aircraft": "ADS-B aircraft",
+        "pins": "Research pins",
         "vehicle_icons": "Vehicle icons",
         "clouds": "Satellite/cloud volume",
         "ice": "Ice and snow",
@@ -9952,8 +10018,12 @@ class HybridRenderController:
         self.globe_rgba = np.zeros((args.height, args.width, 4), dtype=np.uint8)
         self.overlay_rgba = np.zeros_like(self.globe_rgba)
         self.aircraft_overlay_rgba = np.zeros_like(self.globe_rgba)
+        self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.frame_rgba = np.zeros_like(self.globe_rgba)
         self.globe_mask = np.zeros((args.height, args.width), dtype=np.uint8)
+        self.pin_records = load_pin_records(getattr(args, "pin_file", None), getattr(args, "pin_json", None))
+        self.current_pin_projections: list[dict[str, object]] = []
+        self.pin_visible_count = 0
         self.output_path = Path(args.output) if args.output else None
         if self.output_path:
             self.output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -10001,6 +10071,7 @@ class HybridRenderController:
             "scale",
             "ais",
             "aircraft",
+            "pins",
             "vehicle_icons",
             "clouds",
             "borders",
@@ -10024,6 +10095,7 @@ class HybridRenderController:
             "high_seas": bool(getattr(args, "high_seas_layer", False)),
             "ais": True,
             "aircraft": bool(getattr(args, "aircraft_layer", False)),
+            "pins": bool(getattr(args, "pin_layer", True)),
             "vehicle_icons": bool(getattr(args, "vehicle_icons", False)),
             "clouds": bool(getattr(args, "cloud_layer", False)),
             "ice": bool(getattr(args, "ice_layer", True)),
@@ -12661,6 +12733,32 @@ class HybridRenderController:
                 self.aircraft_visible_count = 0
                 self.aircraft_rendered_count = 0
                 self.aircraft_overlay_rgba = np.zeros_like(self.globe_rgba)
+            if self.layer_visible.get("pins", True) and self.pin_records:
+                self.current_pin_projections = project_pins_to_screen(
+                    self.pin_records,
+                    yaw=self.yaw,
+                    pitch=self.pitch,
+                    zoom=self.zoom,
+                    width=self.width,
+                    height=self.height,
+                    flip_longitude=self.flip_longitude,
+                    flip_latitude=self.flip_latitude,
+                    horizon_eps=float(getattr(self.args, "pin_horizon_eps", 0.006)),
+                )
+                self.pin_visible_count = sum(1 for pin in self.current_pin_projections if pin.get("visible") is True)
+                self.pin_overlay_rgba = mask_overlay_to_globe(
+                    render_pin_overlay(
+                        self.width,
+                        self.height,
+                        self.current_pin_projections,
+                        int(getattr(self.args, "pin_size", 9)),
+                    ),
+                    self.globe_mask,
+                )
+            else:
+                self.current_pin_projections = []
+                self.pin_visible_count = 0
+                self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
             if defer_vector_overlays:
                 self.vector_overlay_cache_deferred += 1
                 self.hydrology_dirty = True
@@ -12676,6 +12774,7 @@ class HybridRenderController:
         self.frame_rgba = alpha_compose(self.frame_rgba, self.boundary_overlay_rgba)
         self.frame_rgba = alpha_compose(self.frame_rgba, self.overlay_rgba)
         self.frame_rgba = alpha_compose(self.frame_rgba, self.aircraft_overlay_rgba)
+        self.frame_rgba = alpha_compose(self.frame_rgba, self.pin_overlay_rgba)
         self.frame_rgba = apply_style_profile(self.frame_rgba, getattr(self.args, "style_profile", "scientific"))
         self.last_render_ms = (time.time() - start) * 1000.0
         if self.output_path and (getattr(self.args, "once", False) or getattr(self.args, "headless", False)):
@@ -14211,6 +14310,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--aircraft-altitude-exaggeration", type=float, default=float(os.environ.get("AIRCRAFT_ALTITUDE_EXAGGERATION", "35.0")))
     parser.add_argument("--aircraft-horizon-eps", type=float, default=float(os.environ.get("AIRCRAFT_HORIZON_EPS", "0.006")))
     parser.add_argument("--aircraft-sample-ratio", type=float, default=float(os.environ.get("AIRCRAFT_SAMPLE_RATIO", "1.0")))
+    parser.add_argument("--pin-file", default=os.environ.get("PIN_FILE"))
+    parser.add_argument("--pin-json", default=os.environ.get("PIN_JSON"))
+    parser.add_argument("--pin-layer", action=bool_action, default=parse_bool(os.environ.get("PIN_LAYER"), True))
+    parser.add_argument("--pin-size", type=int, default=int(os.environ.get("PIN_SIZE", "9")))
+    parser.add_argument("--pin-horizon-eps", type=float, default=float(os.environ.get("PIN_HORIZON_EPS", "0.006")))
 
     parser.add_argument("--adaptive-sampling", action=bool_action, default=parse_bool(os.environ.get("ADAPTIVE_SAMPLING"), True))
     parser.add_argument("--target-fps", type=float, default=float(os.environ.get("TARGET_FPS", "30.0")))
@@ -14327,6 +14431,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
             "eez-layer",
             "high-seas-layer",
             "aircraft-layer",
+            "pin-layer",
             "ocean-material",
             "terrain-contours",
             "scale-bar",
@@ -14345,6 +14450,13 @@ def renderer_capabilities_packet() -> dict[str, object]:
             "cloud-detail",
         ],
         "pin_overlay": pin_projection_contract_packet(),
+        "pin_controls": [
+            "pin-file",
+            "pin-json",
+            "pin-layer",
+            "pin-size",
+            "pin-horizon-eps",
+        ],
         "rrkal_boundary": {
             "displaytools_owns": [
                 "renderer launch flags",

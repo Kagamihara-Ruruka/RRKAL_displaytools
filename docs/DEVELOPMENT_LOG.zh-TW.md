@@ -740,3 +740,19 @@ Positioning:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-29 - Renderer Pin overlay input
+
+Scope:
+- Added renderer Pin input flags: `--pin-file`, `--pin-json`, `--pin-layer`, `--pin-size`, and `--pin-horizon-eps`.
+- Qt launch commands now pass current research Pins to the renderer with `--pin-json`.
+- Renderer now projects Pins every overlay pass and draws visible markers after AIS/ADS-B overlays.
+- Pins classified as `behind_horizon`, `off_viewport`, or `invalid` are not drawn.
+- Smoke now compiles `pin_projection.py`.
+
+Positioning:
+- This moves scientific Pins from UI-only annotation into an initial renderer overlay loop.
+- The current occlusion closes the visible hemisphere problem; globe-mask/depth-buffer refinement and label collision remain next.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
