@@ -16359,6 +16359,28 @@ def renderer_capabilities_packet() -> dict[str, object]:
             ],
             "pending": [],
         },
+        "timeline_handoff": {
+            "schema": "rrkal_displaytools.timeline_handoff.v1",
+            "input_contracts": [
+                "rrkal_displaytools.timeline_state.v1",
+                "rrkal_displaytools.timeline_keyframe.v1",
+                "profile.timeline_keyframes",
+            ],
+            "applies": [
+                "Qt Timeline dock state",
+                "Qt launch packet handoff",
+                "research provenance summary",
+                "No-GUI launch packet keyframe summary",
+                "UI-only keyframe playback preview",
+            ],
+            "pending": [
+                "renderer_timeline_playback",
+                "animation_export",
+                "ocean_material_keyframe_interpolation",
+                "camera_keyframe_interpolation",
+            ],
+            "boundary": "Timeline keyframes are portable UI/profile state; renderer animation playback is not claimed yet.",
+        },
         "ui_handoff_contracts": {
             "schema": "rrkal_displaytools.ui_handoff_contracts.v1",
             "contracts": [

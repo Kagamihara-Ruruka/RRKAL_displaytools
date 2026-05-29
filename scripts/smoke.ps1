@@ -77,6 +77,9 @@ if ($capabilities.active_layer_diagnostics.schema -ne "rrkal_displaytools.active
 if ($capabilities.ui_handoff_contracts.schema -ne "rrkal_displaytools.ui_handoff_contracts.v1") {
     throw "Renderer ui_handoff_contracts capability missing or invalid"
 }
+if ($capabilities.timeline_handoff.schema -ne "rrkal_displaytools.timeline_handoff.v1") {
+    throw "Renderer timeline_handoff capability missing or invalid"
+}
 if ($capabilities.boundary_highlight.identity_status_schema -ne "rrkal_displaytools.boundary_identity_status.v1") {
     throw "Renderer boundary_highlight identity_status capability missing or invalid"
 }

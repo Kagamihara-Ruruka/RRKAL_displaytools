@@ -56,6 +56,7 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "boundary_highlight.identity_status",
                     "layer_undo",
                     "session_journal",
+                    "timeline_state",
                     "canvas_preview stream provenance",
                 ],
                 "evidence": [
@@ -63,7 +64,9 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "launch_packet boundary_highlight.identity_status",
                     "launch_packet layer_undo",
                     "launch_packet session_journal",
+                    "launch_packet timeline_state",
                     "renderer capabilities active_layer_diagnostics",
+                    "renderer capabilities timeline_handoff",
                     "renderer capabilities ui_handoff_contracts",
                     "profile_schema optional canvas_preview",
                 ],
@@ -120,7 +123,11 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "provenance timeline_state",
                 ],
                 "pending": ["renderer_timeline_playback", "animation_export"],
-                "evidence": ["Timeline dock controls", "rrkal_displaytools.timeline_state.v1"],
+                "evidence": [
+                    "Timeline dock controls",
+                    "rrkal_displaytools.timeline_state.v1",
+                    "renderer capabilities timeline_handoff",
+                ],
             },
             {
                 "id": "renderer_output_provenance",

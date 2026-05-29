@@ -1,5 +1,19 @@
 # Development Log
 
+## 2026-05-29 - Timeline renderer handoff capability
+
+Scope:
+- Renderer capabilities now expose `timeline_handoff`.
+- The capability lists Timeline state/keyframe input contracts, applied Qt/launch/provenance/no-GUI handoff paths, and pending renderer playback/export work.
+- Smoke now gates `capabilities.timeline_handoff.schema`.
+- Closed-loop status evidence now links Timeline panel status to renderer capability discovery.
+
+Positioning:
+- This makes Timeline handoff inspectable from renderer capability discovery without overclaiming renderer animation playback.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Timeline No-GUI keyframe handoff
 
 Scope:
