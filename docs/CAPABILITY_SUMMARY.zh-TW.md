@@ -454,3 +454,8 @@
 
 - Qt Actions now uses section headers for Run/profile, Inspect Replay/contracts, Inspect Renderer ports, Inspect Research interaction, Renderer diagnostics and Process.
 - Smoke verifies the section header marker and representative Inspect group headers.
+
+### 2026-05-30 Qt Layer Inspect actions
+
+- Qt Actions now includes `Inspect: Layer runtime` and `Inspect: Layer pick`.
+- These actions expose existing layer runtime state/ack and selected-layer pick JSON from the grouped Actions panel, and are listed in profile replay inspector contracts.

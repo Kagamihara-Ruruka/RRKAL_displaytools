@@ -230,6 +230,21 @@ Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
 
 
+## 2026-05-30 - Qt Layer Inspect actions
+
+Scope:
+- Added `Inspect: Layer runtime` and `Inspect: Layer pick` buttons to the grouped Qt Actions panel.
+- The runtime action opens existing layer runtime state / renderer ack JSON; the pick action opens existing selected-layer pick JSON.
+- Added `layer_runtime` and `layer_pick` to `profile_ui_state_replay.qt_inspector_action_ids` and group definitions across Qt, no-GUI launch packet and renderer capability discovery.
+- Updated clone quickstart and profile schema docs; smoke verifies the new action IDs and button labels.
+
+Decision:
+- Layer control needs first-class Inspect actions because layer runtime and selected-layer pick state are central to the current scientific workflow.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+
 ## 2026-05-30 - Qt Actions section layout
 
 Scope:

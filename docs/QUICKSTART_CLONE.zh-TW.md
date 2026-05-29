@@ -107,8 +107,8 @@ Qt 面板目前可做：
 跨機器 clone 後建議先按 Actions 裡的 `Inspect:` 檢查入口：
 
 - Replay/contracts：先開 `Inspect: Clone ready`、`Inspect: Profile replay`、`Inspect: Module seams`，確認 portable command、profile replay coverage 與模組邊界。
-- Renderer ports：再開 `Inspect: Hydro LOD`、`Inspect: Ocean port`、`Inspect: Style routes`，確認 hydrology/LOD、sea-state scalar port、parchment/tactical renderer routes。
-- Research interaction：最後開 `Inspect: Pin pick`、`Inspect: Cursor geo`、`Inspect: Boundary JSON`，確認 Pin pick、滑鼠經緯度、Boundary/EEZ 強調與 identity warning。
+- Renderer ports：再開 `Inspect: Hydro LOD`、`Inspect: Ocean port`、`Inspect: Style routes`、`Inspect: Layer runtime`，確認 hydrology/LOD、sea-state scalar port、parchment/tactical renderer routes 與 layer runtime ack。
+- Research interaction：最後開 `Inspect: Layer pick`、`Inspect: Pin pick`、`Inspect: Cursor geo`、`Inspect: Boundary JSON`，確認 selected-layer pick、Pin pick、滑鼠經緯度、Boundary/EEZ 強調與 identity warning。
 
 ## 6. Canvas Preview / Live preview
 

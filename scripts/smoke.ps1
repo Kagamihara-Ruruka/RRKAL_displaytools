@@ -326,8 +326,11 @@ if ($launchPacket.cross_machine_clone_readiness.handoff_first_command -notlike "
 if ($launchPacket.profile_ui_state_replay.qt_inspector_action_ids -notcontains "boundary_json") {
     throw "Launch packet profile_ui_state_replay Boundary inspector action missing"
 }
-if ([int]$launchPacket.profile_ui_state_replay.qt_inspector_action_count -lt 9) {
+if ([int]$launchPacket.profile_ui_state_replay.qt_inspector_action_count -lt 11) {
     throw "Launch packet profile_ui_state_replay inspector action count missing"
+}
+if ($launchPacket.profile_ui_state_replay.qt_inspector_action_ids -notcontains "layer_runtime") {
+    throw "Launch packet profile_ui_state_replay layer runtime inspector action missing"
 }
 if ([int]$launchPacket.profile_ui_state_replay.qt_inspector_group_count -lt 3) {
     throw "Launch packet profile_ui_state_replay inspector group count missing"
@@ -948,6 +951,9 @@ if ($capabilities.profile_ui_state_replay.qt_inspector_action_ids -notcontains "
 }
 if ($capabilities.profile_ui_state_replay.qt_inspector_action_labels -notcontains "Inspect: Clone ready") {
     throw "Renderer profile_ui_state_replay Clone inspector label missing"
+}
+if ($capabilities.profile_ui_state_replay.qt_inspector_action_ids -notcontains "layer_pick") {
+    throw "Renderer profile_ui_state_replay layer pick inspector action missing"
 }
 if ($capabilities.profile_ui_state_replay.qt_inspector_action_groups.id -notcontains "renderer_ports") {
     throw "Renderer profile_ui_state_replay renderer ports group missing"
@@ -1713,6 +1719,12 @@ if ($qtPanelSource -notlike "*Renderer ports: inspect scalar ocean material and 
 if ($qtPanelSource -notlike "*Research interaction: inspect Boundary emphasis, identity warning and renderer ack JSON*") {
     throw "Qt Research interaction inspector tooltip is missing"
 }
+if ($qtPanelSource -notlike "*Inspect: Layer runtime*") {
+    throw "Qt Layer runtime inspector button is missing"
+}
+if ($qtPanelSource -notlike "*Inspect: Layer pick*") {
+    throw "Qt Layer pick inspector button is missing"
+}
 if ($qtPanelSource -notlike "*setAccessibleDescription*") {
     throw "Qt contract inspector accessible descriptions are missing"
 }
@@ -1938,6 +1950,9 @@ if ($profileSchemaDoc -notmatch 'Qt Inspect actions') {
 }
 if ($profileSchemaDoc -notmatch 'qt_inspector_action_ids') {
     throw "Profile schema docs missing profile UI state replay inspector action ids"
+}
+if ($profileSchemaDoc -notmatch 'layer_runtime') {
+    throw "Profile schema docs missing layer runtime inspector action id"
 }
 if ($profileSchemaDoc -notmatch 'qt_inspector_action_groups') {
     throw "Profile schema docs missing profile UI state replay inspector action groups"

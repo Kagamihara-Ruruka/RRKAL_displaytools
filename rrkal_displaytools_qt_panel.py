@@ -265,14 +265,16 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
         ("style_routes", "Inspect: Style routes"),
         ("module_seams", "Inspect: Module seams"),
         ("clone_ready", "Inspect: Clone ready"),
+        ("layer_runtime", "Inspect: Layer runtime"),
+        ("layer_pick", "Inspect: Layer pick"),
         ("pin_pick", "Inspect: Pin pick"),
         ("cursor_geo", "Inspect: Cursor geo"),
         ("boundary_json", "Inspect: Boundary JSON"),
     ]
     qt_inspector_groups = [
         {"id": "replay_contracts", "label": "Replay/contracts", "action_ids": ["profile_replay", "clone_ready", "module_seams"]},
-        {"id": "renderer_ports", "label": "Renderer ports", "action_ids": ["hydro_lod", "ocean_port", "style_routes"]},
-        {"id": "research_interaction", "label": "Research interaction", "action_ids": ["pin_pick", "cursor_geo", "boundary_json"]},
+        {"id": "renderer_ports", "label": "Renderer ports", "action_ids": ["hydro_lod", "ocean_port", "style_routes", "layer_runtime"]},
+        {"id": "research_interaction", "label": "Research interaction", "action_ids": ["layer_pick", "pin_pick", "cursor_geo", "boundary_json"]},
     ]
     return {
         "schema": "rrkal_displaytools.profile_ui_state_replay.v1",
@@ -2605,6 +2607,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         style_routes_button = QtWidgets.QPushButton("Inspect: Style routes")
         module_seams_button = QtWidgets.QPushButton("Inspect: Module seams")
         clone_ready_button = QtWidgets.QPushButton("Inspect: Clone ready")
+        layer_runtime_button = QtWidgets.QPushButton("Inspect: Layer runtime")
+        layer_pick_button = QtWidgets.QPushButton("Inspect: Layer pick")
         pin_pick_button = QtWidgets.QPushButton("Inspect: Pin pick")
         cursor_geo_button = QtWidgets.QPushButton("Inspect: Cursor geo")
         boundary_state_button = QtWidgets.QPushButton("Inspect: Boundary JSON")
@@ -2623,8 +2627,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             (ocean_port_button, "Renderer ports: inspect scalar ocean material and sea-state handoff JSON."),
             (hydro_lod_button, "Renderer ports: inspect hydrology layer and LOD hook readiness JSON."),
             (style_routes_button, "Renderer ports: inspect parchment and tactical style renderer route JSON."),
+            (layer_runtime_button, "Renderer ports: inspect layer runtime state and renderer ack JSON."),
             (module_seams_button, "Replay/contracts: inspect future module extraction seam registry JSON."),
             (clone_ready_button, "Replay/contracts: inspect cross-machine clone readiness JSON."),
+            (layer_pick_button, "Research interaction: inspect selected-layer renderer pick JSON."),
             (pin_pick_button, "Research interaction: inspect renderer Pin hover/click pick bridge JSON."),
             (cursor_geo_button, "Research interaction: inspect mouse cursor latitude/longitude geodesy bridge JSON."),
             (boundary_state_button, "Research interaction: inspect Boundary emphasis, identity warning and renderer ack JSON."),
@@ -2645,6 +2651,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         style_routes_button.clicked.connect(self.show_style_renderer_routes)
         module_seams_button.clicked.connect(self.show_module_boundary_registry)
         clone_ready_button.clicked.connect(self.show_cross_machine_clone_readiness)
+        layer_runtime_button.clicked.connect(self.show_layer_runtime_state)
+        layer_pick_button.clicked.connect(self.show_layer_pick_state)
         pin_pick_button.clicked.connect(self.show_pin_pick_state)
         cursor_geo_button.clicked.connect(self.show_cursor_geodesy_state)
         boundary_state_button.clicked.connect(self.show_boundary_state)
@@ -2661,8 +2669,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         action_sections = (
             ("Run / profile", (refresh_button, copy_button, copy_portable_button, save_button, load_button, open_templates_button, open_local_profiles_button, export_packet_button)),
             ("Inspect: Replay/contracts", (profile_replay_button, module_seams_button, clone_ready_button)),
-            ("Inspect: Renderer ports", (hydro_lod_button, ocean_port_button, style_routes_button)),
-            ("Inspect: Research interaction", (pin_pick_button, cursor_geo_button, boundary_state_button)),
+            ("Inspect: Renderer ports", (hydro_lod_button, ocean_port_button, style_routes_button, layer_runtime_button)),
+            ("Inspect: Research interaction", (layer_pick_button, pin_pick_button, cursor_geo_button, boundary_state_button)),
             ("Renderer diagnostics", (capabilities_button, closed_loop_button, layer_manifest_button, canvas_state_button, thumbnail_button, live_preview_button, smoke_button)),
             ("Process", (launch_button, restart_button, stop_button)),
         )
