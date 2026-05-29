@@ -212,7 +212,7 @@ def layer_undo_packet() -> dict[str, object]:
         "tracking_enabled": False,
         "covers": ["visibility", "lock", "opacity", "blend_mode", "active_layer"],
         "source": "no_gui_export_no_runtime_stack",
-        "global_document_undo": "pending",
+        "global_document_undo": "manual_document_snapshot_undo",
     }
 
 
@@ -231,6 +231,30 @@ def session_journal_packet() -> dict[str, object]:
             "boundary_highlight_ack": False,
         },
         "boundary": "Recent UI/runtime bridge journal only; not a persisted lab notebook or global document history.",
+    }
+
+
+def document_undo_packet() -> dict[str, object]:
+    return {
+        "schema": "rrkal_displaytools.document_snapshot_undo.v1",
+        "mode": "no_gui_export_status_only",
+        "undo_depth": 0,
+        "redo_depth": 0,
+        "capacity": 0,
+        "implemented": [
+            "manual_snapshot_capture",
+            "profile_state_undo",
+            "profile_state_redo",
+            "history_panel_controls",
+            "launch_packet_status_contract",
+            "provenance_status_contract",
+        ],
+        "pending": [
+            "automatic_change_capture",
+            "operation_level_history",
+            "persisted_lab_notebook",
+        ],
+        "boundary": "No-GUI export reports the UI contract only; runtime snapshots are created in the Qt panel.",
     }
 
 
@@ -330,6 +354,7 @@ def launch_packet(
         "active_layer_diagnostics": active_layer_diagnostics_packet(profile),
         "layer_undo": layer_undo_packet(),
         "session_journal": session_journal_packet(),
+        "document_undo": document_undo_packet(),
         "timeline_state": timeline_state_packet(profile),
         "timeline_runtime_state": timeline_runtime_state_packet(profile, timeline_state_file),
         "timeline_runtime_state_file": timeline_state_file,

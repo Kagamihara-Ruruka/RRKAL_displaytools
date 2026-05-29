@@ -37,6 +37,9 @@ if ($launchPacket.layer_undo.schema -ne "rrkal_displaytools.layer_stack_undo.v1"
 if ($launchPacket.session_journal.schema -ne "rrkal_displaytools.session_journal.v1") {
     throw "Launch packet session_journal schema missing or invalid"
 }
+if ($launchPacket.document_undo.schema -ne "rrkal_displaytools.document_snapshot_undo.v1") {
+    throw "Launch packet document_undo schema missing or invalid"
+}
 if ($launchPacket.timeline_state.schema -ne "rrkal_displaytools.timeline_state.v1") {
     throw "Launch packet timeline_state schema missing or invalid"
 }
@@ -144,6 +147,9 @@ if ($capabilities.active_layer_diagnostics.schema -ne "rrkal_displaytools.active
 }
 if ($capabilities.ui_handoff_contracts.schema -ne "rrkal_displaytools.ui_handoff_contracts.v1") {
     throw "Renderer ui_handoff_contracts capability missing or invalid"
+}
+if ($capabilities.ui_handoff_contracts.contracts -notcontains "document_undo") {
+    throw "Renderer ui_handoff_contracts document_undo contract missing"
 }
 if ($capabilities.timeline_handoff.schema -ne "rrkal_displaytools.timeline_handoff.v1") {
     throw "Renderer timeline_handoff capability missing or invalid"

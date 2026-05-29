@@ -64,6 +64,7 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "launch_packet boundary_highlight.identity_status",
                     "launch_packet layer_undo",
                     "launch_packet session_journal",
+                    "launch_packet document_undo",
                     "launch_packet timeline_state",
                     "renderer capabilities active_layer_diagnostics",
                     "renderer capabilities timeline_handoff",
@@ -131,6 +132,26 @@ def renderer_closed_loop_status_packet() -> dict[str, object]:
                     "rrkal_displaytools.timeline_runtime_state.v1",
                     "rrkal_displaytools.renderer_timeline_ack.v1",
                     "renderer capabilities timeline_handoff",
+                ],
+            },
+            {
+                "id": "manual_document_snapshot_undo",
+                "applies": [
+                    "History panel Snapshot/Undo/Redo controls",
+                    "manual profile-state snapshot capture",
+                    "manual snapshot undo",
+                    "manual snapshot redo",
+                    "launch packet document_undo contract",
+                    "provenance document_undo contract",
+                ],
+                "pending": [
+                    "automatic_change_capture",
+                    "operation_level_history",
+                    "persisted_lab_notebook",
+                ],
+                "evidence": [
+                    "rrkal_displaytools.document_snapshot_undo.v1",
+                    "History dock controls",
                 ],
             },
             {

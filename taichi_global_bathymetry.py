@@ -16497,6 +16497,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "active_layer_diagnostics",
                 "layer_undo",
                 "session_journal",
+                "document_undo",
                 "timeline_state",
                 "boundary_highlight.identity_status",
             ],
@@ -16507,7 +16508,7 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "cross-machine clone inspection",
             ],
             "pending": [
-                "global_document_undo",
+                "automatic_document_undo_capture",
                 "persisted_lab_notebook",
             ],
             "boundary": "Renderer capability discovery only; displaytools does not own RRKAL data discovery/cache governance.",

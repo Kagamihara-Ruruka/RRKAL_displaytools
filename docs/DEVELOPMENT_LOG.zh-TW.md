@@ -1,5 +1,21 @@
 # Development Log
 
+## 2026-05-29 - Manual document snapshot undo
+
+Scope:
+- History panel now provides Snapshot / Undo / Redo controls for manual document snapshots.
+- Snapshots capture the Qt profile state, including renderer controls, layer UI state, tools, Pins, Boundary highlight, Canvas Preview, and Timeline keyframes.
+- Launch packets and research provenance now include `document_undo`.
+- No-GUI launch packet export reports the same `rrkal_displaytools.document_snapshot_undo.v1` contract.
+- Renderer capabilities now list `document_undo` in `ui_handoff_contracts`.
+- Smoke now gates launch packet `document_undo` and renderer capability discovery.
+
+Positioning:
+- This closes a usable manual global snapshot undo/redo loop for UIUX work while keeping automatic change capture, operation-level history, and persisted lab notebook explicitly pending.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - Timeline ack smoke endpoint
 
 Scope:

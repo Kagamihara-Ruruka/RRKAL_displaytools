@@ -266,6 +266,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_pick_state_mtime_ns: int | None = LAYER_PICK_STATE_PATH.stat().st_mtime_ns if LAYER_PICK_STATE_PATH.exists() else None
         self.layer_pick_state_payload: dict[str, object] | None = None
         self.history_list: QtWidgets.QListWidget | None = None
+        self.document_undo_stack: list[dict[str, object]] = []
+        self.document_redo_stack: list[dict[str, object]] = []
+        self.document_undo_capacity = 12
+        self.document_undo_tracking_enabled = False
         self.timeline_state_label: QtWidgets.QLabel | None = None
         self.timeline_keyframe_list: QtWidgets.QListWidget | None = None
         self.timeline_keyframes: list[dict[str, object]] = []
@@ -378,6 +382,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_undo_tracking_enabled = True
         self.refresh_layer_undo_label()
         self.refresh_timeline_state_label()
+        self.document_undo_tracking_enabled = True
+        self.capture_document_snapshot("Initial workspace", clear_redo=False)
 
     def _build_ui(self) -> None:
         central = QtWidgets.QWidget(self)
@@ -937,6 +943,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
 
         history_dock = QtWidgets.QDockWidget("History", self)
         history_dock.setObjectName("historyDock")
+        history_panel = QtWidgets.QWidget(history_dock)
+        history_layout = QtWidgets.QVBoxLayout(history_panel)
+        history_layout.setContentsMargins(8, 8, 8, 8)
         self.history_list = QtWidgets.QListWidget()
         for item in (
             "✅ Qt Studio workspace loaded",
@@ -946,14 +955,26 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "✅ Selected-layer renderer picking bridge",
             "✅ Layer stack undo snapshots",
             "🚧 Timeline/keyframes",
-            "🚧 Global document undo stack",
+            "✅ Manual document snapshot undo/redo",
         ):
             self.history_list.addItem(item)
         for item in self.layer_runtime_history:
             self.history_list.insertItem(0, item)
         for item in self.pin_pick_history:
             self.history_list.insertItem(0, item)
-        history_dock.setWidget(self.history_list)
+        history_layout.addWidget(self.history_list)
+        document_history_actions = QtWidgets.QHBoxLayout()
+        snapshot_button = QtWidgets.QPushButton("Snapshot")
+        snapshot_button.clicked.connect(lambda: self.capture_document_snapshot("Manual snapshot"))
+        undo_document_button = QtWidgets.QPushButton("Undo")
+        undo_document_button.clicked.connect(self.undo_document_snapshot)
+        redo_document_button = QtWidgets.QPushButton("Redo")
+        redo_document_button.clicked.connect(self.redo_document_snapshot)
+        document_history_actions.addWidget(snapshot_button)
+        document_history_actions.addWidget(undo_document_button)
+        document_history_actions.addWidget(redo_document_button)
+        history_layout.addLayout(document_history_actions)
+        history_dock.setWidget(history_panel)
         self.docks["history"] = history_dock
         self.addDockWidget(QtCore.Qt.DockWidgetArea.RightDockWidgetArea, history_dock)
 
@@ -1292,6 +1313,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),
+            "document_undo": self.collect_document_undo_state(),
             "timeline_state": self.collect_timeline_state(),
             "timeline_runtime_state_file": str(TIMELINE_STATE_PATH),
             "timeline_ack_file": str(TIMELINE_ACK_PATH),
@@ -2186,7 +2208,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "tracking_enabled": self.layer_undo_tracking_enabled,
             "covers": ["visibility", "lock", "opacity", "blend_mode", "active_layer"],
             "source": "qt_panel_runtime",
-            "global_document_undo": "pending",
+            "global_document_undo": "manual_document_snapshot_undo",
         }
 
     def collect_session_journal(self) -> dict[str, object]:
@@ -2205,6 +2227,97 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             },
             "boundary": "Recent UI/runtime bridge journal only; not a persisted lab notebook or global document history.",
         }
+
+    def collect_document_snapshot(self) -> dict[str, object]:
+        return {
+            "schema": "rrkal_displaytools.document_snapshot.v1",
+            "captured_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "profile": self.collect_profile(),
+            "boundary": "Manual UI profile snapshot; not an automatic operation-level history or persisted lab notebook.",
+        }
+
+    def document_snapshot_signature(self, snapshot: dict[str, object]) -> str:
+        comparable = dict(snapshot)
+        comparable.pop("captured_at_utc", None)
+        return json.dumps(comparable, ensure_ascii=False, sort_keys=True)
+
+    def collect_document_undo_state(self) -> dict[str, object]:
+        return {
+            "schema": "rrkal_displaytools.document_snapshot_undo.v1",
+            "mode": "manual_snapshot",
+            "undo_depth": len(self.document_undo_stack),
+            "redo_depth": len(self.document_redo_stack),
+            "capacity": self.document_undo_capacity,
+            "implemented": [
+                "manual_snapshot_capture",
+                "profile_state_undo",
+                "profile_state_redo",
+                "history_panel_controls",
+                "launch_packet_status_contract",
+                "provenance_status_contract",
+            ],
+            "pending": [
+                "automatic_change_capture",
+                "operation_level_history",
+                "persisted_lab_notebook",
+            ],
+            "boundary": "Undo/redo restores saved Qt profile state snapshots only; it is not a full operation log.",
+        }
+
+    def capture_document_snapshot(self, label: str = "Manual snapshot", clear_redo: bool = True) -> None:
+        if not self.document_undo_tracking_enabled:
+            return
+        snapshot = self.collect_document_snapshot()
+        signature = self.document_snapshot_signature(snapshot)
+        if self.document_undo_stack and self.document_snapshot_signature(self.document_undo_stack[-1]) == signature:
+            self.status.setText("Document snapshot unchanged; not captured")
+            return
+        self.document_undo_stack.append(snapshot)
+        while len(self.document_undo_stack) > self.document_undo_capacity:
+            self.document_undo_stack.pop(0)
+        if clear_redo:
+            self.document_redo_stack.clear()
+        if self.history_list is not None:
+            self.history_list.insertItem(0, f"Document snapshot captured: {label}")
+        self.refresh_research_provenance()
+        self.status.setText(f"已保存 document snapshot：{label}")
+
+    def apply_document_snapshot(self, snapshot: dict[str, object]) -> None:
+        profile = snapshot.get("profile")
+        if not isinstance(profile, dict):
+            self.status.setText("Document snapshot 格式錯誤")
+            return
+        self.document_undo_tracking_enabled = False
+        try:
+            self.apply_profile(profile)
+        finally:
+            self.document_undo_tracking_enabled = True
+        self.refresh_research_provenance()
+
+    @QtCore.pyqtSlot()
+    def undo_document_snapshot(self) -> None:
+        if len(self.document_undo_stack) < 2:
+            self.status.setText("Document snapshot undo stack 不足")
+            return
+        current = self.document_undo_stack.pop()
+        self.document_redo_stack.append(current)
+        target = self.document_undo_stack[-1]
+        self.apply_document_snapshot(target)
+        if self.history_list is not None:
+            self.history_list.insertItem(0, "Document snapshot undo")
+        self.status.setText("已回復上一個 document snapshot")
+
+    @QtCore.pyqtSlot()
+    def redo_document_snapshot(self) -> None:
+        if not self.document_redo_stack:
+            self.status.setText("Document snapshot redo stack 為空")
+            return
+        snapshot = self.document_redo_stack.pop()
+        self.document_undo_stack.append(snapshot)
+        self.apply_document_snapshot(snapshot)
+        if self.history_list is not None:
+            self.history_list.insertItem(0, "Document snapshot redo")
+        self.status.setText("已重做 document snapshot")
 
     def collect_timeline_state(self) -> dict[str, object]:
         keyframes = [
@@ -3195,6 +3308,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "active_layer_diagnostics": self.active_layer_diagnostics_packet(),
             "layer_undo": self.collect_layer_undo_state(),
             "session_journal": self.collect_session_journal(),
+            "document_undo": self.collect_document_undo_state(),
             "timeline_state": self.collect_timeline_state(),
             "timeline_runtime_state_file": str(TIMELINE_STATE_PATH),
             "timeline_state_last_write_utc": self.timeline_state_last_write_utc,
