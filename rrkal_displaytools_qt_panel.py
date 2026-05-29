@@ -1506,7 +1506,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"{'On' if state.get('enabled') else 'Off'}; trigger={state.get('trigger', 'hover')}; "
             f"RGB={color_text}; contrast={state.get('contrast')}%; alpha={state.get('alpha')}%; "
             f"gamma={gamma:.2f}; feather={state.get('feather')}%; "
-            f"breath={'on' if breathing_enabled else 'off'}; targets={target_count}; line mask live; polygon fill pending"
+            f"breath={'on' if breathing_enabled else 'off'}; targets={target_count}; line mask live; closed-ring fill live"
         )
 
     def refresh_boundary_highlight_status(self) -> None:
@@ -1577,7 +1577,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         layout = QtWidgets.QVBoxLayout(dialog)
         note = QtWidgets.QLabel(
             "控制國界/領海/EEZ/公海 hover 強調遮罩。這是科研定位用的圖層強調狀態，"
-            "已寫入 profile / launch packet / provenance；renderer 線段遮罩已 live，polygon fill 仍為下一步。"
+            "已寫入 profile / launch packet / provenance；renderer 線段遮罩與閉合 ring fill 已 live，完整 feature identity 仍為下一步。"
         )
         note.setWordWrap(True)
         layout.addWidget(note)
@@ -2376,7 +2376,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "boundary_highlight": self.collect_boundary_highlight_state(),
             "boundary_highlight_ack_file": str(BOUNDARY_HIGHLIGHT_ACK_PATH),
             "boundary_highlight_ack": self.boundary_highlight_ack_payload,
-            "boundary_highlight_boundary": "Line hover mask and selected-layer line picking are live; polygon fill mask and territory feature identity remain pending.",
+            "boundary_highlight_boundary": "Line hover mask, selected-layer line picking, and closed-ring fill preview are live; full territory feature identity and open-line area inference remain pending.",
             "visible_layers": visible_layers,
             "locked_layers": locked_layers,
             "layer_visibility_snapshot_active": self.layer_visibility_snapshot is not None,

@@ -1,5 +1,19 @@
 ﻿# Development Log
 
+## 2026-05-29 - Boundary closed-ring fill preview
+
+Scope:
+- Boundary highlight rendering now fills the hovered line when the source geometry is a closed lon/lat ring.
+- Fill alpha follows the existing highlight alpha and breathing controls, while outline/glow remains active.
+- Renderer boundary highlight ack/capabilities now distinguish closed-ring polygon fill preview from full territory feature identity and open-line area inference.
+
+Positioning:
+- This is an honest partial polygon-mask closure for datasets that already provide closed rings.
+- It does not invent country/EEZ area ownership from open boundary lines.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
 ## 2026-05-29 - UI construction label cleanup
 
 Scope:

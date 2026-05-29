@@ -3269,6 +3269,15 @@ class GeoVectorLineOverlay:
                 segments.append(segment)
             return segments
 
+        def screen_polygon_area(points: list[tuple[float, float]]) -> float:
+            if len(points) < 3:
+                return 0.0
+            area = 0.0
+            for idx, point in enumerate(points):
+                next_point = points[(idx + 1) % len(points)]
+                area += point[0] * next_point[1] - next_point[0] * point[1]
+            return abs(area) * 0.5
+
         for line_index, line in enumerate(self.lines):
             if len(line) < 2:
                 continue
@@ -3276,6 +3285,17 @@ class GeoVectorLineOverlay:
                 pulse = 0.5 + 0.5 * math.sin(float(highlight_phase) * math.tau)
                 color_base = highlight_color or (255, 255, 180)
                 alpha_scale = max(0.0, min(float(highlight_alpha_scale), 2.0))
+                try:
+                    line_closed = bool(np.linalg.norm(line[0] - line[-1]) < 1e-3)
+                except Exception:
+                    line_closed = False
+                if line_closed:
+                    fill_alpha = int(min(180, (32 + 42 * pulse) * alpha_scale))
+                    fill_rgba = (int(color_base[0]), int(color_base[1]), int(color_base[2]), fill_alpha)
+                    fill_segments = draw_projected_line(line, (0, 0, 0, 0), 1)
+                    for segment in fill_segments:
+                        if len(segment) >= 3 and screen_polygon_area(segment) >= 6.0:
+                            draw.polygon(segment, fill=fill_rgba)
                 glow_alpha = int(min(255, (95 + 95 * pulse) * alpha_scale))
                 core_alpha = int(min(255, 220 + 35 * alpha_scale))
                 glow_width = max(4, int(line_width) + int(7 + 5 * pulse) + max(0, int(highlight_width_extra)))
@@ -12693,11 +12713,12 @@ class HybridRenderController:
                 "hover_hit_gate",
                 "outline_glow_preview",
                 "hover_contrast_gamma_color",
+                "closed_ring_polygon_fill_preview",
             ],
             "pending": [
-                "polygon_fill_mask",
                 "fill_shader_contrast_gamma",
                 "territory_feature_identity",
+                "open_line_area_inference",
             ],
             "error": getattr(self, "boundary_highlight_error", None),
             "source": "taichi_global_bathymetry",
@@ -15827,11 +15848,12 @@ def renderer_capabilities_packet() -> dict[str, object]:
                 "hover_hit_gate",
                 "outline_glow_preview",
                 "hover_contrast_gamma_color",
+                "closed_ring_polygon_fill_preview",
             ],
             "pending": [
-                "polygon_fill_mask",
                 "fill_shader_contrast_gamma",
                 "territory_feature_identity",
+                "open_line_area_inference",
             ],
         },
         "layer_runtime_state": {
