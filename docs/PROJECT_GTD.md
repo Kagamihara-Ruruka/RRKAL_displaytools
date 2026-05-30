@@ -496,3 +496,14 @@ Done:
 
 Next:
 - Continue tightening profile/launch packet reviewer actions and one-click export flow.
+
+
+## 2026-05-30 - Launch reviewer summary contract
+
+Done:
+- Added `launch_reviewer_summary_contract` to `profile_launch_readiness`.
+- Added `Copy launch summary` to the Qt Replay/contracts group.
+- Handoff and smoke gate the launch reviewer summary contract.
+
+Next:
+- Continue tightening one-click reviewer packet export for clone users.

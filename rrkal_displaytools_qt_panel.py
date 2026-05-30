@@ -213,6 +213,22 @@ def profile_launch_readiness_packet(
         ],
         "launch_packet_fields": ["profile_launch_readiness", "portable_command", "style_renderer_entries", "layer_operator_groups"],
         "renderer_capability_field": "profile_launch_readiness",
+        "launch_reviewer_summary_contract_schema": "rrkal_displaytools.launch_reviewer_summary_contract.v1",
+        "launch_reviewer_summary_contract": {
+            "label": "Launch reviewer",
+            "summary_format": "Launch reviewer: readiness={readiness}; checks={ready_check_count}/{check_count}; command={portable_command_line}; fields={launch_packet_fields}; renderer={renderer_capability_field}",
+            "qt_inspector_group": "replay_contracts",
+            "qt_copy_action": "copy_launch_reviewer_summary",
+            "component_contract_fields": [
+                "profile_launch_readiness",
+                "portable_command",
+                "style_renderer_entries",
+                "layer_operator_groups",
+            ],
+            "launch_packet_field": "profile_launch_readiness.launch_reviewer_summary_contract",
+            "handoff_field": "profile_launch_readiness.launch_reviewer_summary_contract",
+            "portable": True,
+        },
         "boundary": "Readiness summarizes displaytools launch/profile/renderer contracts only; RRKAL data discovery, download, import, and cache governance are out of scope.",
     }
 
@@ -261,6 +277,7 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
     ]
     qt_inspector_actions = [
         ("profile_replay", "Inspect: Profile replay"),
+        ("launch_summary", "Copy launch summary"),
         ("timeline", "Inspect: Timeline"),
         ("ocean_port", "Inspect: Ocean port"),
         ("hydro_lod", "Inspect: Hydro LOD"),
@@ -283,7 +300,7 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
         ("live_preview", "Inspect: Live preview"),
     ]
     qt_inspector_groups = [
-        {"id": "replay_contracts", "label": "Replay/contracts", "action_ids": ["profile_replay", "timeline", "clone_ready", "clone_summary", "module_seams"]},
+        {"id": "replay_contracts", "label": "Replay/contracts", "action_ids": ["profile_replay", "launch_summary", "timeline", "clone_ready", "clone_summary", "module_seams"]},
         {"id": "renderer_ports", "label": "Renderer ports", "action_ids": ["hydro_lod", "ocean_port", "style_routes", "layer_matrix", "layer_runtime"]},
         {"id": "research_interaction", "label": "Research interaction", "action_ids": ["layer_pick", "selection_state", "layer_ops", "canvas_state", "pin_pick", "cursor_geo", "boundary_json", "research_summary"]},
         {"id": "visual_review", "label": "Visual review", "action_ids": ["visual_readiness", "renderer_thumbnail", "live_preview"]},
@@ -2812,6 +2829,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         open_local_profiles_button = QtWidgets.QPushButton("本機配置")
         export_packet_button = QtWidgets.QPushButton("匯出啟動包")
         profile_replay_button = QtWidgets.QPushButton("Inspect: Profile replay")
+        copy_launch_summary_button = QtWidgets.QPushButton("Copy launch summary")
         timeline_button = QtWidgets.QPushButton("Inspect: Timeline")
         ocean_port_button = QtWidgets.QPushButton("Inspect: Ocean port")
         hydro_lod_button = QtWidgets.QPushButton("Inspect: Hydro LOD")
@@ -2846,6 +2864,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         stop_button = QtWidgets.QPushButton("停止本面板啟動的程序")
         for button, tooltip in (
             (profile_replay_button, "Replay/contracts: inspect portable UI/profile replay coverage JSON."),
+            (copy_launch_summary_button, "Replay/contracts: copy profile, portable command and launch packet reviewer summary."),
             (timeline_button, "Replay/contracts: inspect Timeline keyframes, runtime state and export options JSON."),
             (ocean_port_button, "Renderer ports: inspect scalar ocean material and sea-state handoff JSON."),
             (hydro_lod_button, "Renderer ports: inspect hydrology layer and LOD hook readiness JSON."),
@@ -2883,6 +2902,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         open_local_profiles_button.clicked.connect(self.open_local_profile_dir)
         export_packet_button.clicked.connect(self.export_launch_packet_dialog)
         profile_replay_button.clicked.connect(self.show_profile_ui_state_replay)
+        copy_launch_summary_button.clicked.connect(self.copy_launch_reviewer_summary)
         timeline_button.clicked.connect(self.show_timeline_runtime_state)
         ocean_port_button.clicked.connect(self.show_ocean_material_control_port)
         hydro_lod_button.clicked.connect(self.show_hydrology_lod_status)
@@ -2917,7 +2937,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         stop_button.clicked.connect(self.stop_renderer)
         action_sections = (
             ("Run / profile", (refresh_button, copy_button, copy_portable_button, save_button, load_button, open_templates_button, open_local_profiles_button, export_packet_button)),
-            ("Inspect: Replay/contracts", (profile_replay_button, timeline_button, module_seams_button, clone_ready_button, copy_clone_summary_button)),
+            ("Inspect: Replay/contracts", (profile_replay_button, copy_launch_summary_button, timeline_button, module_seams_button, clone_ready_button, copy_clone_summary_button)),
             ("Inspect: Renderer ports", (hydro_lod_button, ocean_port_button, style_routes_button, layer_matrix_button, layer_runtime_button)),
             ("Inspect: Research interaction", (layer_pick_button, selection_state_button, copy_selection_summary_button, layer_ops_button, canvas_state_button, pin_pick_button, copy_pin_summary_action_button, cursor_geo_button, copy_cursor_summary_button, boundary_state_button, copy_boundary_summary_button, copy_research_summary_button)),
             ("Inspect: Visual review", (visual_readiness_button, copy_visual_summary_button, thumbnail_button, live_preview_button)),
@@ -3836,6 +3856,23 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "rrkal_displaytools_qt_panel",
             self.collect_style_renderer_entries(),
             self.collect_layer_operator_groups(),
+        )
+
+    def launch_reviewer_summary_text(self) -> str:
+        packet = self.collect_profile_launch_readiness()
+        contract = packet.get("launch_reviewer_summary_contract", {})
+        label = "Launch reviewer"
+        if isinstance(contract, dict):
+            label = str(contract.get("label") or label)
+        fields = packet.get("launch_packet_fields", [])
+        field_text = ",".join(str(item) for item in fields) if isinstance(fields, list) else str(fields)
+        return (
+            f"{label}: "
+            f"readiness={packet.get('readiness')}; "
+            f"checks={packet.get('ready_check_count')}/{packet.get('check_count')}; "
+            f"command={subprocess.list2cmdline(self.build_portable_command())}; "
+            f"fields={field_text}; "
+            f"renderer={packet.get('renderer_capability_field')}"
         )
 
     def collect_profile_launch_readiness_ui(self) -> dict[str, object]:
@@ -7565,6 +7602,11 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         summary = self.clone_reviewer_summary_text()
         QtWidgets.QApplication.clipboard().setText(summary)
         self.status.setText("已複製 clone reviewer 摘要")
+
+    def copy_launch_reviewer_summary(self) -> None:
+        summary = self.launch_reviewer_summary_text()
+        QtWidgets.QApplication.clipboard().setText(summary)
+        self.status.setText("已複製 launch reviewer 摘要")
 
     def show_cursor_geodesy_state(self) -> None:
         self.command_text.setPlainText(

@@ -1029,6 +1029,22 @@ def profile_launch_readiness_packet(
         ],
         "launch_packet_fields": ["profile_launch_readiness", "portable_command", "style_renderer_entries", "layer_operator_groups"],
         "renderer_capability_field": "profile_launch_readiness",
+        "launch_reviewer_summary_contract_schema": "rrkal_displaytools.launch_reviewer_summary_contract.v1",
+        "launch_reviewer_summary_contract": {
+            "label": "Launch reviewer",
+            "summary_format": "Launch reviewer: readiness={readiness}; checks={ready_check_count}/{check_count}; command={portable_command_line}; fields={launch_packet_fields}; renderer={renderer_capability_field}",
+            "qt_inspector_group": "replay_contracts",
+            "qt_copy_action": "copy_launch_reviewer_summary",
+            "component_contract_fields": [
+                "profile_launch_readiness",
+                "portable_command",
+                "style_renderer_entries",
+                "layer_operator_groups",
+            ],
+            "launch_packet_field": "profile_launch_readiness.launch_reviewer_summary_contract",
+            "handoff_field": "profile_launch_readiness.launch_reviewer_summary_contract",
+            "portable": True,
+        },
         "boundary": "Readiness summarizes displaytools launch/profile/renderer contracts only; RRKAL data discovery, download, import, and cache governance are out of scope.",
     }
 
@@ -1077,6 +1093,7 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
     ]
     qt_inspector_actions = [
         ("profile_replay", "Inspect: Profile replay"),
+        ("launch_summary", "Copy launch summary"),
         ("timeline", "Inspect: Timeline"),
         ("ocean_port", "Inspect: Ocean port"),
         ("hydro_lod", "Inspect: Hydro LOD"),
@@ -1099,7 +1116,7 @@ def profile_ui_state_replay_packet(source: str) -> dict[str, object]:
         ("live_preview", "Inspect: Live preview"),
     ]
     qt_inspector_groups = [
-        {"id": "replay_contracts", "label": "Replay/contracts", "action_ids": ["profile_replay", "timeline", "clone_ready", "clone_summary", "module_seams"]},
+        {"id": "replay_contracts", "label": "Replay/contracts", "action_ids": ["profile_replay", "launch_summary", "timeline", "clone_ready", "clone_summary", "module_seams"]},
         {"id": "renderer_ports", "label": "Renderer ports", "action_ids": ["hydro_lod", "ocean_port", "style_routes", "layer_matrix", "layer_runtime"]},
         {"id": "research_interaction", "label": "Research interaction", "action_ids": ["layer_pick", "selection_state", "layer_ops", "canvas_state", "pin_pick", "cursor_geo", "boundary_json", "research_summary"]},
         {"id": "visual_review", "label": "Visual review", "action_ids": ["visual_readiness", "renderer_thumbnail", "live_preview"]},

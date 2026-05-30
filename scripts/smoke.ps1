@@ -425,6 +425,21 @@ if ($launchPacket.profile_launch_readiness.readiness -ne "ready") {
 if ([int]$launchPacket.profile_launch_readiness.ready_check_count -lt 7) {
     throw "Launch packet profile_launch_readiness ready check count missing"
 }
+if ($launchPacket.profile_launch_readiness.launch_reviewer_summary_contract_schema -ne "rrkal_displaytools.launch_reviewer_summary_contract.v1") {
+    throw "Launch packet launch reviewer summary contract schema missing or invalid"
+}
+if ($launchPacket.profile_launch_readiness.launch_reviewer_summary_contract.qt_copy_action -ne "copy_launch_reviewer_summary") {
+    throw "Launch packet launch reviewer summary copy action missing or invalid"
+}
+if ($launchPacket.profile_launch_readiness.launch_reviewer_summary_contract.component_contract_fields -notcontains "portable_command") {
+    throw "Launch packet launch reviewer summary component contracts incomplete"
+}
+if (-not $launchPacket.profile_launch_readiness.launch_reviewer_summary_contract.portable) {
+    throw "Launch packet launch reviewer summary portability flag missing"
+}
+if ($launchPacket.profile_ui_state_replay.qt_inspector_action_ids -notcontains "launch_summary") {
+    throw "Launch packet profile_ui_state_replay launch summary action missing"
+}
 if ($launchPacket.profile_launch_readiness_ui.schema -ne "rrkal_displaytools.profile_launch_readiness_ui.v1") {
     throw "Launch packet profile_launch_readiness_ui schema missing or invalid"
 }
@@ -1135,6 +1150,15 @@ if ($capabilities.profile_launch_readiness.readiness -ne "ready") {
 if ([int]$capabilities.profile_launch_readiness.ready_check_count -lt 7) {
     throw "Renderer profile_launch_readiness ready check count missing"
 }
+if ($capabilities.profile_launch_readiness.launch_reviewer_summary_contract_schema -ne "rrkal_displaytools.launch_reviewer_summary_contract.v1") {
+    throw "Renderer launch reviewer summary contract schema missing or invalid"
+}
+if ($capabilities.profile_launch_readiness.launch_reviewer_summary_contract.qt_copy_action -ne "copy_launch_reviewer_summary") {
+    throw "Renderer launch reviewer summary copy action missing or invalid"
+}
+if ($capabilities.profile_ui_state_replay.qt_inspector_action_ids -notcontains "launch_summary") {
+    throw "Renderer profile_ui_state_replay launch summary action missing"
+}
 if ($capabilities.profile_launch_readiness_ui.schema -ne "rrkal_displaytools.profile_launch_readiness_ui.v1") {
     throw "Renderer profile_launch_readiness_ui schema missing or invalid"
 }
@@ -1793,6 +1817,15 @@ if ($handoff.profile_launch_readiness.readiness -ne "ready") {
 if ([int]$handoff.profile_launch_readiness.ready_check_count -lt 7) {
     throw "Handoff inspection profile_launch_readiness ready check count missing"
 }
+if ($handoff.profile_launch_readiness.launch_reviewer_summary_contract_schema -ne "rrkal_displaytools.launch_reviewer_summary_contract.v1") {
+    throw "Handoff inspection launch reviewer summary contract schema missing or invalid"
+}
+if ($handoff.profile_launch_readiness.launch_reviewer_summary_contract.qt_copy_action -ne "copy_launch_reviewer_summary") {
+    throw "Handoff inspection launch reviewer summary copy action missing or invalid"
+}
+if (-not $handoff.profile_launch_readiness.launch_reviewer_summary_contract.portable) {
+    throw "Handoff inspection launch reviewer summary portability flag missing"
+}
 if ($handoff.launch_packet_contracts.profile_launch_readiness_ui -ne "rrkal_displaytools.profile_launch_readiness_ui.v1") {
     throw "Handoff inspection profile_launch_readiness_ui launch contract missing or invalid"
 }
@@ -2070,6 +2103,15 @@ if ($qtPanelSource -notlike "*show_profile_ui_state_replay*") {
 }
 if ($qtPanelSource -notlike "*Profile replay*") {
     throw "Qt Profile replay action button is missing"
+}
+if ($qtPanelSource -notlike "*Copy launch summary*") {
+    throw "Qt launch reviewer copy summary button is missing"
+}
+if ($qtPanelSource -notlike "*copy_launch_reviewer_summary*") {
+    throw "Qt launch reviewer copy summary action is missing"
+}
+if ($qtPanelSource -notlike "*launch_reviewer_summary_text*") {
+    throw "Qt launch reviewer summary formatter is missing"
 }
 if ($qtPanelSource -notlike "*show_ocean_material_control_port*") {
     throw "Qt ocean material control port JSON action is missing"

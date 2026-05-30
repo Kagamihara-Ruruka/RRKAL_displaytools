@@ -293,6 +293,8 @@ $summary = [ordered]@{
         ready_check_count = $launchPacket.profile_launch_readiness.ready_check_count
         check_count = $launchPacket.profile_launch_readiness.check_count
         cross_machine_commands = $launchPacket.profile_launch_readiness.cross_machine_commands
+        launch_reviewer_summary_contract_schema = $launchPacket.profile_launch_readiness.launch_reviewer_summary_contract_schema
+        launch_reviewer_summary_contract = $launchPacket.profile_launch_readiness.launch_reviewer_summary_contract
     }
     profile_launch_readiness_ui = @{
         launch_packet_schema = $launchPacket.profile_launch_readiness_ui.schema

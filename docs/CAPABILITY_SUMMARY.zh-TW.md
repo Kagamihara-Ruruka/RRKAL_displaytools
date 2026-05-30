@@ -401,6 +401,12 @@
 - Qt Replay/contracts includes `Copy clone summary`, which copies repo/setup/profile/Qt-first/smoke/handoff-first readiness for clone handoff notes.
 - Smoke gates launch packet, renderer capability, handoff and Qt source coverage.
 
+### 2026-05-30 Launch reviewer summary contract
+
+- `profile_launch_readiness.launch_reviewer_summary_contract_schema` now advertises `rrkal_displaytools.launch_reviewer_summary_contract.v1`.
+- Qt Replay/contracts includes `Copy launch summary`, which copies readiness checks, portable command and launch packet fields for reviewer handoff.
+- Smoke gates launch packet, renderer capability, handoff and Qt source coverage.
+
 ### 2026-05-30 Qt contract inspector tooltips
 
 - The Qt Actions inspector buttons now include tooltips and accessible descriptions for Profile replay, Ocean port, Hydro LOD, Style routes, Module seams and Clone ready.
