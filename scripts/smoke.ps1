@@ -6424,6 +6424,15 @@ if ($preDecouplingGate.required_before_move -notcontains "scripts/inspect_decoup
 if ($preDecouplingGate.decoupling_boundary_inspector_command -notlike "*scripts/inspect_decoupling_boundaries.ps1") {
     throw "Pre-decoupling gate boundary inspector command missing"
 }
+if ($preDecouplingGate.required_before_move -notcontains "scripts/inspect_render_plan_compose_work_order.ps1") {
+    throw "Pre-decoupling gate render plan compose work order requirement missing"
+}
+if ($preDecouplingGate.render_plan_compose_work_order_command -notlike "*scripts/inspect_render_plan_compose_work_order.ps1") {
+    throw "Pre-decoupling gate render plan compose work order command missing"
+}
+if ($preDecouplingGate.render_plan_compose_work_order_schema -ne "rrkal_displaytools.render_plan_compose_work_order.v1") {
+    throw "Pre-decoupling gate render plan compose work order schema missing"
+}
 
 $preDecouplingSnapshotPath = Join-Path $RepoRoot "scripts\export_pre_decoupling_snapshot.ps1"
 if (-not (Test-Path -LiteralPath $preDecouplingSnapshotPath)) {

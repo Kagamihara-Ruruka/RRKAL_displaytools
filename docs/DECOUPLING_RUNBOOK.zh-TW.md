@@ -23,6 +23,7 @@ The gate must report:
 - `observability_baseline_schema=rrkal_displaytools.decoupling_observability_baseline.v1`
 - `performance_smoke_schema=rrkal_displaytools.performance_smoke.v1`
 - `decoupling_boundary_inspector_command=scripts/inspect_decoupling_boundaries.ps1`
+- `render_plan_compose_work_order_command=scripts/inspect_render_plan_compose_work_order.ps1`
 
 For a read-only boundary review before code movement, run:
 
@@ -39,6 +40,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_
 ```
 
 This must report the target module, source helpers, keep-contracts, smoke gates, and the non-goal that runtime compose-run merging stays disabled until zero-diff parity artifacts exist.
+
+The pre-decoupling gate treats this work order as required-before-move evidence. If it fails, do not start extraction.
 
 ## First extraction order
 

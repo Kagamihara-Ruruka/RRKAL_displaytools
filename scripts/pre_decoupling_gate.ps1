@@ -25,8 +25,24 @@ function Invoke-JsonPython {
     return $raw.Substring($jsonStart) | ConvertFrom-Json
 }
 
+function Invoke-JsonPowerShell {
+    param([string[]]$ArgumentList)
+
+    $text = & powershell @ArgumentList
+    if ($LASTEXITCODE -ne 0) {
+        throw "Command failed: powershell $($ArgumentList -join ' ')"
+    }
+    $raw = $text -join "`n"
+    $jsonStart = $raw.IndexOf("{")
+    if ($jsonStart -lt 0) {
+        throw "JSON payload not found: powershell $($ArgumentList -join ' ')"
+    }
+    return $raw.Substring($jsonStart) | ConvertFrom-Json
+}
+
 $readiness = Invoke-JsonPython @("decoupling_readiness.py", "--phase", "post_07_decoupling")
 $performanceContract = Invoke-JsonPython @("performance_telemetry.py", "--contract-only")
+$workOrderContract = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_render_plan_compose_work_order.ps1", "-ContractOnly")
 $firstExtraction = @($readiness.first_extraction_order | Select-Object -First 1)[0]
 $gate = [ordered]@{
     schema = "rrkal_displaytools.pre_decoupling_gate.v1"
@@ -42,11 +58,14 @@ $gate = [ordered]@{
     render_telemetry_schema = $readiness.observability_baseline.render_telemetry_schema
     performance_smoke_command = $readiness.observability_baseline.pre_move_command
     decoupling_boundary_inspector_command = $readiness.operation_schedule.decoupling_boundary_inspector_command
+    render_plan_compose_work_order_command = $readiness.operation_schedule.render_plan_compose_work_order_command
+    render_plan_compose_work_order_schema = $workOrderContract.output_schema
     required_before_move = @(
         "clean git worktree",
         "scripts/smoke.ps1",
         "scripts/performance_smoke.ps1",
         "scripts/inspect_decoupling_boundaries.ps1",
+        "scripts/inspect_render_plan_compose_work_order.ps1",
         "git diff --check",
         "docs/DEVELOPMENT_LOG.zh-TW.md smoke result"
     )
@@ -84,6 +103,12 @@ if ($performanceContract.schema -ne $gate.performance_smoke_schema) {
 if ($gate.decoupling_boundary_inspector_command -notlike "*scripts/inspect_decoupling_boundaries.ps1") {
     throw "Pre-decoupling boundary inspector command missing"
 }
+if ($gate.render_plan_compose_work_order_command -notlike "*scripts/inspect_render_plan_compose_work_order.ps1") {
+    throw "Pre-decoupling render plan compose work order command missing"
+}
+if ($gate.render_plan_compose_work_order_schema -ne "rrkal_displaytools.render_plan_compose_work_order.v1") {
+    throw "Pre-decoupling render plan compose work order schema missing"
+}
 
 if (-not $ContractOnly) {
     $gitStatus = git status --porcelain
@@ -103,6 +128,10 @@ if (-not $ContractOnly) {
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_decoupling_boundaries.ps1
     if ($LASTEXITCODE -ne 0) {
         throw "Pre-decoupling boundary inspector failed"
+    }
+    powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_compose_work_order.ps1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Pre-decoupling render plan compose work order inspector failed"
     }
     $gate.smoke_executed = $true
 }

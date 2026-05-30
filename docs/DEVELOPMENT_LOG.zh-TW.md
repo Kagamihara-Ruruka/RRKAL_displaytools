@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - Render plan compose work order gate
+
+- Added `render_plan_compose_work_order_command` and schema evidence to `scripts/pre_decoupling_gate.ps1`.
+- The pre-decoupling gate now requires `scripts/inspect_render_plan_compose_work_order.ps1` before renderer code movement, alongside smoke, performance smoke and boundary inspection.
+- Kept this as a pre-7 read-only gate hardening step; no renderer code was moved.
+- Smoke: PASS via `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`; cloud-drive transient file-access retry occurred and recovered.
+
 ## 2026-05-31 - Render plan compose work order inspector
 
 - Added `scripts/inspect_render_plan_compose_work_order.ps1` to produce a no-GUI work order for the first post-7 extraction: `render_plan_compose -> render_core/render_plan.py`.
