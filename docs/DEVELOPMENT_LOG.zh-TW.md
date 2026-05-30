@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Qt Pin occlusion legend
+
+Changes:
+- Added `pinOcclusionLegend` to the Qt Pin Annotation panel, sourced from `rrkal_displaytools.pin_projection.v1`.
+- The Pin projection contract now exposes the occlusion status vocabulary: `visible`, `behind_horizon`, `off_viewport`, and `invalid`.
+- Handoff inspection and smoke now verify the Qt occlusion legend object and shared Pin occlusion vocabulary.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Qt Layer row hover affordance
 
 Changes:

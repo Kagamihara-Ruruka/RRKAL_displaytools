@@ -932,6 +932,12 @@ if ($launchPacket.pin_overlay.rotation_rule -notlike "*every frame*") {
 if ($launchPacket.pin_overlay.occlusion_rule -notlike "*view_z <= horizon_eps*") {
     throw "Launch packet pin_overlay occlusion rule missing"
 }
+if ($launchPacket.pin_overlay.occlusion_status_values -notcontains "behind_horizon") {
+    throw "Launch packet pin_overlay occlusion status values missing behind_horizon"
+}
+if ($launchPacket.pin_overlay.qt_occlusion_legend_object -ne "pinOcclusionLegend") {
+    throw "Launch packet pin_overlay occlusion legend object missing"
+}
 if ($launchPacket.pin_overlay.renderer_overlay_status -ne "wired_to_pin_overlay_rgba_and_frame_composition") {
     throw "Launch packet pin_overlay renderer overlay status mismatch"
 }
@@ -1206,6 +1212,12 @@ if ($capabilities.pin_overlay.renderer_overlay_status -ne "wired_to_pin_overlay_
 }
 if ($capabilities.pin_overlay.horizon_control -ne "--pin-horizon-eps / PIN_HORIZON_EPS") {
     throw "Renderer pin_overlay horizon control missing"
+}
+if ($capabilities.pin_overlay.qt_occlusion_legend_object -ne "pinOcclusionLegend") {
+    throw "Renderer pin_overlay occlusion legend object missing"
+}
+if ($capabilities.pin_overlay.occlusion_status_values -notcontains "off_viewport") {
+    throw "Renderer pin_overlay occlusion status values missing off_viewport"
 }
 if ($capabilities.pin_overlay.cursor_fill_sources -notcontains "renderer_cursor_geodesy_state") {
     throw "Renderer pin_overlay cursor fill source missing"
@@ -2003,6 +2015,15 @@ if ($handoff.pin_overlay.coordinate_source_values -notcontains "renderer_globe_r
 if ($handoff.pin_overlay.qt_ui_affordances -notcontains "projection_rotation_occlusion_note") {
     throw "Handoff inspection pin_overlay projection note affordance missing"
 }
+if ($handoff.pin_overlay.qt_ui_affordances -notcontains "pin_occlusion_legend") {
+    throw "Handoff inspection pin_overlay occlusion legend affordance missing"
+}
+if ($handoff.pin_overlay.qt_occlusion_legend_object -ne "pinOcclusionLegend") {
+    throw "Handoff inspection pin_overlay occlusion legend object missing"
+}
+if ($handoff.pin_overlay.occlusion_status_values -notcontains "invalid") {
+    throw "Handoff inspection pin_overlay occlusion status values missing invalid"
+}
 if ($handoff.pin_overlay.pin_list_summary_format -ne "source=<coordinate_source_label>") {
     throw "Handoff inspection pin_overlay list summary format missing"
 }
@@ -2461,11 +2482,11 @@ if ($qtPanelSource -notlike "*coordinate_source*") {
 if ($qtPanelSource -notlike "*source=*") {
     throw "Qt panel Pin list coordinate source summary missing"
 }
-if ($qtPanelSource -notlike "*Pin projection: renderer rotates geodetic markers with the globe every frame*") {
-    throw "Qt panel Pin projection rotation note missing"
+if ($qtPanelSource -notlike "*pinProjectionNote*") {
+    throw "Qt panel Pin projection note object missing"
 }
-if ($qtPanelSource -notlike "*back-side pins are hidden by horizon/depth occlusion*") {
-    throw "Qt panel Pin projection occlusion note missing"
+if ($qtPanelSource -notlike "*qt_projection_note*") {
+    throw "Qt panel Pin projection note contract key missing"
 }
 if ($qtPanelSource -notlike "*screen_position*") {
     throw "Qt panel layer pick screen position diagnostics missing"
@@ -2733,6 +2754,9 @@ if ($qtPanelSource -notlike "*copy_pin_overlay_summary*") {
 }
 if ($qtPanelSource -notlike "*pin_overlay_summary_text*") {
     throw "Qt Pin overlay summary formatter missing"
+}
+if ($qtPanelSource -notlike "*pinOcclusionLegend*") {
+    throw "Qt Pin occlusion legend object is missing"
 }
 if ($qtPanelSource -notlike "*Research interaction: inspect renderer Pin hover/click pick bridge JSON*") {
     throw "Qt Pin pick action tooltip is missing"

@@ -3494,6 +3494,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             QLabel#layerControlFeedbackStrip { color: #18384a; background: #e8f3ff; border: 1px solid #8fb7d8; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
             QLabel#layerSelectionAffordance { color: #2f4167; background: #edf1ff; border: 1px solid #98a8d8; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
             QLabel#layerHoverAffordance { color: #3d4a24; background: #f4f8e8; border: 1px solid #b5c77f; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
+            QLabel#pinOcclusionLegend { color: #4d2f16; background: #fff3dc; border: 1px solid #d7a45d; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
             QWidget#layerRow { border-bottom: 1px solid #d6e0ea; }
             QWidget#layerRow[selected="true"] { background: #dceeff; border: 1px solid #5b8db8; }
             QLabel#selectedLayer { color: #23435f; font-weight: 700; padding-top: 6px; }
@@ -3617,12 +3618,15 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.pin_cursor_fill_label = QtWidgets.QLabel(f"Pin cursor fill: {self.pin_cursor_fill_source_text()}")
         self.pin_cursor_fill_label.setWordWrap(True)
         pin_form.addRow("Cursor Fill", self.pin_cursor_fill_label)
-        pin_projection_note = QtWidgets.QLabel(
-            "Pin projection: renderer rotates geodetic markers with the globe every frame; "
-            "back-side pins are hidden by horizon/depth occlusion."
-        )
+        pin_contract = pin_projection_contract_packet()
+        pin_projection_note = QtWidgets.QLabel(str(pin_contract.get("qt_projection_note", "")))
+        pin_projection_note.setObjectName("pinProjectionNote")
         pin_projection_note.setWordWrap(True)
         pin_form.addRow("Projection", pin_projection_note)
+        pin_occlusion_legend = QtWidgets.QLabel(str(pin_contract.get("qt_occlusion_legend_text", "")))
+        pin_occlusion_legend.setObjectName("pinOcclusionLegend")
+        pin_occlusion_legend.setWordWrap(True)
+        pin_form.addRow("Occlusion", pin_occlusion_legend)
         pin_actions = QtWidgets.QHBoxLayout()
         add_pin_button = QtWidgets.QPushButton("加入 Pin")
         remove_pin_button = QtWidgets.QPushButton("移除選取 Pin")
