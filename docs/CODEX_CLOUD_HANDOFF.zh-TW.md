@@ -97,7 +97,7 @@ git diff --cached --check
 - 私有 repo 建議命名：dialogue-save。
 - 每個對話 session 建議使用資料夾：RRKAL_displaytools/<dialogue-title-slug>__YYYY-MM-DD__<thread-short-id>/。
 - metadata.json 保存原始對話框名稱、repo、branch、commit、匯出時間與 redaction 狀態。
-- Cloud/local agent 預設只讀 handoff；raw transcript 只在 handoff 不足時讀取。
+- Cloud/local agent 預設只讀 handoff；raw transcript 只在 handoff 不足時讀取。`n- 還原流程見 `docs/DIALOGUE_SAVE_RESTORE.zh-TW.md`。
 
 ## 目前風險
 

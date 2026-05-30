@@ -88,7 +88,7 @@ dialogue-save/
 
 - 產生本輪摘要。
 - 更新公開 handoff / decisions。
-- 若使用者允許，將 raw transcript 放入私有 repo。
+- 若使用者允許，將 raw transcript 放入私有 repo。`n- 若需要恢復完整對話，依 `docs/DIALOGUE_SAVE_RESTORE.zh-TW.md` 從私有 repo 分片還原。
 - 對 raw transcript 做 secret/path/token 掃描。
 - 提交前仍跑 smoke 與 docs encoding scan。
 

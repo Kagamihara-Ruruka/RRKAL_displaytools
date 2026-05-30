@@ -7,6 +7,7 @@
 - `DEVELOPMENT_LOG.zh-TW.md`: chronological development log and commit handoff notes.
 - `WORKFLOW.zh-TW.md`: standard local/cloud development loop, testing split, conversation backup policy, and push report template.
 - `CODEX_CLOUD_HANDOFF.zh-TW.md`: first-read entrypoint for Codex Cloud, local Codex, and other agents taking over from GitHub.
+- `DIALOGUE_SAVE_RESTORE.zh-TW.md`: private `dialogue-save` transcript chunk restore workflow for emergency full-context recovery.
 - `AGENT_HANDOFF.zh-TW.md`: current agent-facing working rules, scope, and known risks.
 - `GIT_HANDOFF.md`: git start/end loop, commit/push rules, and do-not-commit list.
 - `WORKSPACE_LAYOUT.zh-TW.md`: canonical workspace, root files, docs map, and local-only artifact policy.

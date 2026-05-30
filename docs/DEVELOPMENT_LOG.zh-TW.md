@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - dialogue-save transcript restore docs
+
+Changes:
+- Added `docs/DIALOGUE_SAVE_RESTORE.zh-TW.md` to document how to reconstruct the private `dialogue-save` gzip transcript chunks into the original Codex rollout JSONL.
+- Linked the restore workflow from the docs index, Cloud handoff and workflow docs so Cloud/local agents can recover full context only when handoff summaries are insufficient.
+- Kept raw transcript storage out of the public repo; this commit documents the process only.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Cloud/local development workflow docs
 
 Changes:
