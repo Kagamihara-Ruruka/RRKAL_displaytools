@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Decoupling readiness packet
+
+Changes:
+- Added `decoupling_readiness.py` as a standalone packet for the pre-7:00 UI closure phase and post-7:00 decoupling phase.
+- Captured the first extraction order: render-plan compose, ocean material, layer runtime bridge, style profile routes and diagnostics packets.
+- Restated the RRKAL/displaytools boundary so discovery/download/import/cache governance stays outside displaytools during decoupling.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Ocean 3D performance budget controls
 
 Changes:
