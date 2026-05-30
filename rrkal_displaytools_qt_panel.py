@@ -1034,6 +1034,16 @@ def visual_feature_closure_matrix_packet(source: str) -> dict[str, object]:
         "feature_ids": feature_ids,
         "features": features,
         "required_feature_ids": feature_ids,
+        "copy_summary_contract_schema": "rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1",
+        "copy_summary_contract": {
+            "schema": "rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1",
+            "summary_format": "Visual closure matrix: status={status}; ready={ready_feature_count}/{feature_count}; ready_features={ready_feature_ids}; queued_features={queued_feature_ids}; runtime_artifacts=require_renderer_execution",
+            "qt_copy_action": "copy_visual_feature_closure_summary",
+            "launch_packet_field": "visual_feature_closure_matrix.copy_summary_contract",
+            "renderer_capability_field": "visual_feature_closure_matrix.copy_summary_contract",
+            "reviewer_field_guide_group": "visual_review",
+            "portable": True,
+        },
         "launch_packet_fields": ["visual_feature_closure_matrix", "visual_review_readiness", "closed_loop_status"],
         "renderer_capability_field": "visual_feature_closure_matrix",
         "handoff_field": "visual_feature_closure_matrix",
@@ -4041,6 +4051,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         canvas_state_button = QtWidgets.QPushButton("Inspect: Canvas state")
         visual_readiness_button = QtWidgets.QPushButton("Inspect: Visual readiness")
         copy_visual_summary_button = QtWidgets.QPushButton("Copy visual summary")
+        copy_visual_closure_summary_button = QtWidgets.QPushButton("Copy closure matrix")
         copy_style_thumbs_command_button = QtWidgets.QPushButton("Copy style thumbs command")
         copy_style_thumb_status_button = QtWidgets.QPushButton("Copy style thumb status")
         thumbnail_button = QtWidgets.QPushButton("Inspect: Renderer thumbnail")
@@ -4086,6 +4097,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             (copy_research_summary_button, "Research interaction: copy selection, pin, cursor and boundary summaries as one portable handoff note."),
             (visual_readiness_button, "Visual review: inspect thumbnail/live preview readiness, frame status and missing-frame hints JSON."),
             (copy_visual_summary_button, "Visual review: copy compact thumbnail/live preview readiness summary to clipboard."),
+            (copy_visual_closure_summary_button, "Visual review: copy smoke-gated feature closure matrix with ready and queued feature groups."),
             (copy_style_thumbs_command_button, "Visual review: copy portable command for generating scientific/nautical/parchment/tactical style thumbnails."),
             (copy_style_thumb_status_button, "Visual review: copy local style thumbnail ready/missing status summary."),
             (thumbnail_button, "Visual review: inspect latest renderer thumbnail PNG."),
@@ -4140,6 +4152,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         canvas_state_button.clicked.connect(self.show_canvas_state_preview)
         visual_readiness_button.clicked.connect(self.show_visual_review_readiness)
         copy_visual_summary_button.clicked.connect(self.copy_visual_review_readiness_summary)
+        copy_visual_closure_summary_button.clicked.connect(self.copy_visual_feature_closure_summary)
         copy_style_thumbs_command_button.clicked.connect(self.copy_style_thumbnail_batch_command)
         copy_style_thumb_status_button.clicked.connect(self.copy_style_thumbnail_readiness_summary)
         thumbnail_button.clicked.connect(self.show_latest_renderer_thumbnail)
@@ -4156,7 +4169,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             ("Inspect: Replay/contracts", (profile_replay_button, copy_launch_summary_button, timeline_button, module_seams_button, copy_module_summary_button, clone_ready_button, copy_clone_summary_button)),
             ("Inspect: Renderer ports", (hydro_lod_button, copy_hydro_lod_summary_button, ocean_port_button, ocean_3d_controls_action_button, copy_ocean_summary_button, copy_ocean_guard_summary_button, style_routes_button, copy_style_routes_summary_button, layer_matrix_button, layer_runtime_button)),
             ("Inspect: Research interaction", (layer_pick_button, selection_state_button, copy_selection_summary_button, layer_ops_button, canvas_state_button, pin_pick_button, copy_pin_summary_action_button, cursor_geo_button, copy_cursor_summary_button, boundary_state_button, copy_boundary_summary_button, copy_research_summary_button)),
-            ("Inspect: Visual review", (visual_readiness_button, copy_visual_summary_button, style_thumbnails_button, copy_style_thumbs_command_button, copy_style_thumb_status_button, thumbnail_button, live_preview_button)),
+            ("Inspect: Visual review", (visual_readiness_button, copy_visual_summary_button, copy_visual_closure_summary_button, style_thumbnails_button, copy_style_thumbs_command_button, copy_style_thumb_status_button, thumbnail_button, live_preview_button)),
             ("Renderer diagnostics", (capabilities_button, closed_loop_button, layer_manifest_button, render_plan_perf_button, copy_compose_budget_button, copy_compose_parity_button, smoke_button)),
             ("Process", (launch_button, restart_button, stop_button)),
         )
@@ -9488,6 +9501,26 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         QtWidgets.QApplication.clipboard().setText(summary)
         self.update_visual_review_readiness_label(packet)
         self.status.setText("已複製 visual readiness 摘要")
+
+    def visual_feature_closure_summary_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet or self.collect_visual_feature_closure_matrix()
+        features = packet.get("features") if isinstance(packet, dict) else []
+        features = features if isinstance(features, list) else []
+        ready_ids = [str(feature.get("id")) for feature in features if isinstance(feature, dict) and feature.get("status") == "ready"]
+        queued_ids = [str(feature.get("id")) for feature in features if isinstance(feature, dict) and feature.get("status") != "ready"]
+        return (
+            "Visual closure matrix: "
+            f"status={packet.get('status')}; "
+            f"ready={packet.get('ready_feature_count')}/{packet.get('feature_count')}; "
+            f"ready_features={','.join(ready_ids) or '-'}; "
+            f"queued_features={','.join(queued_ids) or '-'}; "
+            "runtime_artifacts=require_renderer_execution"
+        )
+
+    def copy_visual_feature_closure_summary(self) -> None:
+        summary = self.visual_feature_closure_summary_text()
+        QtWidgets.QApplication.clipboard().setText(summary)
+        self.status.setText("Copied visual feature closure matrix summary to clipboard.")
 
     def show_layer_runtime_state(self) -> None:
         self.write_layer_runtime_state()

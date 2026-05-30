@@ -485,6 +485,12 @@ if ($launchPacket.visual_feature_closure_matrix.feature_ids -notcontains "render
 if ($launchPacket.visual_feature_closure_matrix.smoke_gate -ne "visual_feature_closure_matrix") {
     throw "Launch packet visual feature closure matrix smoke gate mismatch"
 }
+if ($launchPacket.visual_feature_closure_matrix.copy_summary_contract.schema -ne "rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1") {
+    throw "Launch packet visual feature closure matrix copy summary contract missing"
+}
+if ($launchPacket.visual_feature_closure_matrix.copy_summary_contract.qt_copy_action -ne "copy_visual_feature_closure_summary") {
+    throw "Launch packet visual feature closure matrix copy action missing"
+}
 if ($launchPacket.renderer_output_artifact_contract.schema -ne "rrkal_displaytools.renderer_output_artifact_contract.v1") {
     throw "Launch packet renderer output artifact contract schema missing or invalid"
 }
@@ -1882,6 +1888,12 @@ if ($capabilities.visual_feature_closure_matrix.feature_ids -notcontains "ocean_
 if ($capabilities.visual_feature_closure_matrix.feature_ids -notcontains "renderer_performance") {
     throw "Renderer visual feature closure matrix missing renderer performance queue"
 }
+if ($capabilities.visual_feature_closure_matrix.copy_summary_contract.schema -ne "rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1") {
+    throw "Renderer visual feature closure matrix copy summary contract missing"
+}
+if ($capabilities.visual_feature_closure_matrix.copy_summary_contract.reviewer_field_guide_group -ne "visual_review") {
+    throw "Renderer visual feature closure matrix reviewer field guide group missing"
+}
 if ($capabilities.renderer_output_artifact_contract.schema -ne "rrkal_displaytools.renderer_output_artifact_contract.v1") {
     throw "Renderer output artifact contract schema missing or invalid"
 }
@@ -2776,6 +2788,12 @@ if ($handoff.visual_feature_closure_matrix.feature_ids -notcontains "boundary_em
 }
 if ($handoff.visual_feature_closure_matrix.feature_ids -notcontains "renderer_performance") {
     throw "Handoff inspection visual feature closure matrix missing renderer performance queue"
+}
+if ($handoff.visual_feature_closure_matrix.copy_summary_contract.schema -ne "rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1") {
+    throw "Handoff inspection visual feature closure matrix copy summary contract missing"
+}
+if ($handoff.visual_feature_closure_matrix.copy_summary_contract.qt_copy_action -ne "copy_visual_feature_closure_summary") {
+    throw "Handoff inspection visual feature closure matrix copy action missing"
 }
 if ($handoff.launch_packet_contracts.renderer_output_artifact_contract -ne "rrkal_displaytools.renderer_output_artifact_contract.v1") {
     throw "Handoff inspection renderer output artifact contract missing or invalid"
@@ -4686,6 +4704,15 @@ if ($qtPanelSource -notlike "*copy_visual_summary_button*") {
 }
 if ($qtPanelSource -notlike "*copy_visual_review_readiness_summary*") {
     throw "Qt panel Visual readiness copy summary action missing"
+}
+if ($qtPanelSource -notlike "*Copy closure matrix*") {
+    throw "Qt panel Visual closure matrix copy button missing"
+}
+if ($qtPanelSource -notlike "*visual_feature_closure_summary_text*") {
+    throw "Qt panel Visual closure matrix summary helper missing"
+}
+if ($qtPanelSource -notlike "*copy_visual_feature_closure_summary*") {
+    throw "Qt panel Visual closure matrix copy action missing"
 }
 if ($qtPanelSource -notlike "*copy_summary_contract*") {
     throw "Qt panel Visual readiness copy summary contract missing"

@@ -252,6 +252,7 @@ $summary = [ordered]@{
         feature_count = $visualFeatureClosureMatrix.feature_count
         ready_feature_count = $visualFeatureClosureMatrix.ready_feature_count
         feature_ids = $visualFeatureClosureMatrix.feature_ids
+        copy_summary_contract = $visualFeatureClosureMatrix.copy_summary_contract
         smoke_gate = $visualFeatureClosureMatrix.smoke_gate
     }
     renderer_output_artifact_contract = @{

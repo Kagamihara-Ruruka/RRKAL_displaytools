@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-05-30 - Visual closure matrix copy summary
+
+Changes:
+- Added `rrkal_displaytools.visual_feature_closure_copy_summary_contract.v1` to the visual feature closure matrix across Qt, no-GUI launch packets, renderer capabilities and handoff inspection.
+- Added Qt `Copy closure matrix` so reviewers can copy ready/queued visual feature status and the renderer-runtime-artifact boundary without opening JSON first.
+- Smoke now gates the copy action, contract, reviewer field-guide group and Qt source markers.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
 ## 2026-05-30 - Reviewer packet field guide copy action
 
 Changes:
