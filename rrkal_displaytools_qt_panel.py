@@ -1055,6 +1055,9 @@ def layer_render_plan_cache_diagnostics_packet(
         "apply_path_count": plan.get("apply_path_count", 0),
         "execution_summary_schema": plan.get("execution_summary_schema", "rrkal_displaytools.layer_render_plan_execution_summary.v1"),
         "execution_summary": plan.get("execution_summary") if isinstance(plan.get("execution_summary"), dict) else {},
+        "execution_phases_schema": plan.get("execution_phases_schema", "rrkal_displaytools.layer_render_plan_execution_phases.v1"),
+        "execution_phases": plan.get("execution_phases") if isinstance(plan.get("execution_phases"), list) else [],
+        "execution_phase_count": plan.get("execution_phase_count", 0),
         "cache_key_available": bool(plan.get("cache_key")),
         "reuse_policy": plan.get("reuse_policy", "reuse_when_cache_key_matches_previous_compiled_plan") if available else "unavailable",
         "reuse_boundary": plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change") if available else "unavailable",
@@ -1116,6 +1119,9 @@ def layer_render_plan_performance_packet(
         "compiled_plan_execution_summary_schema": "rrkal_displaytools.layer_render_plan_execution_summary.v1",
         "compiled_plan_execution_summary_helper": "HybridRenderController.layer_render_plan_execution_summary",
         "compiled_plan_execution_summary_field": "execution_summary",
+        "compiled_plan_execution_phases_schema": "rrkal_displaytools.layer_render_plan_execution_phases.v1",
+        "compiled_plan_execution_phases_helper": "HybridRenderController.layer_render_plan_execution_phases",
+        "compiled_plan_execution_phases_field": "execution_phases",
         "compiled_plan_reuse_decision_field": "cache_reuse_decision",
         "compiled_plan_reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
         "compiled_plan_reuse_status_values": ["compiled", "reused"],
@@ -4819,6 +4825,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             batch_text = "-"
         apply_path_count = diagnostics.get("apply_path_count", 0)
         execution_summary = diagnostics.get("execution_summary") if isinstance(diagnostics.get("execution_summary"), dict) else {}
+        execution_phase_count = diagnostics.get("execution_phase_count", 0)
+        phases = diagnostics.get("execution_phases")
+        if isinstance(phases, list):
+            phase_text = ",".join(str(item.get("id", "-")) for item in phases[:3] if isinstance(item, dict))
+        else:
+            phase_text = "-"
         return (
             "Render plan cache: "
             f"status={diagnostics.get('status', 'unavailable')}; "
@@ -4830,6 +4842,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"apply={apply_path_count}; "
             f"exec={execution_summary.get('current_execution_mode', 'unavailable')}; "
             f"sp={execution_summary.get('single_pass_candidate_count', 0)}; "
+            f"phases={execution_phase_count}:{phase_text}; "
             f"key={key_state}; "
             f"reuse={diagnostics.get('reuse_boundary', 'unavailable')}; "
             f"steps={diagnostics.get('composition_step_count', '-')}; "

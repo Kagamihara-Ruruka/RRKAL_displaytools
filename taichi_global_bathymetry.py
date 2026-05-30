@@ -14348,6 +14348,84 @@ class HybridRenderController:
             "next_refactor_target": "replace per-step overlay helpers with a unified Taichi render/composite pass",
         }
 
+    def layer_render_plan_execution_phases(
+        self,
+        apply_path: list[dict[str, object]],
+        batch_decisions: list[dict[str, object]],
+        execution_summary: dict[str, object],
+    ) -> list[dict[str, object]]:
+        def phase_decisions(items: list[dict[str, object]]) -> list[str]:
+            values = sorted(
+                {
+                    str(item.get("decision") or "unknown_decision")
+                    for item in items
+                    if isinstance(item, dict)
+                }
+            )
+            return values or ["none"]
+
+        batch_items = [
+            item
+            for item in batch_decisions
+            if isinstance(item, dict) and item.get("scope") == "batch"
+        ]
+        layer_items = [
+            item
+            for item in batch_decisions
+            if isinstance(item, dict) and item.get("scope") == "layer"
+        ]
+        single_pass_items = [
+            item
+            for item in apply_path
+            if isinstance(item, dict) and item.get("single_pass_candidate")
+        ]
+        blockers_value = execution_summary.get("single_pass_blockers")
+        blockers = blockers_value if isinstance(blockers_value, list) else []
+        postprocess_count = sum(
+            1
+            for item in apply_path
+            if isinstance(item, dict) and item.get("kind") == "style_profile_postprocess"
+        )
+        return [
+            {
+                "id": "prepare_batches",
+                "order": 0,
+                "status": "planned_runtime_metadata",
+                "item_count": len(batch_items),
+                "decisions": phase_decisions(batch_items),
+                "current_runtime_path": "precomputed_overlay_buffers",
+                "future_single_pass_role": "prepare GPU-ready batch inputs",
+            },
+            {
+                "id": "compose_overlays",
+                "order": 1,
+                "status": "current_runtime_path",
+                "item_count": len(layer_items),
+                "decisions": phase_decisions(layer_items),
+                "current_runtime_path": "HybridRenderController.apply_layer_render_plan_composition",
+                "future_single_pass_role": "replace per-layer overlay composition with one Taichi composite pass",
+            },
+            {
+                "id": "postprocess",
+                "order": 2,
+                "status": "current_runtime_path",
+                "item_count": postprocess_count,
+                "decisions": ["postprocess_each_frame"],
+                "current_runtime_path": "apply_style_profile",
+                "future_single_pass_role": "remain final style pass unless folded into shader",
+            },
+            {
+                "id": "future_single_pass_candidate",
+                "order": 3,
+                "status": "queued_after_module_decoupling",
+                "item_count": len(single_pass_items),
+                "decisions": ["single_pass_candidate"],
+                "current_runtime_path": "metadata_only",
+                "future_single_pass_role": "candidate steps for unified Taichi render/composite pass",
+                "blockers": blockers,
+            },
+        ]
+
     def compile_layer_render_plan(
         self,
         changed: bool | None = None,
@@ -14366,6 +14444,7 @@ class HybridRenderController:
         batch_decisions = self.layer_render_plan_batch_decisions(runtime_snapshot, composition_steps, invalidation_scope)
         apply_path = self.layer_render_plan_apply_path(composition_steps, batch_decisions)
         execution_summary = self.layer_render_plan_execution_summary(apply_path, batch_decisions)
+        execution_phases = self.layer_render_plan_execution_phases(apply_path, batch_decisions, execution_summary)
         cached_plan = getattr(self, "compiled_layer_render_plan", None)
         if isinstance(cached_plan, dict) and getattr(self, "compiled_layer_render_plan_cache_key", None) == cache_key:
             plan = dict(cached_plan)
@@ -14378,6 +14457,9 @@ class HybridRenderController:
             plan["apply_path"] = apply_path
             plan["apply_path_count"] = len(apply_path)
             plan["execution_summary"] = execution_summary
+            plan["execution_phases"] = execution_phases
+            plan["execution_phases_schema"] = plan.get("execution_phases_schema", "rrkal_displaytools.layer_render_plan_execution_phases.v1")
+            plan["execution_phase_count"] = len(execution_phases)
             plan["reuse_policy"] = "reuse_when_cache_key_matches_previous_compiled_plan"
             plan["reuse_boundary"] = plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change")
             plan["frame_index"] = int(getattr(self, "frame_index", 0))
@@ -14404,6 +14486,9 @@ class HybridRenderController:
             "apply_path_count": len(apply_path),
             "execution_summary": execution_summary,
             "execution_summary_schema": "rrkal_displaytools.layer_render_plan_execution_summary.v1",
+            "execution_phases": execution_phases,
+            "execution_phases_schema": "rrkal_displaytools.layer_render_plan_execution_phases.v1",
+            "execution_phase_count": len(execution_phases),
             "reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
             "reuse_status_values": ["compiled", "reused"],
             "runtime_optimization_applied": False,
@@ -19363,6 +19448,9 @@ def layer_render_plan_cache_diagnostics_packet(
         "apply_path_count": plan.get("apply_path_count", 0),
         "execution_summary_schema": plan.get("execution_summary_schema", "rrkal_displaytools.layer_render_plan_execution_summary.v1"),
         "execution_summary": plan.get("execution_summary") if isinstance(plan.get("execution_summary"), dict) else {},
+        "execution_phases_schema": plan.get("execution_phases_schema", "rrkal_displaytools.layer_render_plan_execution_phases.v1"),
+        "execution_phases": plan.get("execution_phases") if isinstance(plan.get("execution_phases"), list) else [],
+        "execution_phase_count": plan.get("execution_phase_count", 0),
         "cache_key_available": bool(plan.get("cache_key")),
         "reuse_policy": plan.get("reuse_policy", "reuse_when_cache_key_matches_previous_compiled_plan") if available else "unavailable",
         "reuse_boundary": plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change") if available else "unavailable",
@@ -19424,6 +19512,9 @@ def layer_render_plan_performance_packet(
         "compiled_plan_execution_summary_schema": "rrkal_displaytools.layer_render_plan_execution_summary.v1",
         "compiled_plan_execution_summary_helper": "HybridRenderController.layer_render_plan_execution_summary",
         "compiled_plan_execution_summary_field": "execution_summary",
+        "compiled_plan_execution_phases_schema": "rrkal_displaytools.layer_render_plan_execution_phases.v1",
+        "compiled_plan_execution_phases_helper": "HybridRenderController.layer_render_plan_execution_phases",
+        "compiled_plan_execution_phases_field": "execution_phases",
         "compiled_plan_reuse_decision_field": "cache_reuse_decision",
         "compiled_plan_reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
         "compiled_plan_reuse_status_values": ["compiled", "reused"],

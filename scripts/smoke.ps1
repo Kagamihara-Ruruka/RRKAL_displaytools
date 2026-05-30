@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $RepoRoot
 
@@ -565,6 +565,15 @@ if ($launchPacket.layer_render_plan_performance.compiled_plan_execution_summary_
 }
 if ($launchPacket.layer_render_plan_performance.compiled_plan_execution_summary_field -ne "execution_summary") {
     throw "Launch packet layer_render_plan_performance execution summary field missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_execution_phases_schema -ne "rrkal_displaytools.layer_render_plan_execution_phases.v1") {
+    throw "Launch packet layer_render_plan_performance execution phases schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_execution_phases_helper -ne "HybridRenderController.layer_render_plan_execution_phases") {
+    throw "Launch packet layer_render_plan_performance execution phases helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_execution_phases_field -ne "execution_phases") {
+    throw "Launch packet layer_render_plan_performance execution phases field missing"
 }
 if ($launchPacket.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Launch packet layer_render_plan_performance reuse decision field missing"
@@ -1738,6 +1747,15 @@ if ($capabilities.layer_render_plan_performance.compiled_plan_execution_summary_
 if ($capabilities.layer_render_plan_performance.compiled_plan_execution_summary_field -ne "execution_summary") {
     throw "Renderer layer_render_plan_performance execution summary field missing"
 }
+if ($capabilities.layer_render_plan_performance.compiled_plan_execution_phases_schema -ne "rrkal_displaytools.layer_render_plan_execution_phases.v1") {
+    throw "Renderer layer_render_plan_performance execution phases schema missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_execution_phases_helper -ne "HybridRenderController.layer_render_plan_execution_phases") {
+    throw "Renderer layer_render_plan_performance execution phases helper missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_execution_phases_field -ne "execution_phases") {
+    throw "Renderer layer_render_plan_performance execution phases field missing"
+}
 if ($capabilities.layer_render_plan_performance.compiled_plan_reuse_policy -ne "reuse_when_cache_key_matches_previous_compiled_plan") {
     throw "Renderer layer_render_plan_performance compiled plan reuse policy missing"
 }
@@ -2458,6 +2476,15 @@ if ($handoff.layer_render_plan_performance.compiled_plan_execution_summary_helpe
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_execution_summary_field -ne "execution_summary") {
     throw "Handoff inspection layer render plan performance execution summary field missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_execution_phases_schema -ne "rrkal_displaytools.layer_render_plan_execution_phases.v1") {
+    throw "Handoff inspection layer render plan performance execution phases schema missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_execution_phases_helper -ne "HybridRenderController.layer_render_plan_execution_phases") {
+    throw "Handoff inspection layer render plan performance execution phases helper missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_execution_phases_field -ne "execution_phases") {
+    throw "Handoff inspection layer render plan performance execution phases field missing"
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Handoff inspection layer render plan performance reuse decision field missing"
@@ -3292,13 +3319,13 @@ if ($qtPanelSource -notlike "*Last layer operation:*") {
 if ($qtPanelSource -notlike "*set_layer_operation_status*") {
     throw "Qt layer operation status helper is missing"
 }
-if ($qtPanelSource -notlike '*self.set_layer_operation_status(f"已 Solo 選取圖層*') {
+if ($qtPanelSource -notlike '*self.set_layer_operation_status(f*Solo*') {
     throw "Qt Solo selected layer operation feedback is missing"
 }
-if ($qtPanelSource -notlike '*self.set_layer_operation_status("已還原 Solo 前圖層可見性"*') {
+if ($qtPanelSource -notlike '*self.set_layer_operation_status(*Solo*snapshot*') {
     throw "Qt restore Solo layer operation feedback is missing"
 }
-if ($qtPanelSource -notlike '*self.set_layer_operation_status("已回復上一個 layer undo snapshot"*') {
+if ($qtPanelSource -notlike '*self.set_layer_operation_status(*layer undo snapshot*') {
     throw "Qt layer undo operation feedback is missing"
 }
 if ($qtPanelSource -notlike "*Layer group toggle:*") {
@@ -3730,6 +3757,15 @@ if ($qtPanelSource -notlike "*renderPlanCacheDiagnosticsButton*") {
 if ($qtPanelSource -notlike "*layer_render_plan_cache_summary_text*") {
     throw "Qt render plan cache diagnostics summary formatter is missing"
 }
+if ($qtPanelSource -notlike "*layer_render_plan_execution_phases.v1*") {
+    throw "Qt render plan execution phases schema is missing"
+}
+if ($qtPanelSource -notlike "*execution_phases*") {
+    throw "Qt render plan execution phases diagnostics are missing"
+}
+if ($qtPanelSource -notlike "*phases={execution_phase_count}:{phase_text}*") {
+    throw "Qt render plan execution phases summary text is missing"
+}
 if ($qtPanelSource -notlike "*refresh_layer_render_plan_cache_diagnostics_strip*") {
     throw "Qt render plan cache diagnostics strip refresh is missing"
 }
@@ -4037,6 +4073,18 @@ if ($rendererSource -notlike "*compose_runtime_blend*") {
 }
 if ($rendererSource -notlike "*def layer_render_plan_execution_summary*") {
     throw "Renderer render plan execution summary helper is missing"
+}
+if ($rendererSource -notlike "*def layer_render_plan_execution_phases*") {
+    throw "Renderer render plan execution phases helper is missing"
+}
+if ($rendererSource -notlike "*prepare_batches*") {
+    throw "Renderer render plan prepare batches phase marker is missing"
+}
+if ($rendererSource -notlike "*compose_overlays*") {
+    throw "Renderer render plan compose overlays phase marker is missing"
+}
+if ($rendererSource -notlike "*future_single_pass_candidate*") {
+    throw "Renderer render plan future single-pass phase marker is missing"
 }
 if ($rendererSource -notlike "*centralized_overlay_composition*") {
     throw "Renderer render plan execution mode marker is missing"

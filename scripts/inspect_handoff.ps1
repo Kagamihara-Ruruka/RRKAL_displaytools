@@ -289,6 +289,12 @@ $summary = [ordered]@{
         compiled_plan_execution_summary_schema = $layerRenderPlanPerformance.compiled_plan_execution_summary_schema
         compiled_plan_execution_summary_helper = $layerRenderPlanPerformance.compiled_plan_execution_summary_helper
         compiled_plan_execution_summary_field = $layerRenderPlanPerformance.compiled_plan_execution_summary_field
+
+        compiled_plan_execution_phases_schema = $layerRenderPlanPerformance.compiled_plan_execution_phases_schema
+
+        compiled_plan_execution_phases_helper = $layerRenderPlanPerformance.compiled_plan_execution_phases_helper
+
+        compiled_plan_execution_phases_field = $layerRenderPlanPerformance.compiled_plan_execution_phases_field
         compiled_plan_reuse_decision_field = $layerRenderPlanPerformance.compiled_plan_reuse_decision_field
         compiled_plan_reuse_policy = $layerRenderPlanPerformance.compiled_plan_reuse_policy
         compiled_plan_reuse_status_values = $layerRenderPlanPerformance.compiled_plan_reuse_status_values

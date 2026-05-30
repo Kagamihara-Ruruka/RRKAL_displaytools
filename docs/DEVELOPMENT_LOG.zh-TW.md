@@ -1,5 +1,17 @@
 # Development Log
 
+## 2026-05-30 - Render-plan execution phases
+
+Changes:
+- Added `HybridRenderController.layer_render_plan_execution_phases()` to split the current render-plan path into phase metadata.
+- Compiled render-plan metadata and Qt diagnostics now expose `rrkal_displaytools.layer_render_plan_execution_phases.v1`, `execution_phases` and `execution_phase_count`.
+- Phase ids are `prepare_batches`, `compose_overlays`, `postprocess` and `future_single_pass_candidate`, making the later unified Taichi render/composite pass boundary explicit.
+- The Layers control-board render-plan strip now shows a compact `phases=` summary next to execution mode and single-pass candidate counts.
+- Smoke gates now verify execution phase schema/helper/field, Qt summary text and renderer phase markers.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Render-plan execution summary
 
 Changes:
