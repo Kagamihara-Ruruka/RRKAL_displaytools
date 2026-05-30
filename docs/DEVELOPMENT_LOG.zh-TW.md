@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - Capability summary includes pre-7 closure
+
+- Added `pre7_closure_readiness` to `scripts/export_capability_summary.ps1`.
+- The current capability report now lists the no-GUI checker, reviewer packet, clone quickstart and Qt Replay/contracts action for pre-7 closure readiness.
+- Smoke now gates the capability summary entry.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`).
+
 ## 2026-05-31 - Pre-7 closure in reviewer packet
 
 - Added `pre7_closure_readiness_check` to the no-GUI visual contract inspector index.

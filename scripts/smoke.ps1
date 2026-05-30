@@ -1924,6 +1924,9 @@ if (($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "qt_firs
 if (-not ($capabilitySummary.planned_capabilities | Where-Object { $_.id -eq "render_plan_compose_decoupling" })) {
     throw "Capability summary planned render-plan decoupling missing"
 }
+if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "pre7_closure_readiness" })) {
+    throw "Capability summary pre-7 closure readiness capability missing"
+}
 if (-not (($capabilitySummary.boundaries -join "`n") -match "RRKAL owns dataset discovery")) {
     throw "Capability summary RRKAL boundary missing"
 }

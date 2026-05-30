@@ -73,6 +73,12 @@ $summary = [ordered]@{
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_cross_machine_review_readiness.ps1"
         },
         [ordered]@{
+            id = "pre7_closure_readiness"
+            status = "mvp"
+            description = "Compact pre-7 closure readiness is available through a no-GUI checker, reviewer packet, clone quickstart and Qt Replay/contracts action."
+            review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_pre7_closure_readiness.ps1"
+        },
+        [ordered]@{
             id = "pre_decoupling_gate"
             status = "armed_for_post_0700"
             description = "Formal pre-decoupling readiness, boundary inspection, render-plan compose work order and not-before gate protect the first code move."
