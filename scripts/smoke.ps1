@@ -2860,6 +2860,12 @@ if ($qtPanelSource -notlike "*copy_style_thumbnail_readiness_summary*") {
 if ($qtPanelSource -notlike "*style_thumbnail_readiness_summary_text*") {
     throw "Qt style thumbnail readiness summary formatter is missing"
 }
+if ($qtPanelSource -like "*packet.get('preview_count')*selected={current_style}*") {
+    throw "Qt style thumbnail readiness copy handler has stale undefined packet reference"
+}
+if ($qtPanelSource -like "*selected={current_style}*") {
+    throw "Qt style thumbnail readiness copy handler has stale undefined current_style reference"
+}
 if ($qtPanelSource -notlike "*show_module_boundary_registry*") {
     throw "Qt module boundary registry JSON action is missing"
 }

@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-05-30 - Style thumbnail readiness copy fix
+
+Changes:
+- Removed stale undefined `packet` / `current_style` references from `copy_style_thumbnail_readiness_summary()`.
+- Added smoke source gates to catch the same stale copy-handler reference pattern.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Style thumbnail readiness copy action
 
 Changes:

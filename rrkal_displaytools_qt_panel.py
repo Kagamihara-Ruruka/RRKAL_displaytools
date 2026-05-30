@@ -4612,10 +4612,6 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         summary = self.style_thumbnail_readiness_summary_text()
         QtWidgets.QApplication.clipboard().setText(summary)
         self.status.setText("已複製 style thumbnail readiness 摘要")
-        if hasattr(self, "style_template_preview_label"):
-            self.style_template_preview_label.setText(
-                f"Style previews: {packet.get('preview_count')} cards; thumbnails={packet.get('thumbnail_artifact_dir')}; selected={current_style}; click a card to update Style profile."
-            )
 
     def apply_style_template_preview_card(self, style_id: str) -> None:
         self._set_combo(self.style_combo, style_id)
