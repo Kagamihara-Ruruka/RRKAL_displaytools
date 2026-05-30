@@ -620,6 +620,15 @@ if ($launchPacket.layer_render_plan_performance.compiled_plan_compose_queue_skip
 if ($launchPacket.layer_render_plan_performance.compiled_plan_compose_queue_skip_reasons -notcontains "transparent_overlay") {
     throw "Launch packet layer_render_plan_performance compose queue transparent-overlay skip reason missing"
 }
+if ($launchPacket.layer_render_plan_performance.compiled_plan_compose_runs_schema -ne "rrkal_displaytools.layer_render_plan_compose_runs.v1") {
+    throw "Launch packet layer_render_plan_performance compose runs schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_compose_runs_helper -ne "HybridRenderController.layer_render_plan_compose_runs") {
+    throw "Launch packet layer_render_plan_performance compose runs helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_compose_runs_field -ne "compose_runs") {
+    throw "Launch packet layer_render_plan_performance compose runs field missing"
+}
 if ($launchPacket.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Launch packet layer_render_plan_performance reuse decision field missing"
 }
@@ -1846,6 +1855,15 @@ if ($capabilities.layer_render_plan_performance.compiled_plan_compose_queue_skip
 if ($capabilities.layer_render_plan_performance.compiled_plan_compose_queue_skip_reasons -notcontains "transparent_overlay") {
     throw "Renderer layer_render_plan_performance compose queue transparent-overlay skip reason missing"
 }
+if ($capabilities.layer_render_plan_performance.compiled_plan_compose_runs_schema -ne "rrkal_displaytools.layer_render_plan_compose_runs.v1") {
+    throw "Renderer layer_render_plan_performance compose runs schema missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_compose_runs_helper -ne "HybridRenderController.layer_render_plan_compose_runs") {
+    throw "Renderer layer_render_plan_performance compose runs helper missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_compose_runs_field -ne "compose_runs") {
+    throw "Renderer layer_render_plan_performance compose runs field missing"
+}
 if ($capabilities.layer_render_plan_performance.compiled_plan_reuse_policy -ne "reuse_when_cache_key_matches_previous_compiled_plan") {
     throw "Renderer layer_render_plan_performance compiled plan reuse policy missing"
 }
@@ -2620,6 +2638,15 @@ if ($handoff.layer_render_plan_performance.compiled_plan_compose_queue_skip_reas
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_compose_queue_skip_reasons -notcontains "transparent_overlay") {
     throw "Handoff inspection layer render plan performance compose queue transparent-overlay skip reason missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_compose_runs_schema -ne "rrkal_displaytools.layer_render_plan_compose_runs.v1") {
+    throw "Handoff inspection layer render plan performance compose runs schema missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_compose_runs_helper -ne "HybridRenderController.layer_render_plan_compose_runs") {
+    throw "Handoff inspection layer render plan performance compose runs helper missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_compose_runs_field -ne "compose_runs") {
+    throw "Handoff inspection layer render plan performance compose runs field missing"
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Handoff inspection layer render plan performance reuse decision field missing"
@@ -3943,6 +3970,18 @@ if ($qtPanelSource -notlike "*queue={compose_queue_count}*") {
 if ($qtPanelSource -notlike "*skip={compose_queue_skipped_count}*") {
     throw "Qt render plan compose queue skip summary text is missing"
 }
+if ($qtPanelSource -notlike "*layer_render_plan_compose_runs.v1*") {
+    throw "Qt render plan compose runs schema is missing"
+}
+if ($qtPanelSource -notlike "*compose_run_count*") {
+    throw "Qt render plan compose run count is missing"
+}
+if ($qtPanelSource -notlike "*runs={compose_run_count}*") {
+    throw "Qt render plan compose runs summary text is missing"
+}
+if ($qtPanelSource -notlike "*merge={compose_merge_candidate_run_count}*") {
+    throw "Qt render plan compose merge summary text is missing"
+}
 if ($qtPanelSource -notlike "*refresh_layer_render_plan_cache_diagnostics_strip*") {
     throw "Qt render plan cache diagnostics strip refresh is missing"
 }
@@ -4265,6 +4304,18 @@ if ($rendererSource -notlike "*def layer_render_plan_bottleneck_recommendation*"
 }
 if ($rendererSource -notlike "*def layer_render_plan_compose_queue*") {
     throw "Renderer render plan compose queue helper is missing"
+}
+if ($rendererSource -notlike "*def layer_render_plan_compose_runs*") {
+    throw "Renderer render plan compose runs helper is missing"
+}
+if ($rendererSource -notlike "*adjacent_alpha_compose_overlays_can_be_collapsed_after_visual_parity_check*") {
+    throw "Renderer render plan compose runs merge-safe marker is missing"
+}
+if ($rendererSource -notlike "*preserve_per_layer_visibility_opacity_blend_semantics*") {
+    throw "Renderer render plan compose runs semantic boundary marker is missing"
+}
+if ($rendererSource -notlike "*compose_merge_candidate_run_count*") {
+    throw "Renderer render plan compose merge candidate count marker is missing"
 }
 if ($rendererSource -notlike "*skip_hidden_missing_or_transparent_overlays_before_composition*") {
     throw "Renderer render plan compose queue optimization marker is missing"

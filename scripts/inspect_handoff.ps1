@@ -334,6 +334,21 @@ $summary = [ordered]@{
 
 
         compiled_plan_compose_queue_skip_reasons = $layerRenderPlanPerformance.compiled_plan_compose_queue_skip_reasons
+
+
+
+
+        compiled_plan_compose_runs_schema = $layerRenderPlanPerformance.compiled_plan_compose_runs_schema
+
+
+
+
+        compiled_plan_compose_runs_helper = $layerRenderPlanPerformance.compiled_plan_compose_runs_helper
+
+
+
+
+        compiled_plan_compose_runs_field = $layerRenderPlanPerformance.compiled_plan_compose_runs_field
         compiled_plan_reuse_decision_field = $layerRenderPlanPerformance.compiled_plan_reuse_decision_field
         compiled_plan_reuse_policy = $layerRenderPlanPerformance.compiled_plan_reuse_policy
         compiled_plan_reuse_status_values = $layerRenderPlanPerformance.compiled_plan_reuse_status_values

@@ -14158,6 +14158,7 @@ class HybridRenderController:
             queued["queue_order"] = len(queue)
             queued["compose_queue_reason"] = "executable_overlay"
             queue.append(queued)
+        compose_runs_packet = self.layer_render_plan_compose_runs(queue)
         return {
             "schema": "rrkal_displaytools.layer_render_plan_compose_queue.v1",
             "source": "HybridRenderController.layer_render_plan_compose_queue",
@@ -14169,7 +14170,78 @@ class HybridRenderController:
             "skipped_step_count": len(skipped_steps),
             "queue": queue,
             "skipped_steps": skipped_steps,
+            "compose_runs_schema": "rrkal_displaytools.layer_render_plan_compose_runs.v1",
+            "compose_runs": compose_runs_packet.get("runs", []),
+            "compose_run_count": compose_runs_packet.get("run_count", 0),
+            "compose_merge_candidate_run_count": compose_runs_packet.get("merge_candidate_run_count", 0),
             "next_optimization_target": "collapse executable queue into fewer overlay composition passes",
+        }
+
+    def layer_render_plan_compose_runs(
+        self,
+        compose_queue: list[dict[str, object]],
+    ) -> dict[str, object]:
+        runs: list[dict[str, object]] = []
+        current_run: dict[str, object] | None = None
+        for step in compose_queue:
+            if not isinstance(step, dict):
+                continue
+            kind = str(step.get("kind") or "unknown")
+            step_id = str(step.get("id") or step.get("layer_id") or "unknown_step")
+            queue_order = int(step.get("queue_order", len(runs)))
+            if kind == "style_profile_postprocess":
+                run_kind = "postprocess"
+                merge_safe = False
+                merge_reason = "full_frame_style_profile_boundary"
+            elif kind == "alpha_compose":
+                run_kind = "alpha_compose_overlays"
+                merge_safe = True
+                merge_reason = "adjacent_alpha_compose_overlays_can_be_collapsed_after_visual_parity_check"
+            elif kind == "alpha_blend":
+                run_kind = "alpha_blend_overlay"
+                merge_safe = False
+                merge_reason = "blend_mode_specific_overlay_boundary"
+            elif kind in {"runtime_blend", "runtime_overlay"}:
+                run_kind = "runtime_layer_overlay"
+                merge_safe = False
+                merge_reason = "preserve_per_layer_visibility_opacity_blend_semantics"
+            else:
+                run_kind = "unknown_overlay"
+                merge_safe = False
+                merge_reason = "unknown_runtime_semantics"
+            can_extend = (
+                current_run is not None
+                and current_run.get("run_kind") == run_kind
+                and current_run.get("merge_safe") is True
+                and merge_safe
+            )
+            if not can_extend:
+                current_run = {
+                    "id": f"compose_run_{len(runs)}",
+                    "run_kind": run_kind,
+                    "merge_safe": merge_safe,
+                    "merge_reason": merge_reason,
+                    "start_queue_order": queue_order,
+                    "end_queue_order": queue_order,
+                    "step_ids": [],
+                    "step_count": 0,
+                    "current_runtime_path": "sequential_compose_queue_execution",
+                    "next_runtime_path": "merged_overlay_pass" if merge_safe else "preserve_ordered_step_execution",
+                }
+                runs.append(current_run)
+            current_run["end_queue_order"] = queue_order
+            step_ids = current_run.get("step_ids")
+            if isinstance(step_ids, list):
+                step_ids.append(step_id)
+            current_run["step_count"] = int(current_run.get("step_count", 0)) + 1
+        return {
+            "schema": "rrkal_displaytools.layer_render_plan_compose_runs.v1",
+            "source": "HybridRenderController.layer_render_plan_compose_runs",
+            "status": "ready",
+            "run_count": len(runs),
+            "merge_candidate_run_count": sum(1 for run in runs if run.get("merge_safe") is True),
+            "runs": runs,
+            "next_optimization_target": "merge safe adjacent alpha_compose overlays after visual parity smoke is available",
         }
 
     def apply_layer_render_plan_composition(self, steps: list[dict[str, object]] | None = None) -> np.ndarray:
@@ -14680,6 +14752,10 @@ class HybridRenderController:
             plan["compose_queue_packet"] = compose_queue_packet
             plan["compose_queue_count"] = compose_queue_packet.get("executable_step_count", 0)
             plan["compose_queue_skipped_count"] = compose_queue_packet.get("skipped_step_count", 0)
+            plan["compose_runs"] = compose_queue_packet.get("compose_runs", [])
+            plan["compose_runs_schema"] = "rrkal_displaytools.layer_render_plan_compose_runs.v1"
+            plan["compose_run_count"] = compose_queue_packet.get("compose_run_count", 0)
+            plan["compose_merge_candidate_run_count"] = compose_queue_packet.get("compose_merge_candidate_run_count", 0)
             return plan
         self.compiled_layer_render_plan_cache_key = cache_key
         return {
@@ -14725,6 +14801,10 @@ class HybridRenderController:
             "compose_queue_packet": compose_queue_packet,
             "compose_queue_count": compose_queue_packet.get("executable_step_count", 0),
             "compose_queue_skipped_count": compose_queue_packet.get("skipped_step_count", 0),
+            "compose_runs": compose_queue_packet.get("compose_runs", []),
+            "compose_runs_schema": "rrkal_displaytools.layer_render_plan_compose_runs.v1",
+            "compose_run_count": compose_queue_packet.get("compose_run_count", 0),
+            "compose_merge_candidate_run_count": compose_queue_packet.get("compose_merge_candidate_run_count", 0),
             "compose_order": runtime_snapshot.get("compose_order", []),
             "apply_helper": "HybridRenderController.apply_layer_render_plan_composition",
             "single_pass_ready": False,
@@ -19710,6 +19790,10 @@ def layer_render_plan_cache_diagnostics_packet(
         "compose_queue_count": plan.get("compose_queue_count", 0),
         "compose_queue_skipped_count": plan.get("compose_queue_skipped_count", 0),
         "compose_queue_packet": plan.get("compose_queue_packet") if isinstance(plan.get("compose_queue_packet"), dict) else {},
+        "compose_runs_schema": plan.get("compose_runs_schema", "rrkal_displaytools.layer_render_plan_compose_runs.v1"),
+        "compose_runs": plan.get("compose_runs") if isinstance(plan.get("compose_runs"), list) else [],
+        "compose_run_count": plan.get("compose_run_count", 0),
+        "compose_merge_candidate_run_count": plan.get("compose_merge_candidate_run_count", 0),
         "cache_key_available": bool(plan.get("cache_key")),
         "reuse_policy": plan.get("reuse_policy", "reuse_when_cache_key_matches_previous_compiled_plan") if available else "unavailable",
         "reuse_boundary": plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change") if available else "unavailable",
@@ -19787,6 +19871,9 @@ def layer_render_plan_performance_packet(
         "compiled_plan_compose_queue_helper": "HybridRenderController.layer_render_plan_compose_queue",
         "compiled_plan_compose_queue_field": "compose_queue",
         "compiled_plan_compose_queue_skip_reasons": ["hidden_layer", "missing_overlay", "transparent_overlay"],
+        "compiled_plan_compose_runs_schema": "rrkal_displaytools.layer_render_plan_compose_runs.v1",
+        "compiled_plan_compose_runs_helper": "HybridRenderController.layer_render_plan_compose_runs",
+        "compiled_plan_compose_runs_field": "compose_runs",
         "phase_timing_unit": "milliseconds",
         "compiled_plan_reuse_decision_field": "cache_reuse_decision",
         "compiled_plan_reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",

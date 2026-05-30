@@ -1,5 +1,17 @@
 # Development Log
 
+## 2026-05-30 - Render-plan compose run grouping
+
+Changes:
+- Added `HybridRenderController.layer_render_plan_compose_runs()` to group the executable compose queue into ordered runs.
+- Compose runs mark which adjacent overlay steps are merge-safe candidates and which must preserve per-layer visibility, opacity or blend semantics.
+- Compiled render-plan metadata and Qt diagnostics now expose `rrkal_displaytools.layer_render_plan_compose_runs.v1`, run count and merge-candidate run count.
+- The Layers control-board render-plan strip now shows `runs=` and `merge=` beside queue and skipped-step evidence.
+- Smoke gates now verify compose run schema/helper/field, Qt summary text and renderer merge-safety markers.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Render-plan compose queue optimization
 
 Changes:
