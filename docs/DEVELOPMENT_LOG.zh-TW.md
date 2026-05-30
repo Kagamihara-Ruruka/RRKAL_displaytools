@@ -1,5 +1,16 @@
 # Development Log
 
+## 2026-05-30 - Render-plan apply path metadata
+
+Changes:
+- Added `HybridRenderController.layer_render_plan_apply_path()` to map each composition step to its current apply helper, batch decision and single-pass candidate flag.
+- Compiled render-plan metadata and Qt diagnostics now expose `rrkal_displaytools.layer_render_plan_apply_path.v1`, `apply_path` and `apply_path_count`.
+- The Layers control-board render-plan strip now includes an `apply=` count next to cache, invalidation and batch decision summaries.
+- Smoke gates now verify apply path schema/helper/field, Qt summary text and renderer source markers for current runtime apply helpers.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Render-plan batch decisions
 
 Changes:

@@ -548,6 +548,15 @@ if ($launchPacket.layer_render_plan_performance.compiled_plan_batch_decision_hel
 if ($launchPacket.layer_render_plan_performance.compiled_plan_batch_decision_field -ne "batch_decisions") {
     throw "Launch packet layer_render_plan_performance batch decision field missing"
 }
+if ($launchPacket.layer_render_plan_performance.compiled_plan_apply_path_schema -ne "rrkal_displaytools.layer_render_plan_apply_path.v1") {
+    throw "Launch packet layer_render_plan_performance apply path schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_apply_path_helper -ne "HybridRenderController.layer_render_plan_apply_path") {
+    throw "Launch packet layer_render_plan_performance apply path helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.compiled_plan_apply_path_field -ne "apply_path") {
+    throw "Launch packet layer_render_plan_performance apply path field missing"
+}
 if ($launchPacket.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Launch packet layer_render_plan_performance reuse decision field missing"
 }
@@ -1702,6 +1711,15 @@ if ($capabilities.layer_render_plan_performance.compiled_plan_batch_decision_hel
 if ($capabilities.layer_render_plan_performance.compiled_plan_batch_decision_field -ne "batch_decisions") {
     throw "Renderer layer_render_plan_performance batch decision field missing"
 }
+if ($capabilities.layer_render_plan_performance.compiled_plan_apply_path_schema -ne "rrkal_displaytools.layer_render_plan_apply_path.v1") {
+    throw "Renderer layer_render_plan_performance apply path schema missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_apply_path_helper -ne "HybridRenderController.layer_render_plan_apply_path") {
+    throw "Renderer layer_render_plan_performance apply path helper missing"
+}
+if ($capabilities.layer_render_plan_performance.compiled_plan_apply_path_field -ne "apply_path") {
+    throw "Renderer layer_render_plan_performance apply path field missing"
+}
 if ($capabilities.layer_render_plan_performance.compiled_plan_reuse_policy -ne "reuse_when_cache_key_matches_previous_compiled_plan") {
     throw "Renderer layer_render_plan_performance compiled plan reuse policy missing"
 }
@@ -2404,6 +2422,15 @@ if ($handoff.layer_render_plan_performance.compiled_plan_batch_decision_helper -
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_batch_decision_field -ne "batch_decisions") {
     throw "Handoff inspection layer render plan performance batch decision field missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_apply_path_schema -ne "rrkal_displaytools.layer_render_plan_apply_path.v1") {
+    throw "Handoff inspection layer render plan performance apply path schema missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_apply_path_helper -ne "HybridRenderController.layer_render_plan_apply_path") {
+    throw "Handoff inspection layer render plan performance apply path helper missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_apply_path_field -ne "apply_path") {
+    throw "Handoff inspection layer render plan performance apply path field missing"
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_reuse_decision_field -ne "cache_reuse_decision") {
     throw "Handoff inspection layer render plan performance reuse decision field missing"
@@ -3634,6 +3661,15 @@ if ($qtPanelSource -notlike "*batch_decisions*") {
 if ($qtPanelSource -notlike "*batches={batch_decision_count}:{batch_text}*") {
     throw "Qt render plan batch decision summary text is missing"
 }
+if ($qtPanelSource -notlike "*layer_render_plan_apply_path.v1*") {
+    throw "Qt render plan apply path schema is missing"
+}
+if ($qtPanelSource -notlike "*apply_path*") {
+    throw "Qt render plan apply path diagnostics field is missing"
+}
+if ($qtPanelSource -notlike "*apply={apply_path_count}*") {
+    throw "Qt render plan apply path summary text is missing"
+}
 if ($qtPanelSource -notlike "*collect_layer_render_plan_cache_diagnostics*") {
     throw "Qt render plan cache diagnostics collector is missing"
 }
@@ -3944,6 +3980,21 @@ if ($rendererSource -notlike '*"compose_dirty_overlay"*') {
 }
 if ($rendererSource -notlike '*"compose_cached_overlay"*') {
     throw "Renderer render plan cached overlay compose decision marker is missing"
+}
+if ($rendererSource -notlike "*def layer_render_plan_apply_path*") {
+    throw "Renderer render plan apply path helper is missing"
+}
+if ($rendererSource -notlike '*"apply_helper": helper_by_kind.get(kind, "unknown_apply_helper")*') {
+    throw "Renderer render plan apply helper mapping is missing"
+}
+if ($rendererSource -notlike "*HybridRenderController.apply_layer_render_plan_composition*") {
+    throw "Renderer render plan apply path current runtime helper is missing"
+}
+if ($rendererSource -notlike "*single_pass_candidate*") {
+    throw "Renderer render plan apply path single-pass candidate marker is missing"
+}
+if ($rendererSource -notlike "*compose_runtime_blend*") {
+    throw "Renderer render plan runtime blend apply helper marker is missing"
 }
 if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "layer_render_plan_snapshot"*') {
     if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "compiled_layer_render_plan"*') {

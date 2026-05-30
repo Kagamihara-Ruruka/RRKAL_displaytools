@@ -14266,6 +14266,46 @@ class HybridRenderController:
             )
         return decisions
 
+    def layer_render_plan_apply_path(
+        self,
+        composition_steps: list[dict[str, object]],
+        batch_decisions: list[dict[str, object]],
+    ) -> list[dict[str, object]]:
+        decisions_by_id = {
+            str(decision.get("id")): decision
+            for decision in batch_decisions
+            if isinstance(decision, dict) and decision.get("scope") == "layer"
+        }
+        helper_by_kind = {
+            "runtime_blend": "HybridRenderController.compose_runtime_blend",
+            "alpha_blend": "alpha_blend_compose",
+            "alpha_compose": "alpha_compose",
+            "runtime_overlay": "HybridRenderController.compose_runtime_overlay",
+            "style_profile_postprocess": "apply_style_profile",
+        }
+        path: list[dict[str, object]] = []
+        for index, step in enumerate(composition_steps):
+            if not isinstance(step, dict):
+                continue
+            step_id = str(step.get("id") or step.get("layer_id") or "")
+            kind = str(step.get("kind") or "")
+            decision = decisions_by_id.get(step_id, {})
+            path.append(
+                {
+                    "order": index,
+                    "id": step_id,
+                    "layer_id": step.get("layer_id"),
+                    "kind": kind,
+                    "decision": decision.get("decision", "compose_cached_overlay"),
+                    "apply_helper": helper_by_kind.get(kind, "unknown_apply_helper"),
+                    "overlay_attr": step.get("overlay_attr"),
+                    "overlay_source": step.get("overlay_source"),
+                    "current_runtime_path": "HybridRenderController.apply_layer_render_plan_composition",
+                    "single_pass_candidate": kind in {"runtime_blend", "alpha_blend", "alpha_compose", "runtime_overlay"},
+                }
+            )
+        return path
+
     def compile_layer_render_plan(
         self,
         changed: bool | None = None,
@@ -14282,6 +14322,7 @@ class HybridRenderController:
         invalidation_reasons = self.layer_render_plan_cache_invalidation_reasons(runtime_snapshot, cache_key)
         invalidation_scope = self.layer_render_plan_cache_invalidation_scope(runtime_snapshot, invalidation_reasons)
         batch_decisions = self.layer_render_plan_batch_decisions(runtime_snapshot, composition_steps, invalidation_scope)
+        apply_path = self.layer_render_plan_apply_path(composition_steps, batch_decisions)
         cached_plan = getattr(self, "compiled_layer_render_plan", None)
         if isinstance(cached_plan, dict) and getattr(self, "compiled_layer_render_plan_cache_key", None) == cache_key:
             plan = dict(cached_plan)
@@ -14291,6 +14332,8 @@ class HybridRenderController:
             plan["cache_invalidation_scope"] = invalidation_scope
             plan["batch_decisions"] = batch_decisions
             plan["batch_decision_count"] = len(batch_decisions)
+            plan["apply_path"] = apply_path
+            plan["apply_path_count"] = len(apply_path)
             plan["reuse_policy"] = "reuse_when_cache_key_matches_previous_compiled_plan"
             plan["reuse_boundary"] = plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change")
             plan["frame_index"] = int(getattr(self, "frame_index", 0))
@@ -14312,6 +14355,9 @@ class HybridRenderController:
             "batch_decisions": batch_decisions,
             "batch_decision_schema": "rrkal_displaytools.layer_render_plan_batch_decisions.v1",
             "batch_decision_count": len(batch_decisions),
+            "apply_path": apply_path,
+            "apply_path_schema": "rrkal_displaytools.layer_render_plan_apply_path.v1",
+            "apply_path_count": len(apply_path),
             "reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
             "reuse_status_values": ["compiled", "reused"],
             "runtime_optimization_applied": False,
@@ -19266,6 +19312,9 @@ def layer_render_plan_cache_diagnostics_packet(
         "batch_decision_schema": plan.get("batch_decision_schema", "rrkal_displaytools.layer_render_plan_batch_decisions.v1"),
         "batch_decisions": plan.get("batch_decisions") if isinstance(plan.get("batch_decisions"), list) else [],
         "batch_decision_count": plan.get("batch_decision_count", 0),
+        "apply_path_schema": plan.get("apply_path_schema", "rrkal_displaytools.layer_render_plan_apply_path.v1"),
+        "apply_path": plan.get("apply_path") if isinstance(plan.get("apply_path"), list) else [],
+        "apply_path_count": plan.get("apply_path_count", 0),
         "cache_key_available": bool(plan.get("cache_key")),
         "reuse_policy": plan.get("reuse_policy", "reuse_when_cache_key_matches_previous_compiled_plan") if available else "unavailable",
         "reuse_boundary": plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change") if available else "unavailable",
@@ -19321,6 +19370,9 @@ def layer_render_plan_performance_packet(
         "compiled_plan_batch_decision_schema": "rrkal_displaytools.layer_render_plan_batch_decisions.v1",
         "compiled_plan_batch_decision_helper": "HybridRenderController.layer_render_plan_batch_decisions",
         "compiled_plan_batch_decision_field": "batch_decisions",
+        "compiled_plan_apply_path_schema": "rrkal_displaytools.layer_render_plan_apply_path.v1",
+        "compiled_plan_apply_path_helper": "HybridRenderController.layer_render_plan_apply_path",
+        "compiled_plan_apply_path_field": "apply_path",
         "compiled_plan_reuse_decision_field": "cache_reuse_decision",
         "compiled_plan_reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
         "compiled_plan_reuse_status_values": ["compiled", "reused"],

@@ -1050,6 +1050,9 @@ def layer_render_plan_cache_diagnostics_packet(
         "batch_decision_schema": plan.get("batch_decision_schema", "rrkal_displaytools.layer_render_plan_batch_decisions.v1"),
         "batch_decisions": plan.get("batch_decisions") if isinstance(plan.get("batch_decisions"), list) else [],
         "batch_decision_count": plan.get("batch_decision_count", 0),
+        "apply_path_schema": plan.get("apply_path_schema", "rrkal_displaytools.layer_render_plan_apply_path.v1"),
+        "apply_path": plan.get("apply_path") if isinstance(plan.get("apply_path"), list) else [],
+        "apply_path_count": plan.get("apply_path_count", 0),
         "cache_key_available": bool(plan.get("cache_key")),
         "reuse_policy": plan.get("reuse_policy", "reuse_when_cache_key_matches_previous_compiled_plan") if available else "unavailable",
         "reuse_boundary": plan.get("reuse_boundary", "valid_until_dirty_flags_or_camera_change") if available else "unavailable",
@@ -1105,6 +1108,9 @@ def layer_render_plan_performance_packet(
         "compiled_plan_batch_decision_schema": "rrkal_displaytools.layer_render_plan_batch_decisions.v1",
         "compiled_plan_batch_decision_helper": "HybridRenderController.layer_render_plan_batch_decisions",
         "compiled_plan_batch_decision_field": "batch_decisions",
+        "compiled_plan_apply_path_schema": "rrkal_displaytools.layer_render_plan_apply_path.v1",
+        "compiled_plan_apply_path_helper": "HybridRenderController.layer_render_plan_apply_path",
+        "compiled_plan_apply_path_field": "apply_path",
         "compiled_plan_reuse_decision_field": "cache_reuse_decision",
         "compiled_plan_reuse_policy": "reuse_when_cache_key_matches_previous_compiled_plan",
         "compiled_plan_reuse_status_values": ["compiled", "reused"],
@@ -4806,6 +4812,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             batch_text = ",".join(str(item.get("decision", "-")) for item in batch_decisions[:3] if isinstance(item, dict))
         else:
             batch_text = "-"
+        apply_path_count = diagnostics.get("apply_path_count", 0)
         return (
             "Render plan cache: "
             f"status={diagnostics.get('status', 'unavailable')}; "
@@ -4814,6 +4821,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"reasons={reason_text}; "
             f"scope={scope_text}; "
             f"batches={batch_decision_count}:{batch_text}; "
+            f"apply={apply_path_count}; "
             f"key={key_state}; "
             f"reuse={diagnostics.get('reuse_boundary', 'unavailable')}; "
             f"steps={diagnostics.get('composition_step_count', '-')}; "
