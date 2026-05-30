@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Post-7 decoupling runbook
+
+Changes:
+- Added `docs/DECOUPLING_RUNBOOK.zh-TW.md` for the post-`2026-05-31T07:00:00+08:00` extraction phase.
+- Linked the runbook from the docs index and agent handoff.
+- Captured the first extraction order and boundary rules so the next agent starts with `render_plan_compose` after the pre-decoupling gate.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Pre-decoupling clean worktree guard
 
 Changes:

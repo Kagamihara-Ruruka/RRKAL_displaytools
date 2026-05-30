@@ -51,6 +51,7 @@
 - `taichi_global_bathymetry.py` is still a monolithic prototype.
 - `rrkal_displaytools_qt_panel.py` is the current Qt operator UI for layer/style/material launch control.
 - Module extraction is planned but not physically completed in this repo.
+- Do not start physical module extraction before `2026-05-31T07:00:00+08:00`; after that, run `scripts\pre_decoupling_gate.ps1` and start with `render_plan_compose`.
 - Current panel entry: `py -3 rrkal_displaytools_qt_panel.py`.
 - Current showcase entry: `py -3 taichi_global_bathymetry.py --demo-closed-loop --style-profile tactical`.
 - Optional packet output: add `--write-demo-packet state\showcase\closed_loop_demo.json`; generated `state/` artifacts remain local-only.

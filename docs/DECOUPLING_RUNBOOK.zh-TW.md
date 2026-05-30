@@ -1,0 +1,49 @@
+# Decoupling Runbook
+
+## Scope
+
+This runbook starts only after `2026-05-31T07:00:00+08:00`.
+
+Before that gate, keep work limited to Qt UI, launch/reviewer packets, handoff docs, and smoke-gated contracts.
+
+## Required preflight
+
+Run from `L:\RRKAL_displaytools`:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\pre_decoupling_gate.ps1
+```
+
+The gate must report:
+
+- `schema=rrkal_displaytools.pre_decoupling_gate.v1`
+- `ready=true`
+- `first_extraction_id=render_plan_compose`
+- `requires_clean_worktree=true`
+
+## First extraction order
+
+1. `render_plan_compose` -> `render_core/render_plan.py`
+2. `ocean_material` -> `render_core/ocean_material.py`
+3. `layer_runtime_bridge` -> `overlays/layer_runtime.py`
+4. `style_profile_routes` -> `styles/profile_routes.py`
+5. `diagnostics_packets` -> `diagnostics/packets.py`
+
+## Boundary rules
+
+- Do not move RRKAL provider discovery into displaytools.
+- Do not move download/import/cache lifecycle into displaytools.
+- Do not change the primary UI stack away from Qt.
+- Keep each extraction smoke-gated, committed, pushed, and documented before starting the next extraction.
+
+## First code-move target
+
+Start with pure render-plan helpers only. Preserve these fields while moving code:
+
+- `layer_render_plan_performance`
+- `compose_performance_summary`
+- `render_compose_parity`
+- `decoupling_readiness`
+- `reviewer_packet_export`
+
+If a move requires runtime visual validation, stop after the smoke-gated commit and ask for local Qt/Taichi visual review.
