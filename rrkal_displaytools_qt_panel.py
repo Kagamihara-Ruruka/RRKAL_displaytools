@@ -3664,6 +3664,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "border:1px solid #a8bd65; border-radius:8px; padding:6px 8px; font-weight:600; }"
         )
         layers_layout.addWidget(self.render_plan_cache_label)
+        self.compose_parity_runner_label = QtWidgets.QLabel("Compose parity runner: ready=unknown")
+        self.compose_parity_runner_label.setObjectName("composeParityRunnerReadinessStrip")
+        self.compose_parity_runner_label.setWordWrap(True)
+        self.compose_parity_runner_label.setStyleSheet(
+            "QLabel#composeParityRunnerReadinessStrip { color:#1d3142; background:#e8f5ff; "
+            "border:1px solid #6ba7c8; border-radius:8px; padding:6px 8px; font-weight:600; }"
+        )
+        layers_layout.addWidget(self.compose_parity_runner_label)
         render_plan_cache_button = QtWidgets.QPushButton("Render plan diagnostics")
         render_plan_cache_button.setObjectName("renderPlanCacheDiagnosticsButton")
         render_plan_cache_button.setToolTip(
@@ -4988,6 +4996,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     def refresh_layer_render_plan_cache_diagnostics_strip(self) -> None:
         if hasattr(self, "render_plan_cache_label"):
             self.render_plan_cache_label.setText(self.layer_render_plan_cache_summary_text())
+        if hasattr(self, "compose_parity_runner_label"):
+            self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text())
 
     def collect_layer_render_plan_performance(self) -> dict[str, object]:
         packet = layer_render_plan_performance_packet(
@@ -9246,6 +9256,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         diagnostics = performance.get("cache_diagnostics") if isinstance(performance.get("cache_diagnostics"), dict) else {}
         if hasattr(self, "render_plan_cache_label"):
             self.render_plan_cache_label.setText(self.layer_render_plan_cache_summary_text(diagnostics))
+        if hasattr(self, "compose_parity_runner_label"):
+            self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text(performance))
         self.command_text.setPlainText(
             json.dumps(
                 {
@@ -9257,6 +9269,28 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             )
         )
         self.status.setText("Displayed layer render-plan performance and cache diagnostics")
+
+    def compose_parity_runner_readiness_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()
+        workflow = packet.get("compose_run_parity_artifact_workflow")
+        workflow = workflow if isinstance(workflow, dict) else {}
+        runner_schema = packet.get("compose_run_parity_artifact_runner_schema", "")
+        runner_script = packet.get("compose_run_parity_artifact_runner_script") or workflow.get("runner_script", "-")
+        runner_command = workflow.get("runner_command", "-")
+        runner_manifest = workflow.get("runner_manifest", "-")
+        runner_ready = bool(
+            runner_schema == "rrkal_displaytools.compose_run_parity_artifact_runner.v1"
+            and runner_script
+            and runner_command
+            and runner_manifest
+        )
+        return (
+            "Compose parity runner: "
+            f"ready={runner_ready}; "
+            f"script={runner_script}; "
+            f"manifest={runner_manifest}; "
+            "runtime_merge=false"
+        )
 
     def compose_parity_workflow_summary_text(self, packet: dict[str, object] | None = None) -> str:
         packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()

@@ -1,5 +1,14 @@
 # Development Log
 
+## 2026-05-30 - Qt compose parity runner readiness strip
+
+Changes:
+- Added a visible Qt Layers control-board strip `composeParityRunnerReadinessStrip` for compose parity runner readiness.
+- The strip shows `ready=`, runner script, runner manifest and `runtime_merge=false`, making the parity runner discoverable without copying or opening the full JSON packet first.
+- Smoke gates the strip object name, readiness helper and ready text marker.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
 ## 2026-05-30 - Compose parity runner venv resolver
 
 Changes:

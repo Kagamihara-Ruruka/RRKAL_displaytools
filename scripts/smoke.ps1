@@ -4249,6 +4249,15 @@ if ($qtPanelSource -notlike "*compose_run_parity_summary_contract.v1*") {
 if ($qtPanelSource -notlike "*render_compose_parity_artifacts.ps1*") {
     throw "Qt compose parity artifact runner script is missing"
 }
+if ($qtPanelSource -notlike "*composeParityRunnerReadinessStrip*") {
+    throw "Qt compose parity runner readiness strip is missing"
+}
+if ($qtPanelSource -notlike "*compose_parity_runner_readiness_text*") {
+    throw "Qt compose parity runner readiness helper is missing"
+}
+if ($qtPanelSource -notlike "*ready={runner_ready}*") {
+    throw "Qt compose parity runner readiness text is missing"
+}
 if ($qtPanelSource -notlike "*run={workflow.get('runner_command', '-')}*") {
     throw "Qt compose parity runner summary text is missing"
 }
