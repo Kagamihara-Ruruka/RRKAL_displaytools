@@ -227,6 +227,18 @@ if ($launchPacket.layer_selection_tool.selection_summary_contract.qt_copy_action
 if (-not $launchPacket.layer_selection_tool.selection_summary_contract.portable) {
     throw "Launch packet layer_selection_tool selection summary portability flag missing"
 }
+if ($launchPacket.layer_selection_affordance.schema -ne "rrkal_displaytools.layer_selection_affordance.v1") {
+    throw "Launch packet layer_selection_affordance schema missing or invalid"
+}
+if ($launchPacket.layer_selection_affordance.qt_label_object -ne "layerSelectionAffordance") {
+    throw "Launch packet layer_selection_affordance label object missing"
+}
+if ($launchPacket.layer_selection_affordance.selected_row_property -ne "selected") {
+    throw "Launch packet layer_selection_affordance selected row property mismatch"
+}
+if ($launchPacket.layer_selection_affordance.focus_aids -notcontains "layerControlFeedbackStrip") {
+    throw "Launch packet layer_selection_affordance feedback strip focus aid missing"
+}
 if ($launchPacket.layer_research_workflow.schema -ne "rrkal_displaytools.layer_research_workflow.v1") {
     throw "Launch packet layer_research_workflow schema missing or invalid"
 }
@@ -1087,6 +1099,15 @@ if ($capabilities.layer_selection_tool.selection_summary_contract_schema -ne "rr
 if ($capabilities.layer_selection_tool.selection_summary_contract.qt_copy_action -ne "copy_layer_selection_summary") {
     throw "Renderer layer_selection_tool selection summary copy action missing or invalid"
 }
+if ($capabilities.layer_selection_affordance.schema -ne "rrkal_displaytools.layer_selection_affordance.v1") {
+    throw "Renderer layer_selection_affordance schema missing or invalid"
+}
+if ($capabilities.layer_selection_affordance.qt_surface -ne "Layers dock selected row highlight / layerSelectionAffordance label") {
+    throw "Renderer layer_selection_affordance Qt surface mismatch"
+}
+if ($capabilities.layer_selection_affordance.selected_row_property -ne "selected") {
+    throw "Renderer layer_selection_affordance selected row property mismatch"
+}
 if ($capabilities.layer_research_workflow.schema -ne "rrkal_displaytools.layer_research_workflow.v1") {
     throw "Renderer layer_research_workflow schema missing or invalid"
 }
@@ -1775,6 +1796,9 @@ if ($handoff.renderer_output_artifact_contract.quick_render_smoke_validates -not
 if ($handoff.launch_packet_contracts.layer_selection_tool -ne "rrkal_displaytools.layer_selection_tool.v1") {
     throw "Handoff inspection layer_selection_tool launch contract missing or invalid"
 }
+if ($handoff.launch_packet_contracts.layer_selection_affordance -ne "rrkal_displaytools.layer_selection_affordance.v1") {
+    throw "Handoff inspection layer_selection_affordance launch contract missing or invalid"
+}
 if ($handoff.launch_packet_contracts.layer_research_workflow -ne "rrkal_displaytools.layer_research_workflow.v1") {
     throw "Handoff inspection layer_research_workflow launch contract missing or invalid"
 }
@@ -1801,6 +1825,15 @@ if ($handoff.layer_selection_tool.selection_summary_contract.qt_copy_action -ne 
 }
 if (-not $handoff.layer_selection_tool.selection_summary_contract.portable) {
     throw "Handoff inspection layer_selection_tool selection summary portability flag missing"
+}
+if ($handoff.layer_selection_affordance.launch_packet_schema -ne "rrkal_displaytools.layer_selection_affordance.v1") {
+    throw "Handoff inspection layer_selection_affordance launch schema missing or invalid"
+}
+if ($handoff.layer_selection_affordance.renderer_capabilities_schema -ne "rrkal_displaytools.layer_selection_affordance.v1") {
+    throw "Handoff inspection layer_selection_affordance renderer schema missing or invalid"
+}
+if ($handoff.layer_selection_affordance.qt_label_object -ne "layerSelectionAffordance") {
+    throw "Handoff inspection layer_selection_affordance label object missing"
 }
 if ($handoff.layer_research_workflow.launch_packet_schema -ne "rrkal_displaytools.layer_research_workflow.v1") {
     throw "Handoff inspection layer_research_workflow launch schema missing or invalid"
@@ -2416,6 +2449,15 @@ if ($qtPanelSource -notlike "*collect_layer_control_feedback_strip*") {
 if ($qtPanelSource -notlike "*rrkal_displaytools.layer_control_feedback_strip.v1*") {
     throw "Qt layer control feedback strip schema is missing"
 }
+if ($qtPanelSource -notlike "*layerSelectionAffordance*") {
+    throw "Qt layer selection affordance label is missing"
+}
+if ($qtPanelSource -notlike "*collect_layer_selection_affordance*") {
+    throw "Qt layer selection affordance collector is missing"
+}
+if ($qtPanelSource -notlike "*rrkal_displaytools.layer_selection_affordance.v1*") {
+    throw "Qt layer selection affordance schema is missing"
+}
 if ($qtPanelSource -notlike "*click a row to select the active research layer*") {
     throw "Qt Layers workflow row-selection hint is missing"
 }
@@ -2751,6 +2793,9 @@ if ($rendererSource -notlike "*layer_operation_feedback_packet*") {
 if ($rendererSource -notlike "*layer_control_feedback_strip_packet*") {
     throw "Renderer capability layer control feedback strip contract missing"
 }
+if ($rendererSource -notlike "*layer_selection_affordance_packet*") {
+    throw "Renderer capability layer selection affordance contract missing"
+}
 
 $scripts = Get-ChildItem scripts -Filter *.ps1
 foreach ($script in $scripts) {
@@ -2857,6 +2902,9 @@ if ($launchPacketSource -notmatch 'layer_operation_feedback') {
 if ($launchPacketSource -notmatch 'layer_control_feedback_strip') {
     throw "Launch packet layer control feedback strip field missing"
 }
+if ($launchPacketSource -notmatch 'layer_selection_affordance') {
+    throw "Launch packet layer selection affordance field missing"
+}
 if ($handoffInspectorSource -notmatch 'profile_ui_state_replay') {
     throw "Handoff inspection profile UI state replay output is missing"
 }
@@ -2865,6 +2913,9 @@ if ($handoffInspectorSource -notmatch 'layer_operation_feedback') {
 }
 if ($handoffInspectorSource -notmatch 'layer_control_feedback_strip') {
     throw "Handoff inspection layer control feedback strip output is missing"
+}
+if ($handoffInspectorSource -notmatch 'layer_selection_affordance') {
+    throw "Handoff inspection layer selection affordance output is missing"
 }
 if ($handoffInspectorSource -notmatch 'profile_visual_quick_review') {
     throw "Handoff inspection profile visual quick review output is missing"

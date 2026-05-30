@@ -2238,6 +2238,51 @@ def layer_selection_tool_packet(source: str, selected_layer: str | None = None) 
         "boundary": "Selection tool state bridges Qt active-layer UX and renderer pick context only; brush/mask editing and RRKAL data governance stay out of scope.",
     }
 
+
+def layer_selection_affordance_packet(
+    source: str,
+    selected_layer: str | None = None,
+    layer_stack: dict[str, dict[str, object]] | None = None,
+) -> dict[str, object]:
+    layer_stack = layer_stack if isinstance(layer_stack, dict) else {}
+    selected_state = layer_stack.get(selected_layer) if isinstance(selected_layer, str) else None
+    selected_state = selected_state if isinstance(selected_state, dict) else {}
+    visible = selected_state.get("visible")
+    locked = selected_state.get("locked")
+    renderer_sync = selected_state.get("renderer_sync") or "unknown"
+    summary_text = (
+        f"Selection affordance: active={selected_layer or 'none'}; "
+        f"row_highlight=selected property; visible={visible}; locked={locked}; renderer={renderer_sync}"
+    )
+    return {
+        "schema": "rrkal_displaytools.layer_selection_affordance.v1",
+        "source": source,
+        "status": "ready",
+        "selected_layer": selected_layer,
+        "selected_layer_state_available": bool(selected_state),
+        "qt_surface": "Layers dock selected row highlight / layerSelectionAffordance label",
+        "qt_label_object": "layerSelectionAffordance",
+        "row_object_name": "layerRow",
+        "selected_row_property": "selected",
+        "selected_row_stylesheet_selector": 'QWidget#layerRow[selected="true"]',
+        "focus_aids": [
+            "selected row highlight",
+            "selectedLayer label",
+            "layerControlFeedbackStrip",
+            "Reveal selected action",
+        ],
+        "visible": visible,
+        "locked": locked,
+        "renderer_sync": renderer_sync,
+        "summary_text": summary_text,
+        "launch_packet_fields": ["layer_selection_affordance", "layer_selection_tool", "layer_control_feedback_strip", "layer_stack_ui"],
+        "renderer_capability_field": "layer_selection_affordance",
+        "handoff_field": "layer_selection_affordance",
+        "smoke_gate": "layer_selection_affordance",
+        "boundary": "Qt selection affordance only; it clarifies active layer targeting without mutating renderer state or RRKAL data governance.",
+    }
+
+
 def layer_research_workflow_packet(
     layer_filter: dict[str, object] | None,
     layer_group_view: dict[str, object] | None,
@@ -3247,6 +3292,7 @@ def launch_packet(
         "layer_operator_shortcuts": layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None),
         "layer_operator_groups": layer_operator_groups_packet(layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None), "scripts.export_launch_packet"),
         "layer_selection_tool": layer_selection_tool_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None),
+        "layer_selection_affordance": layer_selection_affordance_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, profile.get("layer_stack_ui") if isinstance(profile.get("layer_stack_ui"), dict) else None),
         "layer_research_workflow": layer_research_workflow_packet(layer_filter_packet(profile), layer_group_view_packet(profile), layer_operator_groups_packet(layer_operator_shortcuts_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None), "scripts.export_launch_packet"), layer_capability_matrix_packet("scripts.export_launch_packet", profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, rrkal_data_manifest_ref), "scripts.export_launch_packet"),
         "boundary_emphasis_control": boundary_emphasis_control_packet(profile.get("boundary_emphasis_control") if isinstance(profile.get("boundary_emphasis_control"), dict) else None, profile.get("selected_layer") if isinstance(profile.get("selected_layer"), str) else None, "scripts.export_launch_packet"),
         "style_renderer_entries": style_renderer_entries_packet("scripts.export_launch_packet", profile.get("style_profile") if isinstance(profile.get("style_profile"), str) else None),

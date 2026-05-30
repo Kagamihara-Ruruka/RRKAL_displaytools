@@ -2086,6 +2086,51 @@ def layer_selection_tool_packet(source: str, selected_layer: str | None = None) 
         "boundary": "Selection tool state bridges Qt active-layer UX and renderer pick context only; brush/mask editing and RRKAL data governance stay out of scope.",
     }
 
+
+def layer_selection_affordance_packet(
+    source: str,
+    selected_layer: str | None = None,
+    layer_stack: dict[str, dict[str, object]] | None = None,
+) -> dict[str, object]:
+    layer_stack = layer_stack if isinstance(layer_stack, dict) else {}
+    selected_state = layer_stack.get(selected_layer) if isinstance(selected_layer, str) else None
+    selected_state = selected_state if isinstance(selected_state, dict) else {}
+    visible = selected_state.get("visible")
+    locked = selected_state.get("locked")
+    renderer_sync = selected_state.get("renderer_sync") or "unknown"
+    summary_text = (
+        f"Selection affordance: active={selected_layer or 'none'}; "
+        f"row_highlight=selected property; visible={visible}; locked={locked}; renderer={renderer_sync}"
+    )
+    return {
+        "schema": "rrkal_displaytools.layer_selection_affordance.v1",
+        "source": source,
+        "status": "ready",
+        "selected_layer": selected_layer,
+        "selected_layer_state_available": bool(selected_state),
+        "qt_surface": "Layers dock selected row highlight / layerSelectionAffordance label",
+        "qt_label_object": "layerSelectionAffordance",
+        "row_object_name": "layerRow",
+        "selected_row_property": "selected",
+        "selected_row_stylesheet_selector": 'QWidget#layerRow[selected="true"]',
+        "focus_aids": [
+            "selected row highlight",
+            "selectedLayer label",
+            "layerControlFeedbackStrip",
+            "Reveal selected action",
+        ],
+        "visible": visible,
+        "locked": locked,
+        "renderer_sync": renderer_sync,
+        "summary_text": summary_text,
+        "launch_packet_fields": ["layer_selection_affordance", "layer_selection_tool", "layer_control_feedback_strip", "layer_stack_ui"],
+        "renderer_capability_field": "layer_selection_affordance",
+        "handoff_field": "layer_selection_affordance",
+        "smoke_gate": "layer_selection_affordance",
+        "boundary": "Qt selection affordance only; it clarifies active layer targeting without mutating renderer state or RRKAL data governance.",
+    }
+
+
 def layer_research_workflow_packet(
     layer_filter: dict[str, object] | None,
     layer_group_view: dict[str, object] | None,
@@ -3027,6 +3072,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.selected_layer_label = QtWidgets.QLabel("目前選取圖層：尚未選取")
         self.selected_layer_label.setObjectName("selectedLayer")
         layers_layout.addWidget(self.selected_layer_label)
+        self.layer_selection_affordance_label = QtWidgets.QLabel(
+            "Selection affordance: active=none; row_highlight=selected property; renderer=unknown"
+        )
+        self.layer_selection_affordance_label.setObjectName("layerSelectionAffordance")
+        self.layer_selection_affordance_label.setWordWrap(True)
+        layers_layout.addWidget(self.layer_selection_affordance_label)
         self.layer_stack_note = QtWidgets.QLabel("Lock / Opacity / Blend 已接 renderer runtime；未支援圖層會在 renderer_sync 標示。")
         self.layer_stack_note.setWordWrap(True)
         layers_layout.addWidget(self.layer_stack_note)
@@ -3353,6 +3404,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             QLabel#profileUiStateReplay { color: #2f4f42; background: #edf7f1; border: 1px solid #9fc7ad; border-radius: 8px; padding: 6px 8px; }
             QLabel#visualReviewReadiness { color: #5b3d18; background: #fff5dd; border: 1px solid #d8b165; border-radius: 8px; padding: 6px 8px; }
             QLabel#layerControlFeedbackStrip { color: #18384a; background: #e8f3ff; border: 1px solid #8fb7d8; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
+            QLabel#layerSelectionAffordance { color: #2f4167; background: #edf1ff; border: 1px solid #98a8d8; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
             QWidget#layerRow { border-bottom: 1px solid #d6e0ea; }
             QWidget#layerRow[selected="true"] { background: #dceeff; border: 1px solid #5b8db8; }
             QLabel#selectedLayer { color: #23435f; font-weight: 700; padding-top: 6px; }
@@ -4125,6 +4177,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "layer_operator_shortcuts": self.collect_layer_operator_shortcuts(),
             "layer_operator_groups": self.collect_layer_operator_groups(),
             "layer_selection_tool": self.collect_layer_selection_tool(),
+            "layer_selection_affordance": self.collect_layer_selection_affordance(),
             "layer_research_workflow": self.collect_layer_research_workflow(),
             "boundary_emphasis_control": self.collect_boundary_emphasis_control(),
             "cursor_geodesy_readout": self.collect_cursor_geodesy_readout(),
@@ -4508,6 +4561,18 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "rrkal_displaytools_qt_panel",
             self.selected_layer_key,
         )
+
+    def collect_layer_selection_affordance(self) -> dict[str, object]:
+        return layer_selection_affordance_packet(
+            "rrkal_displaytools_qt_panel",
+            self.selected_layer_key,
+            self.collect_layer_stack_ui(),
+        )
+
+    def refresh_layer_selection_affordance(self) -> None:
+        label = getattr(self, "layer_selection_affordance_label", None)
+        if label is not None:
+            label.setText(str(self.collect_layer_selection_affordance().get("summary_text")))
 
     def layer_selection_summary_text(self, packet: dict[str, object] | None = None) -> str:
         packet = packet or self.collect_layer_selection_tool()
@@ -7065,6 +7130,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             for label in self.layer_property_labels.values():
                 label.setText("-")
             self.layer_property_labels["name"].setText("尚未選取")
+            self.refresh_layer_selection_affordance()
             self.refresh_layer_control_feedback_strip()
             return
         label = next((text for layer_key, text in LAYER_LABELS if layer_key == key), key)
@@ -7119,6 +7185,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         summary_label = getattr(self, "layer_operation_summary_label", None)
         if summary_label is not None:
             summary_label.setText(self.active_layer_operation_summary_text())
+        self.refresh_layer_selection_affordance()
         self.refresh_layer_control_feedback_strip()
         self.refresh_boundary_highlight_status()
 

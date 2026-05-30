@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Qt Layer selection affordance
+
+Changes:
+- Added `rrkal_displaytools.layer_selection_affordance.v1` for Qt launch packets, no-GUI launch packets, renderer capability discovery and handoff inspection.
+- Qt Layers dock now exposes `layerSelectionAffordance`, linking selected-row highlighting, selected-layer label, `layerControlFeedbackStrip` and Reveal selected into one active-target focus contract.
+- Smoke now verifies the schema, label object, selected row property, renderer capability field and handoff summary.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Qt Layer control feedback strip
 
 Changes:
