@@ -18,14 +18,18 @@ function Invoke-NativeWithRetry {
     )
 
     $maxAttempts = 4
+    $lastOutput = $null
     for ($attempt = 1; $attempt -le $maxAttempts; $attempt += 1) {
-        if ($CaptureOutput) {
-            $output = & $FilePath @ArgumentList
-        } else {
-            & $FilePath @ArgumentList
-            $output = $null
+        $previousErrorActionPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            $output = & $FilePath @ArgumentList 2>&1
+            $exitCode = $LASTEXITCODE
+        } finally {
+            $ErrorActionPreference = $previousErrorActionPreference
         }
-        if ($LASTEXITCODE -eq 0) {
+        $lastOutput = $output
+        if ($exitCode -eq 0) {
             if ($CaptureOutput) {
                 return $output
             }
@@ -36,7 +40,8 @@ function Invoke-NativeWithRetry {
             Start-Sleep -Milliseconds (400 * $attempt)
         }
     }
-    throw "Command failed: $FilePath $($ArgumentList -join ' ')"
+    $lastText = if ($null -ne $lastOutput) { ($lastOutput | Out-String).Trim() } else { "" }
+    throw "Command failed: $FilePath $($ArgumentList -join ' ')`n$lastText"
 }
 
 function Invoke-CheckedNative {

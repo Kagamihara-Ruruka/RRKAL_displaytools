@@ -37,6 +37,7 @@ Last updated: 2026-05-30
 
 ## Done
 - 2026-05-30: Documented Cloud/local development workflow and handoff entrypoint, including private transcript backup policy and maturity reporting requirements.
+- 2026-05-30: Suppressed transient cloud-drive retry noise in passing smoke logs while preserving final failure output.
 - 2026-05-30: Added Qt `Copy decoupling summary` for handoff-friendly post-7 extraction readiness.
 - 2026-05-30: Added `docs/DECOUPLING_RUNBOOK.zh-TW.md` and linked it from handoff docs for the post-7 renderer extraction phase.
 - 2026-05-30: Added a clean-worktree guard to the pre-decoupling gate for post-7 renderer extraction.

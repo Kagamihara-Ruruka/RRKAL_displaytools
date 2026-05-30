@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Suppress transient smoke retry noise
+
+Changes:
+- Updated `scripts/smoke.ps1` retry helper to capture native command output during retries.
+- Successful retry attempts now avoid leaking transient `Errno 13 Permission denied` messages into a passing smoke log.
+- Final failures still include the last captured command output for diagnosis.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Qt copy decoupling readiness summary
 
 Changes:
