@@ -1714,6 +1714,61 @@ def ocean_material_control_port_packet(
         "roughness": bounded_float(material.get("roughness"), 0.28, 0.02, 1.0),
         "foam": bounded_float(material.get("foam"), 0.12, 0.0, 1.0),
     }
+    performance_budget_presets = {
+        "safe_preview": {
+            "label": "Safe preview",
+            "wave_strength": 0.08,
+            "roughness": 0.12,
+            "foam": 0.02,
+            "intent": "lowest-cost interactive orientation",
+        },
+        "balanced": {
+            "label": "Balanced research",
+            "wave_strength": 0.22,
+            "roughness": 0.28,
+            "foam": 0.12,
+            "intent": "default scientific review",
+        },
+        "research_detail": {
+            "label": "Research detail",
+            "wave_strength": 0.34,
+            "roughness": 0.38,
+            "foam": 0.18,
+            "intent": "higher-detail still capture or short inspection",
+        },
+    }
+    performance_budget = str(material.get("performance_budget") or "balanced")
+    if performance_budget not in performance_budget_presets:
+        performance_budget = "balanced"
+    cost_multipliers = {"safe_preview": 0.55, "balanced": 1.0, "research_detail": 1.35}
+    scalar_intensity = (
+        controls["wave_strength"] * 0.45
+        + controls["roughness"] * 0.35
+        + controls["foam"] * 0.20
+    )
+    interactive_cost_score = round(scalar_intensity * cost_multipliers[performance_budget], 3)
+    if interactive_cost_score <= 0.18:
+        interactive_cost_tier = "safe"
+        interactive_cost_advice = "responsive preview budget"
+    elif interactive_cost_score <= 0.32:
+        interactive_cost_tier = "moderate"
+        interactive_cost_advice = "usable for review; switch to safe preview if orbiting feels slow"
+    elif interactive_cost_score <= 0.50:
+        interactive_cost_tier = "high"
+        interactive_cost_advice = "prefer still review or safe preview before long interaction"
+    else:
+        interactive_cost_tier = "capture_only"
+        interactive_cost_advice = "best for still capture; not recommended for live orbit review"
+    interactive_cost_estimate = {
+        "schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+        "score": interactive_cost_score,
+        "tier": interactive_cost_tier,
+        "advice": interactive_cost_advice,
+        "budget": performance_budget,
+        "scalar_intensity": round(scalar_intensity, 3),
+        "inputs": dict(controls),
+        "boundary": "UI-side relative estimate only; measured render-loop telemetry remains a post-decoupling optimization task.",
+    }
     renderer_flags = ["--ocean-wave-strength", "--ocean-roughness", "--ocean-foam"]
     taichi_uniforms = ["ocean_enabled", "wave_strength", "roughness", "foam", "time_seconds"]
     summary_parameter_fields = [
@@ -1721,6 +1776,9 @@ def ocean_material_control_port_packet(
         "wave_strength",
         "roughness",
         "foam",
+        "performance_budget",
+        "interactive_cost_tier",
+        "interactive_cost_score",
         "renderer_apply_status",
         "sea_state_status",
         "sea_state_scalar_sample_schema",
@@ -1731,12 +1789,17 @@ def ocean_material_control_port_packet(
         "source": source,
         "enabled": bool(material.get("enabled", True)),
         "material_controls": controls,
+        "performance_budget": performance_budget,
+        "performance_budget_preset": performance_budget_presets[performance_budget],
+        "performance_budget_presets": performance_budget_presets,
+        "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+        "interactive_cost_estimate": interactive_cost_estimate,
         "renderer_flags": renderer_flags,
         "taichi_uniforms": taichi_uniforms,
         "ocean_material_summary_contract_schema": "rrkal_displaytools.ocean_material_summary_contract.v1",
         "ocean_material_summary_contract": {
             "schema": "rrkal_displaytools.ocean_material_summary_contract.v1",
-            "summary_format": "Ocean material: enabled={enabled}; wave={wave_strength}; roughness={roughness}; foam={foam}; apply={renderer_apply_status}; sea_state={sea_state_status}; sample={sea_state_scalar_sample_schema}; flags={renderer_flags}; governance=RRKAL-owned provider/cache",
+            "summary_format": "Ocean material: enabled={enabled}; wave={wave_strength}; roughness={roughness}; foam={foam}; budget={performance_budget}; cost={interactive_cost_tier}/{interactive_cost_score}; apply={renderer_apply_status}; sea_state={sea_state_status}; sample={sea_state_scalar_sample_schema}; flags={renderer_flags}; governance=RRKAL-owned provider/cache",
             "summary_parameter_fields": summary_parameter_fields,
             "qt_copy_action": "copy_ocean_material_summary",
             "portable": True,
@@ -1749,6 +1812,8 @@ def ocean_material_control_port_packet(
             "dock_object": "propertiesDock",
             "label_object": "taichiOcean3DControlPanel",
             "button_object": "taichiOcean3DControlButton",
+            "dialog_cost_label_object": "ocean3DDialogCostEstimate",
+            "dialog_safe_preview_button_object": "ocean3DDialogSafePreviewButton",
             "control_board_surface": "Layers dock quick strip",
             "control_board_label_object": "ocean3DControlBoardStrip",
             "control_board_button_object": "ocean3DControlBoardButton",
@@ -1758,6 +1823,13 @@ def ocean_material_control_port_packet(
             "performance_guard_action": "apply_ocean_3d_safe_preview",
             "performance_guard_preset": {"wave_strength": 0.08, "roughness": 0.12, "foam": 0.02},
             "performance_guard_boundary": "Safe preview lowers scalar ocean-material intensity only; true renderer pass reduction remains the layer render-plan merge follow-up.",
+            "performance_budget_combo_object": "ocean3DPerformanceBudgetCombo",
+            "performance_budget_label_object": "ocean3DPerformanceBudgetStrip",
+            "performance_budget_apply_action": "apply_ocean_3d_budget",
+            "performance_budget_selected": performance_budget,
+            "performance_budget_preset": performance_budget_presets[performance_budget],
+            "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+            "interactive_cost_estimate_field": "interactive_cost_estimate",
             "performance_guard_summary_contract_schema": "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1",
             "performance_guard_summary_contract": {
                 "schema": "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1",
@@ -1791,6 +1863,13 @@ def ocean_material_control_port_packet(
             "performance_guard_label_object": "ocean3DPerformanceGuardStrip",
             "performance_guard_button_object": "ocean3DPerformanceSafePreviewButton",
             "performance_guard_action": "apply_ocean_3d_safe_preview",
+            "dialog_cost_label_object": "ocean3DDialogCostEstimate",
+            "dialog_safe_preview_button_object": "ocean3DDialogSafePreviewButton",
+            "performance_budget_combo_object": "ocean3DPerformanceBudgetCombo",
+            "performance_budget_label_object": "ocean3DPerformanceBudgetStrip",
+            "performance_budget_apply_action": "apply_ocean_3d_budget",
+            "performance_budget_selected": performance_budget,
+            "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
             "dialog_action": "open_taichi_ocean_3d_controls",
             "performance_followup": "post_decoupling_precompute_layer_render_plan_then_single_render_pass",
             "user_issue": "Ocean 3D controls must be visible from the control board, not only the Properties dock.",

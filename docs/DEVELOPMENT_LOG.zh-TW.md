@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - Ocean 3D dialog cost estimate
+
+- Added `rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1` to the Ocean material control port in Qt launch packets, no-GUI launch packets and renderer capability discovery.
+- Added `ocean3DDialogCostEstimate` and `ocean3DDialogSafePreviewButton` to the Taichi 3D Ocean dialog so researchers can see relative interaction cost and switch to the low-cost preset before live orbit review.
+- Kept this as a UI/runtime-scalar guard only; measured render-loop telemetry and render-pass reduction remain post-decoupling work.
+- Smoke: PASS via `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`; cloud-drive transient file-access retries occurred and recovered.
+
 ## 2026-05-31 - Agent Exchange workflow adoption
 
 - Adopted `L:\AGENT_EXCHANGE` as an advisory cross-agent read-check in the displaytools workflow.

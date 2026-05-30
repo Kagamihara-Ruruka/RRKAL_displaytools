@@ -921,6 +921,35 @@ def ocean_material_control_port_packet(
     performance_budget = str(material.get("performance_budget") or "balanced")
     if performance_budget not in performance_budget_presets:
         performance_budget = "balanced"
+    cost_multipliers = {"safe_preview": 0.55, "balanced": 1.0, "research_detail": 1.35}
+    scalar_intensity = (
+        controls["wave_strength"] * 0.45
+        + controls["roughness"] * 0.35
+        + controls["foam"] * 0.20
+    )
+    interactive_cost_score = round(scalar_intensity * cost_multipliers[performance_budget], 3)
+    if interactive_cost_score <= 0.18:
+        interactive_cost_tier = "safe"
+        interactive_cost_advice = "responsive preview budget"
+    elif interactive_cost_score <= 0.32:
+        interactive_cost_tier = "moderate"
+        interactive_cost_advice = "usable for review; switch to safe preview if orbiting feels slow"
+    elif interactive_cost_score <= 0.50:
+        interactive_cost_tier = "high"
+        interactive_cost_advice = "prefer still review or safe preview before long interaction"
+    else:
+        interactive_cost_tier = "capture_only"
+        interactive_cost_advice = "best for still capture; not recommended for live orbit review"
+    interactive_cost_estimate = {
+        "schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+        "score": interactive_cost_score,
+        "tier": interactive_cost_tier,
+        "advice": interactive_cost_advice,
+        "budget": performance_budget,
+        "scalar_intensity": round(scalar_intensity, 3),
+        "inputs": dict(controls),
+        "boundary": "UI-side relative estimate only; measured render-loop telemetry remains a post-decoupling optimization task.",
+    }
     renderer_flags = ["--ocean-wave-strength", "--ocean-roughness", "--ocean-foam"]
     taichi_uniforms = ["ocean_enabled", "wave_strength", "roughness", "foam", "time_seconds"]
     summary_parameter_fields = [
@@ -929,6 +958,8 @@ def ocean_material_control_port_packet(
         "roughness",
         "foam",
         "performance_budget",
+        "interactive_cost_tier",
+        "interactive_cost_score",
         "renderer_apply_status",
         "sea_state_status",
         "sea_state_scalar_sample_schema",
@@ -942,12 +973,14 @@ def ocean_material_control_port_packet(
         "performance_budget": performance_budget,
         "performance_budget_preset": performance_budget_presets[performance_budget],
         "performance_budget_presets": performance_budget_presets,
+        "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+        "interactive_cost_estimate": interactive_cost_estimate,
         "renderer_flags": renderer_flags,
         "taichi_uniforms": taichi_uniforms,
         "ocean_material_summary_contract_schema": "rrkal_displaytools.ocean_material_summary_contract.v1",
         "ocean_material_summary_contract": {
             "schema": "rrkal_displaytools.ocean_material_summary_contract.v1",
-            "summary_format": "Ocean material: enabled={enabled}; wave={wave_strength}; roughness={roughness}; foam={foam}; budget={performance_budget}; apply={renderer_apply_status}; sea_state={sea_state_status}; sample={sea_state_scalar_sample_schema}; flags={renderer_flags}; governance=RRKAL-owned provider/cache",
+            "summary_format": "Ocean material: enabled={enabled}; wave={wave_strength}; roughness={roughness}; foam={foam}; budget={performance_budget}; cost={interactive_cost_tier}/{interactive_cost_score}; apply={renderer_apply_status}; sea_state={sea_state_status}; sample={sea_state_scalar_sample_schema}; flags={renderer_flags}; governance=RRKAL-owned provider/cache",
             "summary_parameter_fields": summary_parameter_fields,
             "qt_copy_action": "copy_ocean_material_summary",
             "portable": True,
@@ -960,6 +993,8 @@ def ocean_material_control_port_packet(
             "dock_object": "propertiesDock",
             "label_object": "taichiOcean3DControlPanel",
             "button_object": "taichiOcean3DControlButton",
+            "dialog_cost_label_object": "ocean3DDialogCostEstimate",
+            "dialog_safe_preview_button_object": "ocean3DDialogSafePreviewButton",
             "control_board_surface": "Layers dock quick strip",
             "control_board_label_object": "ocean3DControlBoardStrip",
             "control_board_button_object": "ocean3DControlBoardButton",
@@ -974,6 +1009,8 @@ def ocean_material_control_port_packet(
             "performance_budget_apply_action": "apply_ocean_3d_budget",
             "performance_budget_selected": performance_budget,
             "performance_budget_preset": performance_budget_presets[performance_budget],
+            "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
+            "interactive_cost_estimate_field": "interactive_cost_estimate",
             "performance_guard_summary_contract_schema": "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1",
             "performance_guard_summary_contract": {
                 "schema": "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1",
@@ -1007,10 +1044,13 @@ def ocean_material_control_port_packet(
             "performance_guard_label_object": "ocean3DPerformanceGuardStrip",
             "performance_guard_button_object": "ocean3DPerformanceSafePreviewButton",
             "performance_guard_action": "apply_ocean_3d_safe_preview",
+            "dialog_cost_label_object": "ocean3DDialogCostEstimate",
+            "dialog_safe_preview_button_object": "ocean3DDialogSafePreviewButton",
             "performance_budget_combo_object": "ocean3DPerformanceBudgetCombo",
             "performance_budget_label_object": "ocean3DPerformanceBudgetStrip",
             "performance_budget_apply_action": "apply_ocean_3d_budget",
             "performance_budget_selected": performance_budget,
+            "interactive_cost_estimate_schema": "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1",
             "dialog_action": "open_taichi_ocean_3d_controls",
             "performance_followup": "post_decoupling_precompute_layer_render_plan_then_single_render_pass",
             "user_issue": "Ocean 3D controls must be visible from the control board, not only the Properties dock.",
@@ -5157,12 +5197,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         packet = self.collect_ocean_material_control_port()
         controls = packet.get("material_controls") if isinstance(packet.get("material_controls"), dict) else {}
         panel = packet.get("qt_control_panel") if isinstance(packet.get("qt_control_panel"), dict) else {}
+        cost = packet.get("interactive_cost_estimate") if isinstance(packet.get("interactive_cost_estimate"), dict) else {}
         return (
             "Taichi 3D Ocean: "
             f"wave={controls.get('wave_strength')}; "
             f"roughness={controls.get('roughness')}; "
             f"foam={controls.get('foam')}; "
             f"budget={packet.get('performance_budget', 'balanced')}; "
+            f"cost={cost.get('tier', 'unknown')}/{cost.get('score', '-')}; "
             f"board={panel.get('control_board_status', 'wired_default_visible')}; "
             f"dialog={panel.get('qt_dialog_action', 'open_taichi_ocean_3d_controls')}; "
             f"followup={panel.get('render_pipeline_followup', 'post_decoupling_precompute_layer_render_plan_then_single_render_pass')}"
@@ -5182,11 +5224,24 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     def ocean_3d_performance_budget_text(self) -> str:
         packet = self.collect_ocean_material_control_port()
         preset = packet.get("performance_budget_preset") if isinstance(packet.get("performance_budget_preset"), dict) else {}
+        cost = packet.get("interactive_cost_estimate") if isinstance(packet.get("interactive_cost_estimate"), dict) else {}
         return (
             "Ocean 3D budget: "
             f"{packet.get('performance_budget', 'balanced')} / {preset.get('label', 'Balanced research')}; "
+            f"cost={cost.get('tier', 'unknown')} score={cost.get('score', '-')}; "
             f"intent={preset.get('intent', 'default scientific review')}; "
             "renderer-pass merge remains queued after module decoupling"
+        )
+
+    def ocean_3d_interactive_cost_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet if isinstance(packet, dict) else self.collect_ocean_material_control_port()
+        cost = packet.get("interactive_cost_estimate") if isinstance(packet.get("interactive_cost_estimate"), dict) else {}
+        return (
+            "Ocean 3D interaction cost: "
+            f"tier={cost.get('tier', 'unknown')}; "
+            f"score={cost.get('score', '-')}; "
+            f"budget={cost.get('budget', packet.get('performance_budget', 'balanced'))}; "
+            f"advice={cost.get('advice', 'safe preview remains available')}"
         )
 
     def ocean_3d_performance_guard_text(self) -> str:
@@ -5215,6 +5270,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "dialog_action": panel.get("qt_dialog_action", "open_taichi_ocean_3d_controls"),
             "safe_preview_action": panel.get("performance_guard_action", "apply_ocean_3d_safe_preview"),
             "safe_preview_button_object": panel.get("performance_guard_button_object", "ocean3DPerformanceSafePreviewButton"),
+            "dialog_cost_label_object": panel.get("dialog_cost_label_object", "ocean3DDialogCostEstimate"),
+            "dialog_safe_preview_button_object": panel.get("dialog_safe_preview_button_object", "ocean3DDialogSafePreviewButton"),
+            "interactive_cost_estimate_schema": panel.get("interactive_cost_estimate_schema", "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1"),
             "render_pipeline_followup": panel.get("render_pipeline_followup", "post_decoupling_precompute_layer_render_plan_then_single_render_pass"),
             "boundary": "Qt exposes visibility and scalar controls only; render-pass merge remains queued for post-decoupling optimization.",
         }
@@ -5296,6 +5354,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         summary.setWordWrap(True)
         layout.addWidget(summary)
         packet = self.collect_ocean_material_control_port()
+        cost_label = QtWidgets.QLabel(self.ocean_3d_interactive_cost_text(packet))
+        cost_label.setObjectName("ocean3DDialogCostEstimate")
+        cost_label.setWordWrap(True)
+        cost_label.setStyleSheet(
+            "QLabel#ocean3DDialogCostEstimate { color:#4b3515; background:#fff6df; "
+            "border:1px solid #caa85a; border-radius:8px; padding:6px 8px; font-weight:600; }"
+        )
+        layout.addWidget(cost_label)
         budget_presets = packet.get("performance_budget_presets") if isinstance(packet.get("performance_budget_presets"), dict) else {}
         form = QtWidgets.QFormLayout()
         budget_combo = QtWidgets.QComboBox()
@@ -5326,6 +5392,20 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         form.addRow("Foam", foam_spin)
         layout.addLayout(form)
 
+        def dialog_packet() -> dict[str, object]:
+            return ocean_material_control_port_packet(
+                {
+                    "wave_strength": wave_spin.value(),
+                    "roughness": roughness_spin.value(),
+                    "foam": foam_spin.value(),
+                    "performance_budget": str(budget_combo.currentData() or self.current_ocean_3d_performance_budget()),
+                },
+                "rrkal_displaytools_qt_panel.dialog",
+            )
+
+        def refresh_dialog_cost() -> None:
+            cost_label.setText(self.ocean_3d_interactive_cost_text(dialog_packet()))
+
         def apply_budget_to_spinboxes() -> None:
             preset = budget_presets.get(str(budget_combo.currentData())) if isinstance(budget_presets, dict) else None
             if not isinstance(preset, dict):
@@ -5333,20 +5413,33 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             wave_spin.setValue(bounded(preset.get("wave_strength"), 0.22, 0.0, 1.0))
             roughness_spin.setValue(bounded(preset.get("roughness"), 0.28, 0.02, 1.0))
             foam_spin.setValue(bounded(preset.get("foam"), 0.12, 0.0, 1.0))
+            refresh_dialog_cost()
 
         budget_combo.currentIndexChanged.connect(lambda _index: apply_budget_to_spinboxes())
+        for spin in (wave_spin, roughness_spin, foam_spin):
+            spin.valueChanged.connect(lambda _value: refresh_dialog_cost())
         performance_note = QtWidgets.QLabel(
             "Performance queue: after module decoupling, precompute a layer render plan and feed one combined render pass instead of independent layer renders."
         )
         performance_note.setWordWrap(True)
         layout.addWidget(performance_note)
         button_row = QtWidgets.QHBoxLayout()
+        dialog_safe_preview_button = QtWidgets.QPushButton("Safe preview")
+        dialog_safe_preview_button.setObjectName("ocean3DDialogSafePreviewButton")
         apply_button = QtWidgets.QPushButton("Apply to Qt profile")
         close_button = QtWidgets.QPushButton("Close")
         button_row.addStretch(1)
+        button_row.addWidget(dialog_safe_preview_button)
         button_row.addWidget(apply_button)
         button_row.addWidget(close_button)
         layout.addLayout(button_row)
+
+        def apply_safe_preview_to_dialog() -> None:
+            safe_index = budget_combo.findData("safe_preview")
+            if safe_index >= 0:
+                budget_combo.setCurrentIndex(safe_index)
+            apply_budget_to_spinboxes()
+            refresh_dialog_cost()
 
         def apply_values() -> None:
             self.wave_edit.setText(scalar_text(wave_spin.value()))
@@ -5363,8 +5456,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.refresh_canvas_preview()
             self.refresh_ocean_3d_control_summary()
             summary.setText(self.ocean_3d_control_summary_text())
+            cost_label.setText(self.ocean_3d_interactive_cost_text())
             self.status.setText("Applied Taichi 3D Ocean Water controls")
 
+        dialog_safe_preview_button.clicked.connect(apply_safe_preview_to_dialog)
         apply_button.clicked.connect(apply_values)
         close_button.clicked.connect(dialog.accept)
         dialog.exec()
@@ -5388,6 +5483,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"roughness={controls.get('roughness')}; "
             f"foam={controls.get('foam')}; "
             f"budget={packet.get('performance_budget', 'balanced')}; "
+            f"cost={packet.get('interactive_cost_estimate', {}).get('tier', 'unknown')}/"
+            f"{packet.get('interactive_cost_estimate', {}).get('score', '-')}; "
             f"apply={apply_contract.get('status', 'unknown')}; "
             f"sea_state={sea_state.get('status', 'unknown')}; "
             f"sample={scalar_sample.get('schema', 'rrkal_displaytools.sea_state_scalar_sample.v1')}; "

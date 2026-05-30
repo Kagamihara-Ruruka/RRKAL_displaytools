@@ -1564,6 +1564,21 @@ if ($launchPacket.ocean_material_control_port.qt_control_panel.performance_guard
 if ($launchPacket.ocean_material_control_port.qt_control_panel.performance_guard_action -ne "apply_ocean_3d_safe_preview") {
     throw "Launch packet Taichi ocean 3D safe preview action missing"
 }
+if ($launchPacket.ocean_material_control_port.qt_control_panel.dialog_cost_label_object -ne "ocean3DDialogCostEstimate") {
+    throw "Launch packet Taichi ocean 3D dialog cost label missing"
+}
+if ($launchPacket.ocean_material_control_port.qt_control_panel.dialog_safe_preview_button_object -ne "ocean3DDialogSafePreviewButton") {
+    throw "Launch packet Taichi ocean 3D dialog safe preview button missing"
+}
+if ($launchPacket.ocean_material_control_port.interactive_cost_estimate_schema -ne "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1") {
+    throw "Launch packet Ocean 3D interactive cost estimate schema missing"
+}
+if ($launchPacket.ocean_material_control_port.interactive_cost_estimate.schema -ne "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1") {
+    throw "Launch packet Ocean 3D interactive cost estimate payload missing"
+}
+if (@("safe", "moderate", "high", "capture_only") -notcontains $launchPacket.ocean_material_control_port.interactive_cost_estimate.tier) {
+    throw "Launch packet Ocean 3D interactive cost tier invalid"
+}
 if ($launchPacket.ocean_material_control_port.qt_control_panel.performance_guard_summary_contract.schema -ne "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1") {
     throw "Launch packet Ocean 3D performance guard summary contract missing"
 }
@@ -2837,6 +2852,21 @@ if ($capabilities.ocean_material_control_port.qt_control_panel.performance_guard
 }
 if ($capabilities.ocean_material_control_port.qt_control_panel.performance_guard_action -ne "apply_ocean_3d_safe_preview") {
     throw "Renderer Taichi ocean 3D safe preview action missing"
+}
+if ($capabilities.ocean_material_control_port.qt_control_panel.dialog_cost_label_object -ne "ocean3DDialogCostEstimate") {
+    throw "Renderer Taichi ocean 3D dialog cost label missing"
+}
+if ($capabilities.ocean_material_control_port.qt_control_panel.dialog_safe_preview_button_object -ne "ocean3DDialogSafePreviewButton") {
+    throw "Renderer Taichi ocean 3D dialog safe preview button missing"
+}
+if ($capabilities.ocean_material_control_port.interactive_cost_estimate_schema -ne "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1") {
+    throw "Renderer Ocean 3D interactive cost estimate schema missing"
+}
+if ($capabilities.ocean_material_control_port.interactive_cost_estimate.schema -ne "rrkal_displaytools.taichi_ocean_3d_interactive_cost_estimate.v1") {
+    throw "Renderer Ocean 3D interactive cost estimate payload missing"
+}
+if (@("safe", "moderate", "high", "capture_only") -notcontains $capabilities.ocean_material_control_port.interactive_cost_estimate.tier) {
+    throw "Renderer Ocean 3D interactive cost tier invalid"
 }
 if ($capabilities.ocean_material_control_port.qt_control_panel.performance_guard_summary_contract.schema -ne "rrkal_displaytools.taichi_ocean_3d_performance_guard_summary_contract.v1") {
     throw "Renderer Ocean 3D performance guard summary contract missing"
