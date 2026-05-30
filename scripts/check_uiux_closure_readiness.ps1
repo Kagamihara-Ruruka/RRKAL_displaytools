@@ -1,0 +1,147 @@
+param(
+    [switch]$ContractOnly
+)
+
+$ErrorActionPreference = "Stop"
+
+$RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
+Set-Location $RepoRoot
+
+$scriptName = "scripts/check_uiux_closure_readiness.ps1"
+
+function Invoke-JsonPowerShell {
+    param([string[]]$ArgumentList)
+
+    $text = $null
+    $lastOutput = $null
+    for ($attempt = 1; $attempt -le 4; $attempt++) {
+        $text = & powershell @ArgumentList 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            $lastOutput = $text
+            break
+        }
+        $lastOutput = $text
+        if ($attempt -lt 4) {
+            Start-Sleep -Milliseconds ([int](250 * $attempt))
+        }
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Command failed: powershell $($ArgumentList -join ' ')`n$($lastOutput -join "`n")"
+    }
+    $raw = $text -join "`n"
+    $jsonStart = $raw.IndexOf("{")
+    if ($jsonStart -lt 0) {
+        throw "JSON payload not found: powershell $($ArgumentList -join ' ')"
+    }
+    return $raw.Substring($jsonStart) | ConvertFrom-Json
+}
+
+if ($ContractOnly) {
+    [ordered]@{
+        schema = "rrkal_displaytools.uiux_closure_readiness_check.v1"
+        source = $scriptName
+        status = "contract_only_no_state_write"
+        output_schema = "rrkal_displaytools.uiux_closure_readiness_check_result.v1"
+        checks = @(
+            "review_packet_ready",
+            "required_uiux_inspectors_registered",
+            "qt_first_primary_ui",
+            "uiux_closure_queued_items_visible",
+            "timeline_pending_items_visible",
+            "layer_preset_selection_scope_ok",
+            "layer_shortcuts_ready",
+            "research_interaction_ready",
+            "renderer_ports_ready",
+            "render_plan_runtime_merge_blocked"
+        )
+        command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_uiux_closure_readiness.ps1"
+        boundary = "Check reads no-GUI UIUX/reviewer contracts only; it does not write state, launch Qt/Taichi, move renderer code, or touch RRKAL discovery/download/import/cache governance."
+        portable = $true
+    } | ConvertTo-Json -Depth 8
+    exit 0
+}
+
+$reviewPacket = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\export_visual_contract_review_packet.ps1")
+$qtUiux = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_qt_uiux_surface.ps1")
+$uiuxClosure = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_uiux_closure_status.ps1")
+$timeline = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_timeline_uiux.ps1")
+$layerPresets = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_layer_visual_presets.ps1")
+$layerShortcuts = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_layer_operator_shortcuts.ps1")
+$research = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_research_interaction.ps1")
+$hydrology = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_hydrology_lod.ps1")
+$ocean = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_ocean_material.ps1")
+$renderPlan = Invoke-JsonPowerShell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\inspect_layer_render_plan_performance.ps1")
+
+$requiredInspectorIds = @(
+    "qt_uiux_surface",
+    "uiux_closure_status",
+    "timeline_uiux",
+    "layer_visual_presets",
+    "layer_operator_shortcuts",
+    "research_interaction",
+    "hydrology_lod",
+    "ocean_material",
+    "layer_render_plan_performance"
+)
+$inspectorIds = @($reviewPacket.inspector_entry_ids)
+
+$checks = [ordered]@{
+    review_packet_ready = ($reviewPacket.status -eq "ready")
+    required_uiux_inspectors_registered = (@($requiredInspectorIds | Where-Object { $inspectorIds -notcontains $_ }).Count -eq 0)
+    qt_first_primary_ui = ($qtUiux.qt_first -eq $true -and $qtUiux.tk_primary_ui_allowed -eq $false)
+    uiux_closure_queued_items_visible = (
+        $uiuxClosure.construction_status -eq "queued_items_visible_not_claimed_done" -and
+        $uiuxClosure.performance_followup_status -eq "queued_until_render_plan_decoupling_and_parity"
+    )
+    timeline_pending_items_visible = (
+        $timeline.construction_status -eq "timeline_contract_ready_with_visible_pending_items" -and
+        @($timeline.readiness_pending) -contains "blend_crossfade_interpolation" -and
+        @($timeline.readiness_pending) -contains "visibility_fade_interpolation"
+    )
+    layer_preset_selection_scope_ok = (
+        @($layerPresets.preset_ids) -contains "hydrology_focus" -and
+        @($layerPresets.preset_ids) -contains "boundary_focus" -and
+        $layerPresets.brush_mask_scope -eq "excluded" -and
+        $layerPresets.selection_tool_mode -eq "select_layer"
+    )
+    layer_shortcuts_ready = (
+        $layerShortcuts.ui_direction -eq "qt_first_photoshop_like_layer_operations" -and
+        @($layerShortcuts.implemented_action_ids) -contains "select_layer" -and
+        @($layerShortcuts.installed_shortcut_ids) -contains "undo_layer_state"
+    )
+    research_interaction_ready = (
+        @($research.research_interaction_action_ids) -contains "pin_pick" -and
+        @($research.research_interaction_action_ids) -contains "cursor_geo" -and
+        @($research.research_interaction_action_ids) -contains "boundary_json"
+    )
+    renderer_ports_ready = (
+        $hydrology.schema -eq "rrkal_displaytools.hydrology_lod_inspection.v1" -and
+        $ocean.schema -eq "rrkal_displaytools.ocean_material_inspection.v1"
+    )
+    render_plan_runtime_merge_blocked = (
+        $renderPlan.optimization_target -eq "precompute_layer_state_then_single_render_pass" -and
+        $renderPlan.compose_runtime_merge_enabled -eq $false -and
+        $renderPlan.merge_preflight_runtime_merge_enabled -eq $false
+    )
+}
+
+$failed = @($checks.GetEnumerator() | Where-Object { $_.Value -ne $true } | ForEach-Object { $_.Key })
+if ($failed.Count -gt 0) {
+    throw "UIUX closure readiness check failed: $($failed -join ', ')"
+}
+
+[ordered]@{
+    schema = "rrkal_displaytools.uiux_closure_readiness_check_result.v1"
+    source = $scriptName
+    status = "pass"
+    ready_for_pre_07_uiux_review = $true
+    inspector_count = $reviewPacket.inspector_entry_count
+    required_inspector_ids = $requiredInspectorIds
+    checks = $checks
+    failed_checks = @()
+    queued_items_visible = $true
+    runtime_merge_enabled = $false
+    next_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\export_visual_contract_review_packet.ps1"
+    boundary = "UIUX closure readiness is no-GUI preflight only; renderer extraction still starts only after the 2026-05-31T07:00:00+08:00 gate."
+    portable = $true
+} | ConvertTo-Json -Depth 10

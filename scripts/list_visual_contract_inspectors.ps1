@@ -61,6 +61,14 @@ $entries = @(
         no_launch_side_effect = $true
     },
     [ordered]@{
+        id = "uiux_closure_readiness_check"
+        category = "uiux"
+        schema = "rrkal_displaytools.uiux_closure_readiness_check.v1"
+        command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_uiux_closure_readiness.ps1"
+        proves = @("aggregated UIUX pass/fail", "queued items visible", "Qt-first boundary", "runtime merge blocked")
+        no_launch_side_effect = $true
+    },
+    [ordered]@{
         id = "layer_visual_presets"
         category = "layer_control"
         schema = "rrkal_displaytools.layer_visual_presets_inspector.v1"
@@ -180,6 +188,7 @@ $entries = @(
         "qt_uiux_surface",
         "uiux_closure_status",
         "timeline_uiux",
+        "uiux_closure_readiness_check",
         "layer_visual_presets",
         "layer_operator_shortcuts",
         "research_interaction",

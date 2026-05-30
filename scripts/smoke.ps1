@@ -1199,6 +1199,9 @@ if ($visualInspectorIndex.entry_ids -notcontains "uiux_closure_status") {
 if ($visualInspectorIndex.entry_ids -notcontains "timeline_uiux") {
     throw "Visual contract inspector index missing Timeline UIUX inspector"
 }
+if ($visualInspectorIndex.entry_ids -notcontains "uiux_closure_readiness_check") {
+    throw "Visual contract inspector index missing UIUX closure readiness check"
+}
 if ($visualInspectorIndex.entry_ids -notcontains "layer_visual_presets") {
     throw "Visual contract inspector index missing Layer visual presets inspector"
 }
@@ -1285,6 +1288,9 @@ if ($visualReviewPacket.inspector_entry_ids -notcontains "uiux_closure_status") 
 if ($visualReviewPacket.inspector_entry_ids -notcontains "timeline_uiux") {
     throw "Visual contract review packet missing Timeline UIUX inspector"
 }
+if ($visualReviewPacket.inspector_entry_ids -notcontains "uiux_closure_readiness_check") {
+    throw "Visual contract review packet missing UIUX closure readiness check"
+}
 if ($visualReviewPacket.inspector_entry_ids -notcontains "layer_visual_presets") {
     throw "Visual contract review packet missing Layer visual presets inspector"
 }
@@ -1314,6 +1320,9 @@ if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -Exec
 }
 if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_timeline_uiux.ps1") {
     throw "Visual contract review packet missing Timeline UIUX first command"
+}
+if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_uiux_closure_readiness.ps1") {
+    throw "Visual contract review packet missing UIUX closure readiness check first command"
 }
 if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_visual_presets.ps1") {
     throw "Visual contract review packet missing Layer visual presets first command"
@@ -1688,6 +1697,38 @@ if ($timelineUiuxInspectorPacket.readiness_pending -notcontains "visibility_fade
 }
 if ($timelineUiuxInspectorPacket.construction_status -ne "timeline_contract_ready_with_visible_pending_items") {
     throw "Timeline UIUX construction status mismatch"
+}
+$uiuxClosureReadinessCheckPath = Join-Path $RepoRoot "scripts\check_uiux_closure_readiness.ps1"
+if (-not (Test-Path -LiteralPath $uiuxClosureReadinessCheckPath)) {
+    throw "UIUX closure readiness check script is missing"
+}
+$uiuxClosureReadinessCheckContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $uiuxClosureReadinessCheckPath, "-ContractOnly")
+$uiuxClosureReadinessCheckContract = ($uiuxClosureReadinessCheckContractText -join "`n") | ConvertFrom-Json
+if ($uiuxClosureReadinessCheckContract.schema -ne "rrkal_displaytools.uiux_closure_readiness_check.v1") {
+    throw "UIUX closure readiness check contract schema missing"
+}
+if ($uiuxClosureReadinessCheckContract.output_schema -ne "rrkal_displaytools.uiux_closure_readiness_check_result.v1") {
+    throw "UIUX closure readiness check output schema missing"
+}
+if ($uiuxClosureReadinessCheckContract.checks -notcontains "render_plan_runtime_merge_blocked") {
+    throw "UIUX closure readiness check runtime merge guard missing"
+}
+$uiuxClosureReadinessCheckText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $uiuxClosureReadinessCheckPath)
+$uiuxClosureReadinessCheck = ($uiuxClosureReadinessCheckText -join "`n") | ConvertFrom-Json
+if ($uiuxClosureReadinessCheck.schema -ne "rrkal_displaytools.uiux_closure_readiness_check_result.v1") {
+    throw "UIUX closure readiness check result schema missing"
+}
+if ($uiuxClosureReadinessCheck.status -ne "pass") {
+    throw "UIUX closure readiness check did not pass"
+}
+if ($uiuxClosureReadinessCheck.ready_for_pre_07_uiux_review -ne $true) {
+    throw "UIUX closure readiness check pre-07 readiness missing"
+}
+if ($uiuxClosureReadinessCheck.queued_items_visible -ne $true) {
+    throw "UIUX closure readiness check queued visibility missing"
+}
+if ($uiuxClosureReadinessCheck.runtime_merge_enabled -ne $false) {
+    throw "UIUX closure readiness check must keep runtime merge disabled"
 }
 $layerVisualPresetsInspectorPath = Join-Path $RepoRoot "scripts\inspect_layer_visual_presets.ps1"
 if (-not (Test-Path -LiteralPath $layerVisualPresetsInspectorPath)) {

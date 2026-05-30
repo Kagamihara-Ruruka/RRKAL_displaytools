@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - UIUX closure readiness check
+
+- Added `scripts/check_uiux_closure_readiness.ps1` as a no-GUI pass/fail check over the UIUX inspector set.
+- Registered the check in the visual contract inspector index, cross-machine review packet and smoke gates.
+- The check verifies Qt-first UI, visible queued items, Timeline pending items, layer presets/shortcuts, research interaction, renderer ports and disabled render-plan runtime merge.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`).
+
 ## 2026-05-31 - Timeline UIUX inspector
 
 - Added `scripts/inspect_timeline_uiux.ps1` as a no-GUI reviewer packet for timeline playback readiness, runtime handoff, animation export, layer opacity interpolation and layer visibility/blend discrete hold.
