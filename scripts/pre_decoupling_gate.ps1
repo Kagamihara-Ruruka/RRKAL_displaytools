@@ -36,10 +36,12 @@ $gate = [ordered]@{
     first_extraction_id = $firstExtraction.id
     first_extraction_target = $firstExtraction.target_module
     required_before_move = @(
+        "clean git worktree",
         "scripts/smoke.ps1",
         "git diff --check",
         "docs/DEVELOPMENT_LOG.zh-TW.md smoke result"
     )
+    requires_clean_worktree = $true
     blocked_scope = @($readiness.phase_policy.post_07_decoupling.blocked)
     rrkal_boundary_rule = $readiness.rrkal_boundary.rule
     smoke_executed = $false
@@ -56,6 +58,13 @@ if ($gate.rrkal_boundary_rule -notmatch "Do not move discovery/download/import/c
 }
 
 if (-not $ContractOnly) {
+    $gitStatus = git status --porcelain
+    if ($LASTEXITCODE -ne 0) {
+        throw "Pre-decoupling git status failed"
+    }
+    if ($gitStatus) {
+        throw "Pre-decoupling gate requires a clean git worktree before moving renderer code"
+    }
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1
     if ($LASTEXITCODE -ne 0) {
         throw "Pre-decoupling smoke failed"

@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Pre-decoupling clean worktree guard
+
+Changes:
+- Strengthened `scripts/pre_decoupling_gate.ps1` so non-contract decoupling starts require a clean git worktree before moving renderer code.
+- Added `requires_clean_worktree=true` to the gate packet and smoke-gated the requirement.
+- This keeps the post-7 module extraction phase small, attributable and reversible.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Decoupling schedule gate metadata
 
 Changes:

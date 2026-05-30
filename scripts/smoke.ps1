@@ -5613,5 +5613,8 @@ if ($preDecouplingGate.first_extraction_id -ne "render_plan_compose") {
 if (-not $preDecouplingGate.ready) {
     throw "Pre-decoupling gate did not report ready"
 }
+if (-not $preDecouplingGate.requires_clean_worktree) {
+    throw "Pre-decoupling gate clean-worktree requirement missing"
+}
 
 Write-Host "Smoke passed."
