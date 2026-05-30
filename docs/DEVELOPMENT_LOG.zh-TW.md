@@ -1,5 +1,15 @@
 # Development Log
 
+## 2026-05-30 - Compiled render-plan cache key
+
+Changes:
+- Added `layer_render_plan_cache_key()` so compiled render plans can report whether the current plan was newly compiled or reused.
+- `compile_layer_render_plan()` now emits `cache_key` and `cache_status`, while preserving the current rendering path and `runtime_optimization_applied=false`.
+- Smoke gates now verify cache-key helper exposure across launch packets, renderer capabilities, handoff inspection and renderer source.
+
+Smoke:
+- PASS (`scripts/smoke.ps1`, before commit).
+
 ## 2026-05-30 - Compiled layer render-plan snapshot
 
 Changes:

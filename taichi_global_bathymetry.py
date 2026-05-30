@@ -14126,6 +14126,26 @@ class HybridRenderController:
                 frame = apply_style_profile(frame, getattr(self.args, "style_profile", "scientific"))
         return frame
 
+    def layer_render_plan_cache_key(
+        self,
+        runtime_snapshot: dict[str, object],
+        composition_steps: list[dict[str, object]],
+    ) -> str:
+        visible_layers = runtime_snapshot.get("visible_layers") if isinstance(runtime_snapshot.get("visible_layers"), list) else []
+        visible_layer_ids = [str(layer_id) for layer_id in visible_layers]
+        payload = {
+            "style_profile": getattr(self.args, "style_profile", "scientific"),
+            "visible_layers": visible_layer_ids,
+            "selected_layer_semantic_target": runtime_snapshot.get("selected_layer_semantic_target"),
+            "dirty_flags": runtime_snapshot.get("dirty_flags"),
+            "defer_vector_overlays": runtime_snapshot.get("defer_vector_overlays"),
+            "composition_ids": [str(step.get("id")) for step in composition_steps],
+            "boundary_layer_ids": sorted(str(layer_id) for layer_id in self.boundary_layer_rgba),
+            "layer_opacity": {layer_id: self.layer_opacity_percent(layer_id) for layer_id in visible_layer_ids},
+            "layer_blend": {layer_id: self.layer_blend_mode(layer_id) for layer_id in visible_layer_ids},
+        }
+        return json.dumps(payload, sort_keys=True, default=str)
+
     def compile_layer_render_plan(
         self,
         changed: bool | None = None,
@@ -14138,10 +14158,22 @@ class HybridRenderController:
             force=force,
             defer_vector_overlays=defer_vector_overlays,
         )
+        cache_key = self.layer_render_plan_cache_key(runtime_snapshot, composition_steps)
+        cached_plan = getattr(self, "compiled_layer_render_plan", None)
+        if isinstance(cached_plan, dict) and getattr(self, "compiled_layer_render_plan_cache_key", None) == cache_key:
+            plan = dict(cached_plan)
+            plan["cache_status"] = "reused"
+            plan["frame_index"] = int(getattr(self, "frame_index", 0))
+            plan["runtime_snapshot"] = runtime_snapshot
+            plan["dirty_flags"] = runtime_snapshot.get("dirty_flags", {})
+            return plan
+        self.compiled_layer_render_plan_cache_key = cache_key
         return {
             "schema": "rrkal_displaytools.compiled_layer_render_plan.v1",
             "source": "HybridRenderController.compile_layer_render_plan",
             "status": "compiled_snapshot",
+            "cache_status": "compiled",
+            "cache_key": cache_key,
             "runtime_optimization_applied": False,
             "optimization_target": "precompute_layer_state_then_single_render_pass",
             "frame_index": int(getattr(self, "frame_index", 0)),
@@ -19095,6 +19127,8 @@ def layer_render_plan_performance_packet(
         "composition_apply_helper": "HybridRenderController.apply_layer_render_plan_composition",
         "compiled_plan_schema": "rrkal_displaytools.compiled_layer_render_plan.v1",
         "compiled_plan_helper": "HybridRenderController.compile_layer_render_plan",
+        "compiled_plan_cache_key_helper": "HybridRenderController.layer_render_plan_cache_key",
+        "compiled_plan_cache_status_field": "cache_status",
         "metadata_sidecar_field": "layer_render_plan",
         "runtime_snapshot_wired": True,
         "deferred_until": "module_decoupling_boundary_contract_is_stable",

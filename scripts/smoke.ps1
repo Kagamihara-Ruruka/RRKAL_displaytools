@@ -518,6 +518,9 @@ if ($launchPacket.layer_render_plan_performance.composition_apply_helper -ne "Hy
 if ($launchPacket.layer_render_plan_performance.compiled_plan_schema -ne "rrkal_displaytools.compiled_layer_render_plan.v1") {
     throw "Launch packet layer_render_plan_performance compiled plan schema missing"
 }
+if ($launchPacket.layer_render_plan_performance.compiled_plan_cache_status_field -ne "cache_status") {
+    throw "Launch packet layer_render_plan_performance compiled plan cache status field missing"
+}
 if ($launchPacket.module_boundary_registry.schema -ne "rrkal_displaytools.module_boundary_registry.v1") {
     throw "Launch packet module_boundary_registry schema missing or invalid"
 }
@@ -1600,6 +1603,9 @@ if ($capabilities.layer_render_plan_performance.composition_apply_helper -ne "Hy
 if ($capabilities.layer_render_plan_performance.compiled_plan_helper -ne "HybridRenderController.compile_layer_render_plan") {
     throw "Renderer layer_render_plan_performance compiled plan helper missing"
 }
+if ($capabilities.layer_render_plan_performance.compiled_plan_cache_key_helper -ne "HybridRenderController.layer_render_plan_cache_key") {
+    throw "Renderer layer_render_plan_performance cache key helper missing"
+}
 if ($capabilities.module_boundary_registry.schema -ne "rrkal_displaytools.module_boundary_registry.v1") {
     throw "Renderer module_boundary_registry schema missing or invalid"
 }
@@ -2248,6 +2254,9 @@ if ($handoff.layer_render_plan_performance.composition_apply_helper -ne "HybridR
 }
 if ($handoff.layer_render_plan_performance.compiled_plan_schema -ne "rrkal_displaytools.compiled_layer_render_plan.v1") {
     throw "Handoff inspection layer render plan performance compiled plan schema missing"
+}
+if ($handoff.layer_render_plan_performance.compiled_plan_cache_key_helper -ne "HybridRenderController.layer_render_plan_cache_key") {
+    throw "Handoff inspection layer render plan performance cache key helper missing"
 }
 if ($handoff.launch_packet_contracts.layer_selection_tool -ne "rrkal_displaytools.layer_selection_tool.v1") {
     throw "Handoff inspection layer_selection_tool launch contract missing or invalid"
@@ -3617,6 +3626,15 @@ if ($rendererSource -notlike "*def apply_layer_render_plan_composition*") {
 }
 if ($rendererSource -notlike "*def compile_layer_render_plan*") {
     throw "Renderer compiled layer render plan helper is missing"
+}
+if ($rendererSource -notlike "*def layer_render_plan_cache_key*") {
+    throw "Renderer layer render plan cache key helper is missing"
+}
+if ($rendererSource -notlike '*"cache_status": "compiled"*') {
+    throw "Renderer compiled layer render plan cache status field is missing"
+}
+if ($rendererSource -notlike '*cache_status*reused*') {
+    throw "Renderer compiled layer render plan reuse branch is missing"
 }
 if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "layer_render_plan_snapshot"*') {
     if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "compiled_layer_render_plan"*') {
