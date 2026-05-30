@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - Layer visual presets inspector
+
+- Added `scripts/inspect_layer_visual_presets.ps1` as a no-GUI reviewer packet for layer visual presets, runtime ack feedback, selection tool and selection affordance state.
+- Registered the inspector in the visual contract inspector index, cross-machine review packet and smoke gates.
+- Smoke now verifies hydrology/boundary/annotation presets, brush/mask exclusion and retained `select_layer` tool mode.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`; transient cloud-drive file-access backoff warnings observed, final retry passed).
+
 ## 2026-05-31 - Qt UIUX surface inspector
 
 - Added `scripts/inspect_qt_uiux_surface.ps1` as a no-GUI reviewer packet for Qt-first UI surface grouping, replay/contracts, renderer ports, research interaction actions, layer operator groups and clone first-run order.

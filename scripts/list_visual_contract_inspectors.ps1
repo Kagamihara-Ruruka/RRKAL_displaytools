@@ -45,6 +45,14 @@ $entries = @(
         no_launch_side_effect = $true
     },
     [ordered]@{
+        id = "layer_visual_presets"
+        category = "layer_control"
+        schema = "rrkal_displaytools.layer_visual_presets_inspector.v1"
+        command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_visual_presets.ps1"
+        proves = @("hydrology preset", "boundary preset", "annotation preset", "brush/mask excluded", "selection tool retained")
+        no_launch_side_effect = $true
+    },
+    [ordered]@{
         id = "research_interaction"
         category = "research_interaction"
         schema = "rrkal_displaytools.research_interaction_inspector.v1"
@@ -138,6 +146,7 @@ $entries = @(
         "style_routes",
         "layer_workflow",
         "qt_uiux_surface",
+        "layer_visual_presets",
         "research_interaction",
         "hydrology_lod",
         "ocean_material",

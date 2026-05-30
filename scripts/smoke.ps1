@@ -1193,6 +1193,9 @@ if ($visualInspectorIndex.entry_ids -notcontains "layer_workflow") {
 if ($visualInspectorIndex.entry_ids -notcontains "qt_uiux_surface") {
     throw "Visual contract inspector index missing Qt UIUX surface inspector"
 }
+if ($visualInspectorIndex.entry_ids -notcontains "layer_visual_presets") {
+    throw "Visual contract inspector index missing Layer visual presets inspector"
+}
 if ($visualInspectorIndex.entry_ids -notcontains "research_interaction") {
     throw "Visual contract inspector index missing Research interaction inspector"
 }
@@ -1264,6 +1267,9 @@ if ($visualReviewPacket.inspector_entry_ids -notcontains "layer_workflow") {
 if ($visualReviewPacket.inspector_entry_ids -notcontains "qt_uiux_surface") {
     throw "Visual contract review packet missing Qt UIUX surface inspector"
 }
+if ($visualReviewPacket.inspector_entry_ids -notcontains "layer_visual_presets") {
+    throw "Visual contract review packet missing Layer visual presets inspector"
+}
 if ($visualReviewPacket.inspector_entry_ids -notcontains "research_interaction") {
     throw "Visual contract review packet missing Research interaction inspector"
 }
@@ -1281,6 +1287,9 @@ if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -Exec
 }
 if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_qt_uiux_surface.ps1") {
     throw "Visual contract review packet missing Qt UIUX surface first command"
+}
+if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_visual_presets.ps1") {
+    throw "Visual contract review packet missing Layer visual presets first command"
 }
 if ($visualReviewPacket.first_commands -notcontains "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_research_interaction.ps1") {
     throw "Visual contract review packet missing Research interaction first command"
@@ -1555,6 +1564,47 @@ if ($qtUiuxSurfaceInspectorPacket.renderer_port_action_ids -notcontains "ocean_p
 }
 if ($qtUiuxSurfaceInspectorPacket.layer_operator_complete_group_count -lt 5) {
     throw "Qt UIUX surface layer operator group closure incomplete"
+}
+$layerVisualPresetsInspectorPath = Join-Path $RepoRoot "scripts\inspect_layer_visual_presets.ps1"
+if (-not (Test-Path -LiteralPath $layerVisualPresetsInspectorPath)) {
+    throw "Layer visual presets inspector script is missing"
+}
+$layerVisualPresetsInspectorContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $layerVisualPresetsInspectorPath, "-ContractOnly")
+$layerVisualPresetsInspectorContract = ($layerVisualPresetsInspectorContractText -join "`n") | ConvertFrom-Json
+if ($layerVisualPresetsInspectorContract.schema -ne "rrkal_displaytools.layer_visual_presets_inspector.v1") {
+    throw "Layer visual presets inspector contract schema missing"
+}
+if ($layerVisualPresetsInspectorContract.required_contracts -notcontains "rrkal_displaytools.layer_visual_presets.v1") {
+    throw "Layer visual presets inspector preset contract missing"
+}
+if ($layerVisualPresetsInspectorContract.required_contracts -notcontains "rrkal_displaytools.layer_selection_tool.v1") {
+    throw "Layer visual presets inspector selection contract missing"
+}
+$layerVisualPresetsInspectorText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $layerVisualPresetsInspectorPath)
+$layerVisualPresetsInspectorPacket = ($layerVisualPresetsInspectorText -join "`n") | ConvertFrom-Json
+if ($layerVisualPresetsInspectorPacket.schema -ne "rrkal_displaytools.layer_visual_presets_inspection.v1") {
+    throw "Layer visual presets inspection schema missing"
+}
+if ($layerVisualPresetsInspectorPacket.preset_ids -notcontains "hydrology_focus") {
+    throw "Layer visual presets hydrology focus preset missing"
+}
+if ($layerVisualPresetsInspectorPacket.preset_ids -notcontains "boundary_focus") {
+    throw "Layer visual presets boundary focus preset missing"
+}
+if ($layerVisualPresetsInspectorPacket.preset_ids -notcontains "annotation_focus") {
+    throw "Layer visual presets annotation focus preset missing"
+}
+if ($layerVisualPresetsInspectorPacket.brush_mask_scope -ne "excluded") {
+    throw "Layer visual presets must exclude brush/mask scope"
+}
+if ($layerVisualPresetsInspectorPacket.selection_brush_mask_scope -ne "excluded") {
+    throw "Layer selection tool must keep brush/mask scope excluded"
+}
+if ($layerVisualPresetsInspectorPacket.selection_tool_mode -ne "select_layer") {
+    throw "Layer visual presets must retain layer selection tool mode"
+}
+if ($layerVisualPresetsInspectorPacket.selection_affordance_quick_actions -notcontains "diagnostics") {
+    throw "Layer visual presets selection diagnostics action missing"
 }
 $researchInteractionInspectorPath = Join-Path $RepoRoot "scripts\inspect_research_interaction.ps1"
 if (-not (Test-Path -LiteralPath $researchInteractionInspectorPath)) {
