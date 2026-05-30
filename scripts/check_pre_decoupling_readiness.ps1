@@ -50,6 +50,7 @@ if ($ContractOnly) {
             "boundary_ready",
             "work_order_ready",
             "required_before_move_complete",
+            "uiux_readiness_required_before_move",
             "snapshot_contract_contains_work_order"
         )
         command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_pre_decoupling_readiness.ps1"
@@ -73,10 +74,12 @@ $checks = [ordered]@{
     work_order_ready = ($bundle.render_plan_compose_work_order.status -eq "ready_for_post_07_extraction")
     required_before_move_complete = (
         $requiredBeforeMove -contains "scripts/smoke.ps1" -and
+        $requiredBeforeMove -contains "scripts/check_uiux_closure_readiness.ps1" -and
         $requiredBeforeMove -contains "scripts/performance_smoke.ps1" -and
         $requiredBeforeMove -contains "scripts/inspect_decoupling_boundaries.ps1" -and
         $requiredBeforeMove -contains "scripts/inspect_render_plan_compose_work_order.ps1"
     )
+    uiux_readiness_required_before_move = ($requiredBeforeMove -contains "scripts/check_uiux_closure_readiness.ps1")
     inspector_index_complete = (
         $inspectorIds -contains "pre_decoupling_readiness_bundle" -and
         $inspectorIds -contains "render_plan_compose_work_order" -and
@@ -98,6 +101,7 @@ if ($failed.Count -gt 0) {
     ready_for_07_gate_review = $true
     first_extraction_id = $bundle.first_extraction_id
     first_extraction_target = $bundle.first_extraction_target
+    uiux_readiness_required_before_move = $checks.uiux_readiness_required_before_move
     checks = $checks
     failed_checks = @()
     next_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\pre_decoupling_gate.ps1"

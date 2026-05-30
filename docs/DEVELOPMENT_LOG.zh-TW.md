@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-05-31 - Pre-decoupling readiness checks UIUX gate
+
+- Updated `scripts/check_pre_decoupling_readiness.ps1` so the compact readiness check also requires `scripts/check_uiux_closure_readiness.ps1` before code movement.
+- Smoke now gates the contract-only check list and normal result flag for UIUX readiness.
+- This keeps the readiness bundle, compact check and formal gate aligned before the post-7 renderer extraction phase.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`).
+
 ## 2026-05-31 - Pre-decoupling gate requires UIUX readiness
 
 - Updated `scripts/pre_decoupling_gate.ps1` so the formal post-7 gate includes `scripts/check_uiux_closure_readiness.ps1`.

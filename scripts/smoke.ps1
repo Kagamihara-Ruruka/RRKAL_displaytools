@@ -1547,6 +1547,9 @@ if ($preDecouplingReadinessCheckContract.output_schema -ne "rrkal_displaytools.p
 if ($preDecouplingReadinessCheckContract.checks -notcontains "required_before_move_complete") {
     throw "Pre-decoupling readiness check required-before-move check missing"
 }
+if ($preDecouplingReadinessCheckContract.checks -notcontains "uiux_readiness_required_before_move") {
+    throw "Pre-decoupling readiness check UIUX required-before-move check missing"
+}
 $preDecouplingReadinessCheckText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $preDecouplingReadinessCheckPath)
 $preDecouplingReadinessCheck = ($preDecouplingReadinessCheckText -join "`n") | ConvertFrom-Json
 if ($preDecouplingReadinessCheck.schema -ne "rrkal_displaytools.pre_decoupling_readiness_check_result.v1") {
@@ -1560,6 +1563,9 @@ if ($preDecouplingReadinessCheck.ready_for_07_gate_review -ne $true) {
 }
 if ($preDecouplingReadinessCheck.first_extraction_target -ne "render_core/render_plan.py") {
     throw "Pre-decoupling readiness check target mismatch"
+}
+if ($preDecouplingReadinessCheck.uiux_readiness_required_before_move -ne $true) {
+    throw "Pre-decoupling readiness check UIUX required-before-move result missing"
 }
 $layerWorkflowInspectorPath = Join-Path $RepoRoot "scripts\inspect_layer_workflow.ps1"
 if (-not (Test-Path -LiteralPath $layerWorkflowInspectorPath)) {
