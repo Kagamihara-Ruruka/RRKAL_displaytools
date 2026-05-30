@@ -5976,12 +5976,12 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def undo_layer_stack_state(self) -> None:
         if not self.layer_undo_stack:
-            self.status.setText("沒有可回復的 layer undo snapshot")
+            self.set_layer_operation_status("沒有可回復的 layer undo snapshot")
             return
         snapshot = self.layer_undo_stack.pop()
         layers = snapshot.get("layers")
         if not isinstance(layers, dict):
-            self.status.setText("Layer undo snapshot 格式不正確")
+            self.set_layer_operation_status("Layer undo snapshot 格式不正確")
             return
         self.layer_undo_restore_active = True
         try:
@@ -6010,7 +6010,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.layer_last_state_signature = self.layer_undo_signature(self.layer_last_state_snapshot)
         self.refresh_command_preview()
         self.refresh_layer_stack_status()
-        self.status.setText("已回復上一個 layer undo snapshot")
+        self.set_layer_operation_status("已回復上一個 layer undo snapshot")
 
     def select_layer(self, key: str) -> None:
         if key not in self.layer_rows:
@@ -6032,10 +6032,10 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
     def solo_selected_layer_visibility(self) -> None:
         key = self.selected_layer_key
         if key not in self.checks:
-            self.status.setText("尚未選取可 Solo 的圖層")
+            self.set_layer_operation_status("尚未選取可 Solo 的圖層")
             return
         if self.layer_locks.get(key) is not None and self.layer_locks[key].isChecked():
-            self.status.setText("選取圖層已鎖定，Solo 未變更 visibility")
+            self.set_layer_operation_status("選取圖層已鎖定，Solo 未變更 visibility")
             return
         self.layer_visibility_snapshot = {
             layer_key: self.checks[layer_key].isChecked()
@@ -6053,11 +6053,11 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.refresh_command_preview()
         self.refresh_layer_stack_status()
         label = next((text for layer_key, text in LAYER_LABELS if layer_key == key), key)
-        self.status.setText(f"已 Solo 選取圖層：{label}")
+        self.set_layer_operation_status(f"已 Solo 選取圖層：{label}")
 
     def restore_layer_visibility_snapshot(self) -> None:
         if not self.layer_visibility_snapshot:
-            self.status.setText("沒有可還原的 Solo 前可見性 snapshot")
+            self.set_layer_operation_status("沒有可還原的 Solo 前可見性 snapshot")
             return
         skipped_locked = 0
         for layer_key, enabled in self.layer_visibility_snapshot.items():
@@ -6073,9 +6073,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         self.refresh_command_preview()
         self.refresh_layer_stack_status()
         if skipped_locked:
-            self.status.setText(f"已還原 Solo 前圖層可見性；跳過 locked layers：{skipped_locked}")
+            self.set_layer_operation_status(f"已還原 Solo 前圖層可見性；跳過 locked layers：{skipped_locked}")
         else:
-            self.status.setText("已還原 Solo 前圖層可見性")
+            self.set_layer_operation_status("已還原 Solo 前圖層可見性")
 
     def canvas_layer_hit_keys(self) -> list[str]:
         visible_keys = [key for key, _label in LAYER_LABELS if key in self.checks and self.checks[key].isChecked()]

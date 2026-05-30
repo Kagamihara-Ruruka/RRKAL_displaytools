@@ -264,3 +264,13 @@ Done:
 
 Next:
 - Extend the same feedback path to solo/restore/undo/isolation actions.
+
+
+## 2026-05-30 - Layer isolation/history operation feedback
+
+Done:
+- Routed Solo selected layer, restore pre-solo visibility and layer undo messages through `set_layer_operation_status()`.
+- Added smoke/docs gates so isolation/history actions keep updating `Last layer operation`.
+
+Next:
+- Continue closing layer operation feedback for group toggles and preset application.

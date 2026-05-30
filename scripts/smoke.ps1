@@ -1725,6 +1725,15 @@ if ($qtPanelSource -notlike "*Last layer operation:*") {
 if ($qtPanelSource -notlike "*set_layer_operation_status*") {
     throw "Qt layer operation status helper is missing"
 }
+if ($qtPanelSource -notlike '*self.set_layer_operation_status(f"已 Solo 選取圖層*') {
+    throw "Qt Solo selected layer operation feedback is missing"
+}
+if ($qtPanelSource -notlike '*self.set_layer_operation_status("已還原 Solo 前圖層可見性"*') {
+    throw "Qt restore Solo layer operation feedback is missing"
+}
+if ($qtPanelSource -notlike '*self.set_layer_operation_status("已回復上一個 layer undo snapshot"*') {
+    throw "Qt layer undo operation feedback is missing"
+}
 if ($qtPanelSource -notlike "*last_layer_operation*") {
     throw "Qt launch packet last layer operation field is missing"
 }

@@ -498,3 +498,4 @@
 
 - Layers dock now keeps a visible `Last layer operation` label for selected-layer visibility, lock, selected-layer reset and stack reset actions.
 - Qt launch/provenance packets include `last_layer_operation`, giving clone/review workflows a compact record of the last layer operation message.
+- Solo selected layer, restore pre-solo visibility and layer undo now use the same operation feedback path, so isolation/history actions leave visible researcher-facing status in the Layers dock.

@@ -3701,3 +3701,13 @@ Changes:
 
 Validation:
 - Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
+
+## 2026-05-30 - Layer isolation/history operation feedback
+
+Changes:
+- Routed Solo selected layer, restore pre-solo visibility and layer undo status messages through `set_layer_operation_status()`.
+- This keeps isolation/history workflow feedback visible in the Layers dock through `Last layer operation`.
+- Added smoke/docs coverage for the Solo/restore/undo feedback path.
+
+Validation:
+- Smoke passed before commit: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\smoke.ps1`.
