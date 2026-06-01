@@ -100,6 +100,41 @@ def build_layer_render_state_packet(
     }
 
 
+def build_lod_counter_packet(
+    source: str,
+    lod_bucket: str,
+    visible_layer_count: int,
+    visible_vector_records: int,
+    deferred_overlay_count: int,
+    cache_hit_count: int,
+    cache_miss_count: int,
+    target_fps: float,
+    last_render_ms: float | None,
+) -> dict[str, object]:
+    target_fps_value = max(1.0, float(target_fps))
+    target_frame_budget_ms = 1000.0 / target_fps_value
+    render_ms = float(last_render_ms or 0.0)
+    pressure = render_ms / max(target_frame_budget_ms, 1e-6) if render_ms > 0.0 else 0.0
+    return {
+        "schema": "rrkal_displaytools.lod_counter_packet.v1",
+        "source": source,
+        "status": "observed_no_runtime_mutation",
+        "contract_schema": "rrkal_displaytools.lod_counter_contract.v1",
+        "lod_bucket": str(lod_bucket or "unknown"),
+        "visible_layer_count": max(0, int(visible_layer_count)),
+        "visible_vector_records": max(0, int(visible_vector_records)),
+        "deferred_overlay_count": max(0, int(deferred_overlay_count)),
+        "cache_hit_count": max(0, int(cache_hit_count)),
+        "cache_miss_count": max(0, int(cache_miss_count)),
+        "target_fps": target_fps_value,
+        "target_frame_budget_ms": target_frame_budget_ms,
+        "last_render_ms": render_ms,
+        "pressure": pressure,
+        "runtime_optimization_applied": False,
+        "boundary": "LOD counters are renderer metadata evidence only; they do not change LOD selection, cache lifecycle or render order.",
+    }
+
+
 def layer_render_plan_performance_packet(
     source: str,
     layer_capability_matrix: dict[str, object] | None = None,
@@ -130,6 +165,9 @@ def layer_render_plan_performance_packet(
         "layer_render_state_packet_schema": "rrkal_displaytools.layer_render_state_packet.v1",
         "layer_render_state_packet_helper": "render_core.render_plan_performance.build_layer_render_state_packet",
         "layer_render_state_packet_field": "renderer_output_metadata.render_inputs.layer_render_state",
+        "lod_counter_packet_schema": "rrkal_displaytools.lod_counter_packet.v1",
+        "lod_counter_packet_helper": "render_core.render_plan_performance.build_lod_counter_packet",
+        "lod_counter_packet_field": "renderer_output_metadata.render_inputs.lod_counters",
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",

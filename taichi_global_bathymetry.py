@@ -21,6 +21,7 @@ from performance_telemetry import contract_packet as performance_smoke_contract_
 from renderer_config_gateway import renderer_config_gateway_packet
 from render_core.render_plan_performance import (
     build_layer_render_state_packet,
+    build_lod_counter_packet,
     build_runtime_pressure_snapshot_packet,
     layer_render_plan_performance_packet,
 )
@@ -15908,6 +15909,17 @@ class HybridRenderController:
                     self.basemap_lod,
                     None,
                     "none",
+                ),
+                "lod_counters": build_lod_counter_packet(
+                    "HybridRenderController.collect_provider_manifest_bundle",
+                    self.basemap_lod,
+                    sum(1 for visible in self.layer_visible.values() if visible),
+                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
+                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
+                    int(getattr(self, "vector_overlay_cache_hits", 0)),
+                    int(getattr(self, "vector_overlay_cache_misses", 0)),
+                    getattr(self.args, "target_fps", 30.0),
+                    self.last_render_ms,
                 ),
                 "point_overlay_budget": dict(self.point_overlay_budget_last),
                 "vector_overlay_cache": {

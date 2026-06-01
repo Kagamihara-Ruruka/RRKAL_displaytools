@@ -608,6 +608,15 @@ if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_helper
 if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_field -ne "renderer_output_metadata.render_inputs.layer_render_state") {
     throw "Launch packet layer_render_plan_performance LayerRenderState packet field missing"
 }
+if ($launchPacket.layer_render_plan_performance.lod_counter_packet_schema -ne "rrkal_displaytools.lod_counter_packet.v1") {
+    throw "Launch packet layer_render_plan_performance LOD counter packet schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.lod_counter_packet_helper -ne "render_core.render_plan_performance.build_lod_counter_packet") {
+    throw "Launch packet layer_render_plan_performance LOD counter packet helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.lod_counter_packet_field -ne "renderer_output_metadata.render_inputs.lod_counters") {
+    throw "Launch packet layer_render_plan_performance LOD counter packet field missing"
+}
 if ($launchPacket.layer_render_plan_performance.runtime_snapshot_schema -ne "rrkal_displaytools.layer_render_plan_runtime_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime snapshot schema missing"
 }
@@ -690,6 +699,12 @@ if ($renderPlanPerformanceModuleSource -notlike "*def build_layer_render_state_p
 }
 if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.layer_render_state_packet.v1*") {
     throw "LayerRenderState packet schema marker is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*def build_lod_counter_packet*") {
+    throw "LOD counter packet builder is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.lod_counter_packet.v1*") {
+    throw "LOD counter packet schema marker is missing"
 }
 $renderPlanPerformanceEntrypoints = @(
     "taichi_global_bathymetry.py",
@@ -7956,6 +7971,9 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_packet.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState packet"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.lod_counter_packet.v1") {
+    throw "Layer render-plan performance inspector contract must expose LOD counter packet"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"

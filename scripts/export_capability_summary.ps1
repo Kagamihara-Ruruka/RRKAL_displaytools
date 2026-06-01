@@ -93,7 +93,7 @@ $summary = [ordered]@{
         [ordered]@{
             id = "runtime_optimization_work_order"
             status = "contract_ready_no_runtime_mutation"
-            description = "Layer render-plan performance now exposes the allowed post-decoupling optimization scope plus runtime_pressure_snapshot and layer_render_state metadata for target-FPS pressure, LOD, layer state and heavy overlay defer/cache counters; compression and RendererSkinAsset work stay out of displaytools."
+            description = "Layer render-plan performance now exposes the allowed post-decoupling optimization scope plus runtime_pressure_snapshot, layer_render_state and lod_counters metadata for target-FPS pressure, layer state, LOD and heavy overlay defer/cache counters; compression and RendererSkinAsset work stay out of displaytools."
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
         },
         [ordered]@{

@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add LOD counter metadata packet
+
+- Added `build_lod_counter_packet()` as the LOD/counter evidence shape for post-decoupling runtime optimization.
+- Wired renderer metadata to emit `render_inputs.lod_counters` with LOD bucket, visible vector records, deferred overlay count, cache hit/miss and target-FPS pressure.
+- Kept the slice observational only: no LOD decision mutation, no render-loop mutation, no compression or RRKAL cache governance integration.
+- Smoke: PASS after transient file-access backoff retry (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add LayerRenderState metadata packet
 
 - Added `build_layer_render_state_packet()` as the first metadata shape for post-decoupling LayerRenderState optimization.
