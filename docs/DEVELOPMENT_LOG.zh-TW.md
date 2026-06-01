@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add runtime pressure snapshot metadata
+
+- Added `build_runtime_pressure_snapshot_packet()` as the first runtime optimization evidence helper.
+- Wired renderer metadata to emit `render_inputs.runtime_pressure_snapshot` with target-FPS pressure, LOD, visible-layer count, vector record count and heavy overlay defer/cache counters.
+- Kept the slice observational only: no render-loop mutation, no compose-run merge, no compression or RRKAL cache governance integration.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Surface runtime optimization in capability summary
 
 - Added `runtime_optimization_work_order` to the post-push capability summary current capabilities.

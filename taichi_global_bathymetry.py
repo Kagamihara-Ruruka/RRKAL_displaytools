@@ -19,7 +19,10 @@ from cursor_geodesy import cursor_raycast_ack_payload, cursor_raycast_state_payl
 from closed_loop_status import renderer_closed_loop_status_packet
 from performance_telemetry import contract_packet as performance_smoke_contract_packet
 from renderer_config_gateway import renderer_config_gateway_packet
-from render_core.render_plan_performance import layer_render_plan_performance_packet
+from render_core.render_plan_performance import (
+    build_runtime_pressure_snapshot_packet,
+    layer_render_plan_performance_packet,
+)
 from render_core.render_plan import (
     alpha_blend_compose,
     alpha_compose,
@@ -15878,6 +15881,21 @@ class HybridRenderController:
                     getattr(self.args, "target_fps", 30.0),
                 ),
                 "render_budget": self.render_budget_decision(),
+                "runtime_pressure_snapshot": build_runtime_pressure_snapshot_packet(
+                    "HybridRenderController.collect_provider_manifest_bundle",
+                    self.width,
+                    self.height,
+                    self.last_render_ms,
+                    getattr(self.args, "target_fps", 30.0),
+                    bool(getattr(self, "interaction_active", False)),
+                    sum(1 for visible in self.layer_visible.values() if visible),
+                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
+                    self.basemap_lod,
+                    int(getattr(self, "vector_overlay_cache_hits", 0)),
+                    int(getattr(self, "vector_overlay_cache_misses", 0)),
+                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
+                    self.render_budget_decision(),
+                ),
                 "point_overlay_budget": dict(self.point_overlay_budget_last),
                 "vector_overlay_cache": {
                     "entries": len(self.vector_overlay_cache),

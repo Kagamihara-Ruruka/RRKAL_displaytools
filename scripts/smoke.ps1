@@ -590,6 +590,15 @@ if ($launchPacket.layer_render_plan_performance.stage_order -notcontains "submit
 if ($launchPacket.layer_render_plan_performance.runtime_optimization_applied -ne $false) {
     throw "Launch packet layer_render_plan_performance must not claim applied runtime optimization"
 }
+if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_schema -ne "rrkal_displaytools.runtime_pressure_snapshot.v1") {
+    throw "Launch packet layer_render_plan_performance runtime pressure snapshot schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_helper -ne "render_core.render_plan_performance.build_runtime_pressure_snapshot_packet") {
+    throw "Launch packet layer_render_plan_performance runtime pressure snapshot helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_field -ne "renderer_output_metadata.render_inputs.runtime_pressure_snapshot") {
+    throw "Launch packet layer_render_plan_performance runtime pressure snapshot field missing"
+}
 if ($launchPacket.layer_render_plan_performance.runtime_snapshot_schema -ne "rrkal_displaytools.layer_render_plan_runtime_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime snapshot schema missing"
 }
@@ -661,6 +670,12 @@ if ($renderPlanPerformanceModuleSource -notlike "*def layer_render_plan_performa
 if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.layer_render_plan_performance.v1*") {
     throw "Shared render plan performance packet schema marker is missing"
 }
+if ($renderPlanPerformanceModuleSource -notlike "*def build_runtime_pressure_snapshot_packet*") {
+    throw "Runtime pressure snapshot builder is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.runtime_pressure_snapshot.v1*") {
+    throw "Runtime pressure snapshot schema marker is missing"
+}
 $renderPlanPerformanceEntrypoints = @(
     "taichi_global_bathymetry.py",
     "rrkal_displaytools_qt_panel.py",
@@ -668,8 +683,11 @@ $renderPlanPerformanceEntrypoints = @(
 )
 foreach ($entrypoint in $renderPlanPerformanceEntrypoints) {
     $entrypointSource = Get-Content -LiteralPath (Join-Path $renderPlanPerformanceRoot $entrypoint) -Raw -Encoding UTF8
-    if ($entrypointSource -notlike "*from render_core.render_plan_performance import layer_render_plan_performance_packet*") {
+    if ($entrypointSource -notlike "*from render_core.render_plan_performance import*") {
         throw "Render plan performance packet shared import missing in $entrypoint"
+    }
+    if ($entrypointSource -notlike "*layer_render_plan_performance_packet*") {
+        throw "Render plan performance packet import marker missing in $entrypoint"
     }
     if (([regex]::Matches($entrypointSource, "(?m)^def layer_render_plan_performance_packet\(")).Count -ne 0) {
         throw "Render plan performance packet local duplicate still exists in $entrypoint"
@@ -7917,6 +7935,9 @@ $renderPlanPerformanceInspectorContractText = Invoke-CapturedNative powershell @
 $renderPlanPerformanceInspectorContract = ($renderPlanPerformanceInspectorContractText -join "`n") | ConvertFrom-Json
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_optimization_work_order.v1") {
     throw "Layer render-plan performance inspector contract must expose runtime optimization work order"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_pressure_snapshot.v1") {
+    throw "Layer render-plan performance inspector contract must expose runtime pressure snapshot"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"

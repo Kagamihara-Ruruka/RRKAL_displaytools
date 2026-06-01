@@ -3,6 +3,54 @@
 from __future__ import annotations
 
 
+def build_runtime_pressure_snapshot_packet(
+    source: str,
+    width: int,
+    height: int,
+    last_render_ms: float | None,
+    target_fps: float,
+    interaction_active: bool,
+    visible_layer_count: int,
+    vector_record_count: int,
+    lod: str,
+    cache_hit_count: int = 0,
+    cache_miss_count: int = 0,
+    deferred_overlay_count: int = 0,
+    budget_decision: dict[str, object] | None = None,
+) -> dict[str, object]:
+    budget = budget_decision if isinstance(budget_decision, dict) else {}
+    target_fps_value = max(1.0, float(target_fps))
+    target_frame_budget_ms = 1000.0 / target_fps_value
+    render_ms = float(last_render_ms or 0.0)
+    pressure = render_ms / max(target_frame_budget_ms, 1e-6) if render_ms > 0.0 else 0.0
+    return {
+        "schema": "rrkal_displaytools.runtime_pressure_snapshot.v1",
+        "source": source,
+        "status": "observed_no_runtime_mutation",
+        "width": max(1, int(width)),
+        "height": max(1, int(height)),
+        "last_render_ms": render_ms,
+        "target_fps": target_fps_value,
+        "target_frame_budget_ms": target_frame_budget_ms,
+        "pressure": pressure,
+        "pressure_state": str(budget.get("state", "warming-up" if render_ms <= 0.0 else "observed")),
+        "interaction_active": bool(interaction_active),
+        "visible_layer_count": max(0, int(visible_layer_count)),
+        "vector_record_count": max(0, int(vector_record_count)),
+        "lod": str(lod),
+        "defer_vector_overlays": bool(budget.get("defer_vector_overlays", False)),
+        "prefer_static_cache": bool(budget.get("prefer_static_cache", False)),
+        "vector_cache_degrees": float(budget.get("vector_cache_degrees", 0.0) or 0.0),
+        "vector_cache_zoom_step": float(budget.get("vector_cache_zoom_step", 0.0) or 0.0),
+        "vector_point_stride": int(budget.get("vector_point_stride", 1) or 1),
+        "cache_hit_count": max(0, int(cache_hit_count)),
+        "cache_miss_count": max(0, int(cache_miss_count)),
+        "deferred_overlay_count": max(0, int(deferred_overlay_count)),
+        "runtime_optimization_applied": False,
+        "boundary": "Snapshot reports renderer pressure and defer/cache policy only; it does not change target FPS, LOD, cache governance or render order.",
+    }
+
+
 def layer_render_plan_performance_packet(
     source: str,
     layer_capability_matrix: dict[str, object] | None = None,
@@ -27,6 +75,9 @@ def layer_render_plan_performance_packet(
         "optimization_target": "precompute_layer_state_then_single_render_pass",
         "current_runtime_claim": "contract_and_schedule_only",
         "runtime_optimization_applied": False,
+        "runtime_pressure_snapshot_schema": "rrkal_displaytools.runtime_pressure_snapshot.v1",
+        "runtime_pressure_snapshot_helper": "render_core.render_plan_performance.build_runtime_pressure_snapshot_packet",
+        "runtime_pressure_snapshot_field": "renderer_output_metadata.render_inputs.runtime_pressure_snapshot",
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
