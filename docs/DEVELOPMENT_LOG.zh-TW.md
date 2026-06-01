@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add LayerRenderState precompute plan metadata
+
+- Added `rrkal_displaytools.layer_state_precompute_plan.v1` as metadata evidence for compiling frozen layer state before renderer submission.
+- Wired renderer handoff metadata to emit `policies.layer_state_precompute_plan` from the current `LayerRenderState` and heavy-overlay defer/cache snapshot.
+- Exposed the schema/helper/field path through the render-plan performance contract.
+- Smoke: PASS after transient file-access backoff retry (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add runtime optimization module boundary evidence
 
 - Added `rrkal_displaytools.runtime_optimization_module_boundary.v1` to show the helper/contract module split explicitly.

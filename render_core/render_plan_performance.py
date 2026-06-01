@@ -6,6 +6,7 @@ from __future__ import annotations
 from render_core.runtime_optimization_review import (
     build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
+    build_layer_state_precompute_plan_packet,
     build_lod_counter_packet,
     build_runtime_optimization_module_boundary_packet,
     build_runtime_optimization_review_summary_packet,
@@ -43,6 +44,9 @@ def layer_render_plan_performance_packet(
         "layer_render_state_packet_schema": "rrkal_displaytools.layer_render_state_packet.v1",
         "layer_render_state_packet_helper": "render_core.runtime_optimization_review.build_layer_render_state_packet",
         "layer_render_state_packet_field": "renderer_output_metadata.policies.layer_render_state",
+        "layer_state_precompute_plan_schema": "rrkal_displaytools.layer_state_precompute_plan.v1",
+        "layer_state_precompute_plan_helper": "render_core.runtime_optimization_review.build_layer_state_precompute_plan_packet",
+        "layer_state_precompute_plan_field": "renderer_output_metadata.policies.layer_state_precompute_plan",
         "lod_counter_packet_schema": "rrkal_displaytools.lod_counter_packet.v1",
         "lod_counter_packet_helper": "render_core.runtime_optimization_review.build_lod_counter_packet",
         "lod_counter_packet_field": "renderer_output_metadata.policies.lod_counters",

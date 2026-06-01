@@ -7,6 +7,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
     helper_exports = [
         "build_runtime_pressure_snapshot_packet",
         "build_layer_render_state_packet",
+        "build_layer_state_precompute_plan_packet",
         "build_lod_counter_packet",
         "build_heavy_overlay_defer_cache_packet",
         "build_runtime_optimization_review_summary_packet",
@@ -14,6 +15,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
     metadata_fields = [
         "renderer_output_metadata.policies.runtime_pressure_snapshot",
         "renderer_output_metadata.policies.layer_render_state",
+        "renderer_output_metadata.policies.layer_state_precompute_plan",
         "renderer_output_metadata.policies.lod_counters",
         "renderer_output_metadata.policies.heavy_overlay_defer_cache",
         "renderer_output_metadata.policies.runtime_optimization_review_summary",
@@ -129,6 +131,67 @@ def build_layer_render_state_packet(
         "layers": layers,
         "runtime_optimization_applied": False,
         "boundary": "LayerRenderState packet freezes existing layer UI/runtime facts for metadata review only; it does not reorder rendering or enable collapsed compose runs.",
+    }
+
+
+def build_layer_state_precompute_plan_packet(
+    source: str,
+    layer_render_state: dict[str, object] | None,
+    heavy_overlay_defer_cache: dict[str, object] | None = None,
+) -> dict[str, object]:
+    state = layer_render_state if isinstance(layer_render_state, dict) else {}
+    overlay = heavy_overlay_defer_cache if isinstance(heavy_overlay_defer_cache, dict) else {}
+    raw_layers = state.get("layers")
+    layers = [layer for layer in raw_layers if isinstance(layer, dict)] if isinstance(raw_layers, list) else []
+    active_dirty_flags = [str(flag) for flag in state.get("active_dirty_flags", [])] if isinstance(state.get("active_dirty_flags"), list) else []
+    static_batch_candidates = []
+    dynamic_layers = []
+    deferred_layers = []
+    for layer in layers:
+        layer_id = str(layer.get("layer_id", ""))
+        if not layer_id or not bool(layer.get("visible", False)):
+            continue
+        defer_reason = str(layer.get("defer_reason", "none") or "none")
+        renderer_target = str(layer.get("renderer_target", layer_id) or layer_id)
+        layer_dirty_flags = [str(flag) for flag in layer.get("dirty_flags", [])] if isinstance(layer.get("dirty_flags"), list) else active_dirty_flags
+        entry = {
+            "layer_id": layer_id,
+            "renderer_target": renderer_target,
+            "cache_key": str(layer.get("cache_key", "") or ""),
+            "lod_bucket": str(layer.get("lod_bucket", state.get("lod_bucket", "unknown")) or "unknown"),
+            "defer_reason": defer_reason,
+            "dirty_flags": layer_dirty_flags,
+        }
+        if defer_reason != "none":
+            deferred_layers.append(entry)
+        elif layer_dirty_flags:
+            dynamic_layers.append(entry)
+        else:
+            static_batch_candidates.append(entry)
+    return {
+        "schema": "rrkal_displaytools.layer_state_precompute_plan.v1",
+        "source": source,
+        "status": "observed_plan_only_runtime_not_rewired",
+        "layer_render_state_schema": str(state.get("schema", "")),
+        "layer_render_state_contract_schema": str(state.get("contract_schema", "")),
+        "compile_strategy": "compile_once_per_dirty_change",
+        "submit_strategy": "single_renderer_plan_candidate",
+        "runtime_entrypoint": "HybridRenderController.project_handoff_snapshot",
+        "visible_layer_count": int(state.get("visible_layer_count", 0) or 0),
+        "layer_state_count": int(state.get("layer_count", 0) or 0),
+        "active_dirty_flags": active_dirty_flags,
+        "static_batch_candidate_count": len(static_batch_candidates),
+        "dynamic_layer_count": len(dynamic_layers),
+        "deferred_layer_count": len(deferred_layers),
+        "static_batch_candidates": static_batch_candidates,
+        "dynamic_layers": dynamic_layers,
+        "deferred_layers": deferred_layers,
+        "defer_vector_overlays": bool(overlay.get("defer_vector_overlays", False)),
+        "prefer_static_cache": bool(overlay.get("prefer_static_cache", False)),
+        "runtime_precompute_applied": False,
+        "runtime_optimization_applied": False,
+        "next_runtime_slice": "make_renderer_consume_frozen_layer_state_before_taichi_submit",
+        "boundary": "Precompute plan is metadata evidence only; it does not reorder layers, allocate worker threads, merge compose runs or change Taichi submission.",
     }
 
 
