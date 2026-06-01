@@ -6569,6 +6569,9 @@ if ($displayRuntimeContracts.protocol_schema -ne "rrkal_displaytools.canvas_runt
 if ($displayRuntimeContracts.sample_runtime_requests_schema -ne "rrkal_displaytools.sample_canvas_runtime_requests.v1") {
     throw "Display runtime contracts exporter sample runtime request schema missing"
 }
+if ($displayRuntimeContracts.sample_runtime_results_schema -ne "rrkal_displaytools.sample_canvas_runtime_results.v1") {
+    throw "Display runtime contracts exporter sample runtime result schema missing"
+}
 if ($displayRuntimeContracts.canvas_types -notcontains "earth") {
     throw "Display runtime contracts exporter missing EarthCanvas"
 }
@@ -6580,6 +6583,9 @@ if ($displayRuntimeContracts.runtime_render_invoked -ne $false) {
 }
 if ($displayRuntimeContracts.sample_runtime_requests.runtime_render_invoked -ne $false) {
     throw "Display runtime sample requests should not invoke runtime render"
+}
+if ($displayRuntimeContracts.sample_runtime_results.runtime_render_invoked -ne $false) {
+    throw "Display runtime sample results should not invoke runtime render"
 }
 if ($visualInspectorIndex.entry_ids -notcontains "display_runtime_contracts") {
     throw "Visual contract inspector index missing display runtime contracts entry"

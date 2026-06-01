@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add contract-only runtime adapter results
+
+- Added `ContractOnlyEarthCanvasRuntimeAdapter` and `ContractOnlyTimeSeriesCanvasRuntimeAdapter` as no-render implementations of the runtime protocol.
+- Added `rrkal_displaytools.sample_canvas_runtime_results.v1` to prove sample runtime requests can produce contract-only result packets without invoking renderer backends.
+- Smoke and `check_display_runtime_contracts.ps1` now verify the aggregated runtime exporter exposes sample runtime results and keeps `runtime_render_invoked=false`.
+- Smoke: PASS after transient file-access backoff retry (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-05-31 - Update capability summary display runtime section
 
 - Updated `docs/CAPABILITY_SUMMARY.zh-TW.md` to include the new DisplayShell / Canvas / Render Matrix and display runtime contract capabilities.

@@ -11,6 +11,8 @@ from typing import Any
 
 from display_core import CANVAS_TIME_SERIES, LAYER_TIME_SERIES
 
+from .protocols import CanvasRuntimeRenderRequest, CanvasRuntimeRenderResult
+
 
 @dataclass(frozen=True)
 class TimeSeriesCanvasRuntimeBoundary:
@@ -47,3 +49,21 @@ def build_time_series_canvas_runtime_contract_packet() -> dict[str, Any]:
             "RRKAL data/cache governance",
         ],
     }
+
+
+class ContractOnlyTimeSeriesCanvasRuntimeAdapter:
+    def runtime_contract_packet(self) -> dict[str, Any]:
+        return build_time_series_canvas_runtime_contract_packet()
+
+    def render(self, request: CanvasRuntimeRenderRequest) -> CanvasRuntimeRenderResult:
+        return CanvasRuntimeRenderResult(
+            canvas_type=CANVAS_TIME_SERIES,
+            adapter=self.__class__.__name__,
+            status="contract_only_no_chart_backend",
+            diagnostics={
+                "request_canvas_type": request.canvas_type,
+                "runtime_options": dict(request.runtime_options),
+                "boundary": "TimeSeriesCanvas runtime adapter marker does not import a chart backend yet.",
+            },
+            runtime_render_invoked=False,
+        )

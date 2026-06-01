@@ -18,6 +18,7 @@ from display_runtime import (  # noqa: E402
     build_canvas_runtime_protocol_packet,
     build_earth_canvas_runtime_contract_packet,
     build_sample_canvas_runtime_requests_packet,
+    build_sample_canvas_runtime_results_packet,
     build_time_series_canvas_runtime_contract_packet,
 )
 
@@ -25,6 +26,7 @@ from display_runtime import (  # noqa: E402
 def main() -> None:
     protocol = build_canvas_runtime_protocol_packet()
     sample_requests = build_sample_canvas_runtime_requests_packet()
+    sample_results = build_sample_canvas_runtime_results_packet()
     contracts = [
         build_earth_canvas_runtime_contract_packet(),
         build_time_series_canvas_runtime_contract_packet(),
@@ -37,9 +39,12 @@ def main() -> None:
         "protocol": protocol,
         "sample_runtime_requests_schema": sample_requests["schema"],
         "sample_runtime_requests": sample_requests,
+        "sample_runtime_results_schema": sample_results["schema"],
+        "sample_runtime_results": sample_results,
         "contract_count": len(contracts),
         "canvas_types": [contract["boundary"]["canvas_type"] for contract in contracts],
-        "runtime_render_invoked": any(contract["runtime_render_invoked"] for contract in contracts),
+        "runtime_render_invoked": any(contract["runtime_render_invoked"] for contract in contracts)
+        or sample_results["runtime_render_invoked"],
         "imports_renderer_packages": any(contract["imports_renderer_packages"] for contract in contracts),
         "contracts": contracts,
         "boundary": "Runtime contracts define landing zones only; concrete renderer execution remains out of scope.",
