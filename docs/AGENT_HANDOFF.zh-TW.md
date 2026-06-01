@@ -29,6 +29,7 @@
 ## Start-of-round checklist
 
 - Work from `L:\RRKAL_displaytools` unless explicitly using a local temporary clone for GUI/renderer validation.
+- Do not scan or depend on K drive for routine displaytools work; K is outside the current workspace unless the user explicitly asks for a bounded read-only lookup.
 - Inspect Git state before edits.
 - Read `docs/WORKFLOW.zh-TW.md`, `docs/CODEX_CLOUD_HANDOFF.zh-TW.md`, `docs/DOCS_INDEX.zh-TW.md`, `docs/PROJECT_GTD.md`, and this handoff.
 - Pick one small, reversible visualization slice.
@@ -50,6 +51,7 @@
 
 - GitHub `main` is the sync truth.
 - `L:\RRKAL_displaytools` is the local cloud-drive working copy.
+- K drive is no longer part of the displaytools working context or routine inventory path.
 - `taichi_global_bathymetry.py` is still a monolithic prototype.
 - `rrkal_displaytools_qt_panel.py` is the current Qt operator UI for layer/style/material launch control.
 - `display_core/` now owns renderer-package-free DisplayShell / Canvas / Layer / Render Matrix contracts.

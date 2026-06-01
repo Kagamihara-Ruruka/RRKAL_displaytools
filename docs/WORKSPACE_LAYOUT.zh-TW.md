@@ -1,12 +1,12 @@
 ﻿# Workspace Layout
 
-最後更新：2026-05-29
+最後更新：2026-06-01
 
 ## Canonical repo
 
-`C:\Users\lyn59\Documents\Codex\RRKAL_displaytools`
+`L:\RRKAL_displaytools`
 
-這是後續 displaytools 開發與 commit 的正式位置。
+這是後續 displaytools 開發與 commit 的正式位置。K 槽不再納入本專案的例行工作區、盤點或掃描範圍；除非使用者明確要求，agent 不應掃描 K 槽或依賴 K 槽狀態做判斷。
 
 ## Root files
 

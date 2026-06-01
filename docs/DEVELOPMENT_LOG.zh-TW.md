@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-06-01 - Align workspace rule to L drive only
+
+- Updated `docs/WORKSPACE_LAYOUT.zh-TW.md` so the canonical repo is `L:\RRKAL_displaytools`.
+- Updated `docs/AGENT_HANDOFF.zh-TW.md` to stop routine K drive scanning or dependency checks unless explicitly requested.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add contract-only runtime adapter results
 
 - Added `ContractOnlyEarthCanvasRuntimeAdapter` and `ContractOnlyTimeSeriesCanvasRuntimeAdapter` as no-render implementations of the runtime protocol.
