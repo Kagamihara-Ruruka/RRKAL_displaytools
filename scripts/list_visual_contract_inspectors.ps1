@@ -209,7 +209,7 @@ $entries = @(
         category = "performance"
         schema = "rrkal_displaytools.layer_render_plan_performance_inspector.v1"
         command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
-        proves = @("precompute render plan target", "single-pass optimization queue", "runtime merge disabled", "zero-diff parity required")
+        proves = @("precompute render plan target", "runtime optimization review summary", "target-FPS pressure metadata", "LayerRenderState metadata", "LOD counter metadata", "heavy overlay defer/cache metadata", "runtime merge disabled", "zero-diff parity required")
         no_launch_side_effect = $true
     },
     [ordered]@{

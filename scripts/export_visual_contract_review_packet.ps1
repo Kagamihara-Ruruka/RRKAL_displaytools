@@ -73,6 +73,19 @@ if ($LASTEXITCODE -ne 0) {
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_ocean_material.ps1",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
     )
+    runtime_optimization_review = @{
+        source_inspector = "layer_render_plan_performance"
+        command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
+        fields = @(
+            "runtime_optimization_review_summary_schema",
+            "runtime_optimization_review_summary_field",
+            "runtime_pressure_snapshot_schema",
+            "layer_render_state_packet_schema",
+            "lod_counter_packet_schema",
+            "heavy_overlay_defer_cache_snapshot_schema"
+        )
+        boundary = "Review metadata only; runtime optimization summary does not enable compose merge or mutate renderer scheduling."
+    }
     pre_decoupling_commands = @(
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\performance_smoke.ps1 -ContractOnly",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_decoupling_boundaries.ps1",

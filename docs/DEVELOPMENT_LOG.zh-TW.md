@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add runtime optimization review packet route
+
+- Added runtime optimization summary proof to the visual contract inspector index.
+- Added a `runtime_optimization_review` block to the visual contract review packet, pointing clone-first reviewers to `inspect_layer_render_plan_performance.ps1`.
+- Smoke now gates the inspector index and visual review packet route.
+- Smoke: PASS after fixing the new inspector-index smoke selector and transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Surface runtime optimization in reviewer handoff
 
 - Added `runtime_optimization_review_summary` to the no-GUI reviewer packet.

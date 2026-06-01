@@ -6581,6 +6581,18 @@ if ($visualInspectorIndex.entry_ids -notcontains "display_shell_render_matrix") 
 if ($visualInspectorIndex.recommended_cross_machine_sequence -notcontains "display_shell_render_matrix") {
     throw "Visual contract inspector recommended sequence missing display shell render matrix"
 }
+$visualInspectorLayerRenderPlanPerformance = @($visualInspectorIndex.entries | Where-Object { $_.id -eq "layer_render_plan_performance" })[0]
+if (@($visualInspectorLayerRenderPlanPerformance.proves) -notcontains "runtime optimization review summary") {
+    throw "Visual contract inspector index missing runtime optimization review summary proof"
+}
+$visualReviewPacketText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\export_visual_contract_review_packet.ps1")
+$visualReviewPacket = ($visualReviewPacketText -join "`n") | ConvertFrom-Json
+if ($visualReviewPacket.runtime_optimization_review.source_inspector -ne "layer_render_plan_performance") {
+    throw "Visual contract review packet runtime optimization source inspector missing"
+}
+if (@($visualReviewPacket.runtime_optimization_review.fields) -notcontains "runtime_optimization_review_summary_schema") {
+    throw "Visual contract review packet runtime optimization summary field missing"
+}
 $displayShellCheckText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts\check_display_shell_render_matrix.ps1")
 $displayShellCheck = $displayShellCheckText | ConvertFrom-Json
 if ($displayShellCheck.schema -ne "rrkal_displaytools.display_shell_render_matrix_check.v1") {

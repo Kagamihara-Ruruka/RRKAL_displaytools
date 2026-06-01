@@ -31,6 +31,7 @@
 - `rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1` 已接到 renderer metadata 的 `policies.heavy_overlay_defer_cache`，把 `defer_vector_overlays`、`prefer_static_cache`、vector camera quantum、stride、cache hit/miss 與 defer reason 打包成 reviewer 可讀狀態。
 - `rrkal_displaytools.runtime_optimization_review_summary.v1` 已接到 renderer metadata 的 `policies.runtime_optimization_review_summary`，把以上四個 packet 彙總為一行 reviewer 摘要。
 - `scripts/export_reviewer_packet.ps1` 與 `scripts/inspect_handoff.ps1` 會暴露 runtime optimization summary contract，跨機器 clone 後可先讀 reviewer/handoff JSON，不必先打開完整 renderer metadata。
+- `scripts/list_visual_contract_inspectors.ps1` 與 `scripts/export_visual_contract_review_packet.ps1` 也會把 runtime optimization review summary 列為 clone-first 檢查點。
 - 這個 work order 同時明確禁止 displaytools 在本階段接 compression integration、RendererSkinAsset loader、new satellite layers、PS5/flight mode 或 RRKAL discovery/download/import/cache governance。
 - Review command: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1`。
 - Smoke 會驗證 runtime pressure snapshot、LayerRenderState packet、LOD counter packet、heavy overlay defer/cache snapshot、runtime optimization review summary、work-order schema、target FPS contract、LayerRenderState contract、LOD counter contract 與 heavy overlay defer/cache policy。
