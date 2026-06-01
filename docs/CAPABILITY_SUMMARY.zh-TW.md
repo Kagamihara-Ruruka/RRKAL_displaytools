@@ -10,7 +10,7 @@
 - `scripts/render_compose_parity_smoke.ps1` now separates `precommit_gate_passed` from `visual_parity_passed`, so contract-only checks do not trigger failed-smoke notifications while parity artifacts are still pending.
 - Real artifact diff failures still return `passed=false` and `notification_level=error`; runtime compose merge remains disabled until zero-diff evidence exists.
 
-最後更新：2026-05-31
+最後更新：2026-06-01
 
 ## 目前已有功能
 
@@ -21,6 +21,13 @@
 - `display_runtime/` 已建立 EarthCanvas 與 TimeSeriesCanvas 的 runtime landing-zone skeleton，目前只提供 contract packet、runtime request/result protocol 與 sample runtime requests，不搬動 Taichi runtime，也不引入 chart backend。
 - No-GUI review commands: `py -3 scripts\export_display_shell_render_matrix.py`、`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_display_shell_render_matrix.ps1`、`py -3 scripts\export_display_runtime_contracts.py`、`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\check_display_runtime_contracts.ps1`、`powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_display_runtime_handoff.ps1`。
 - Smoke 會驗證 display shell exporter/check、display_core/display_runtime import boundary、runtime contracts、sample runtime requests、runtime handoff inspector 與 capability summary 對齊。
+
+### Runtime optimization work order
+
+- `rrkal_displaytools.runtime_optimization_work_order.v1` 已加入 `layer_render_plan_performance`，明確把後續效能切片限定在 profiler、target FPS、safe preview、LOD counters、LayerRenderState 與 heavy overlay defer/cache。
+- 這個 work order 同時明確禁止 displaytools 在本階段接 compression integration、RendererSkinAsset loader、new satellite layers、PS5/flight mode 或 RRKAL discovery/download/import/cache governance。
+- Review command: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1`。
+- Smoke 會驗證 work-order schema、target FPS contract、LayerRenderState contract、LOD counter contract 與 heavy overlay defer/cache policy。
 
 ### Qt-first operator UI
 

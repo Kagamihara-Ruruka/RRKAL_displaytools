@@ -7922,6 +7922,20 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"
 }
 
+$runtimeOptimizationCapabilityText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\export_capability_summary.ps1"))
+$runtimeOptimizationCapability = ($runtimeOptimizationCapabilityText -join "`n") | ConvertFrom-Json
+$runtimeOptimizationCurrentIds = @($runtimeOptimizationCapability.current_capabilities | ForEach-Object { $_.id })
+$runtimeOptimizationPlannedIds = @($runtimeOptimizationCapability.planned_capabilities | ForEach-Object { $_.id })
+if ($runtimeOptimizationCurrentIds -notcontains "runtime_optimization_work_order") {
+    throw "Capability summary missing runtime optimization work order current capability"
+}
+if ($runtimeOptimizationPlannedIds -notcontains "layer_render_plan_performance") {
+    throw "Capability summary missing planned layer render-plan performance capability"
+}
+if ((@($runtimeOptimizationCapability.boundaries) -join "`n") -notmatch "Runtime optimization can add profiler") {
+    throw "Capability summary missing runtime optimization boundary"
+}
+
 $pre7ClosurePath = Join-Path $RepoRoot "scripts\check_pre7_closure_readiness.ps1"
 if (-not (Test-Path -LiteralPath $pre7ClosurePath)) {
     throw "Pre-7 closure readiness checker is missing"

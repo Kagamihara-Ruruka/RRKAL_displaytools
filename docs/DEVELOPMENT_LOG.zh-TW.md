@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-06-01 - Surface runtime optimization in capability summary
+
+- Added `runtime_optimization_work_order` to the post-push capability summary current capabilities.
+- Updated `docs/CAPABILITY_SUMMARY.zh-TW.md` so cloned machines can review the runtime optimization scope and explicit non-goals from the summary page.
+- Smoke: PASS after fixing the new capability-summary boundary assertion and transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add runtime optimization work order
 
 - Added `rrkal_displaytools.runtime_optimization_work_order.v1` to the layer render-plan performance contract.

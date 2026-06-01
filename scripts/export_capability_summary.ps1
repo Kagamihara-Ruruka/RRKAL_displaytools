@@ -91,6 +91,12 @@ $summary = [ordered]@{
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_compose_source_map.ps1"
         },
         [ordered]@{
+            id = "runtime_optimization_work_order"
+            status = "contract_ready_no_runtime_mutation"
+            description = "Layer render-plan performance now exposes the allowed post-decoupling optimization scope: profiler, target FPS, safe preview, LOD counters, LayerRenderState and heavy overlay defer/cache; compression and RendererSkinAsset work stay out of displaytools."
+            review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
+        },
+        [ordered]@{
             id = "display_shell_render_matrix"
             status = "contract_ready"
             description = "DisplayShell / Canvas / Layer / Render Matrix contracts expose EarthCanvas and TimeSeriesCanvas samples, renderer registry dispatch and no-GUI pass/fail gates."
@@ -117,7 +123,7 @@ $summary = [ordered]@{
         [ordered]@{
             id = "layer_render_plan_performance"
             status = "planned_after_decoupling"
-            description = "Precompute layer state once and render through a single compose pass with zero-diff parity evidence."
+            description = "Precompute LayerRenderState once, track target-FPS pressure and LOD counters, defer/cache heavy overlays during interaction, then render through a single compose pass only after zero-diff parity evidence."
         },
         [ordered]@{
             id = "timeline_blend_visibility_runtime"
@@ -145,6 +151,7 @@ $summary = [ordered]@{
         "RRKAL owns dataset discovery, download, import, install registry, cache lifecycle and asset repair.",
         "Displaytools owns renderer/UI contracts, material controls, visual review packets and no-GUI smoke evidence.",
         "display_core and display_runtime skeletons stay renderer-package-free until adapter parity is explicit.",
+        "Runtime optimization can add profiler, target FPS, safe preview, LOD counters, LayerRenderState and heavy overlay defer/cache; it must not connect compression, RendererSkinAsset loading, satellite layers or RRKAL cache governance.",
         "Renderer code movement is blocked until the post-07 formal pre-decoupling gate."
     )
     recommended_next_stage = "Continue pre-07 UIUX reviewer closure, then start render-plan compose decoupling after the formal 07:00 +08:00 gate."
