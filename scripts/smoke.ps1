@@ -617,6 +617,15 @@ if ($launchPacket.layer_render_plan_performance.layer_state_precompute_plan_help
 if ($launchPacket.layer_render_plan_performance.layer_state_precompute_plan_field -ne "renderer_output_metadata.policies.layer_state_precompute_plan") {
     throw "Launch packet layer_render_plan_performance LayerRenderState precompute plan field missing"
 }
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_decision_schema -ne "rrkal_displaytools.layer_state_precompute_decision.v1") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute decision schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_decision_helper -ne "render_core.runtime_optimization_review.build_layer_state_precompute_decision_packet") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute decision helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_decision_field -ne "renderer_output_metadata.policies.layer_state_precompute_decision") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute decision field missing"
+}
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_schema -ne "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Launch packet layer_render_plan_performance LOD counter packet schema missing"
 }
@@ -748,6 +757,12 @@ if ($runtimeOptimizationReviewModuleSource -notlike "*def build_layer_state_prec
 }
 if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.layer_state_precompute_plan.v1*") {
     throw "LayerRenderState precompute plan schema marker is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_layer_state_precompute_decision_packet*") {
+    throw "LayerRenderState precompute decision builder is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.layer_state_precompute_decision.v1*") {
+    throw "LayerRenderState precompute decision schema marker is missing"
 }
 if ($runtimeOptimizationReviewModuleSource -notlike "*def build_lod_counter_packet*") {
     throw "LOD counter packet builder is missing"
@@ -2353,6 +2368,12 @@ if ($layerRenderPlanPerformanceInspectorPacket.layer_state_precompute_plan_schem
 }
 if ($layerRenderPlanPerformanceInspectorPacket.layer_state_precompute_plan_helper -ne "render_core.runtime_optimization_review.build_layer_state_precompute_plan_packet") {
     throw "Layer render-plan performance LayerRenderState precompute plan helper missing"
+}
+if ($layerRenderPlanPerformanceInspectorPacket.layer_state_precompute_decision_schema -ne "rrkal_displaytools.layer_state_precompute_decision.v1") {
+    throw "Layer render-plan performance LayerRenderState precompute decision schema missing"
+}
+if ($layerRenderPlanPerformanceInspectorPacket.layer_state_precompute_decision_helper -ne "render_core.runtime_optimization_review.build_layer_state_precompute_decision_packet") {
+    throw "Layer render-plan performance LayerRenderState precompute decision helper missing"
 }
 if ($layerRenderPlanPerformanceInspectorPacket.runtime_optimization_module_boundary_schema -ne "rrkal_displaytools.runtime_optimization_module_boundary.v1") {
     throw "Layer render-plan performance runtime optimization module boundary schema missing"
@@ -8086,6 +8107,9 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_state_precompute_plan.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState precompute plan"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_state_precompute_decision.v1") {
+    throw "Layer render-plan performance inspector contract must expose LayerRenderState precompute decision"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Layer render-plan performance inspector contract must expose LOD counter packet"

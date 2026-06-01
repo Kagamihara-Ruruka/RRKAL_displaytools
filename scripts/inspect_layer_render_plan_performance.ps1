@@ -30,6 +30,7 @@ if ($ContractOnly) {
             "rrkal_displaytools.runtime_pressure_snapshot.v1",
             "rrkal_displaytools.layer_render_state_packet.v1",
             "rrkal_displaytools.layer_state_precompute_plan.v1",
+            "rrkal_displaytools.layer_state_precompute_decision.v1",
             "rrkal_displaytools.lod_counter_packet.v1",
             "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
             "rrkal_displaytools.runtime_optimization_review_summary.v1",
@@ -100,6 +101,9 @@ $runtimeModuleBoundary = $perf.runtime_optimization_module_boundary
     layer_state_precompute_plan_schema = $perf.layer_state_precompute_plan_schema
     layer_state_precompute_plan_helper = $perf.layer_state_precompute_plan_helper
     layer_state_precompute_plan_field = $perf.layer_state_precompute_plan_field
+    layer_state_precompute_decision_schema = $perf.layer_state_precompute_decision_schema
+    layer_state_precompute_decision_helper = $perf.layer_state_precompute_decision_helper
+    layer_state_precompute_decision_field = $perf.layer_state_precompute_decision_field
     lod_counter_packet_schema = $perf.lod_counter_packet_schema
     lod_counter_packet_helper = $perf.lod_counter_packet_helper
     lod_counter_packet_field = $perf.lod_counter_packet_field

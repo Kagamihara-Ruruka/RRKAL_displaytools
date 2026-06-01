@@ -8,6 +8,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
         "build_runtime_pressure_snapshot_packet",
         "build_layer_render_state_packet",
         "build_layer_state_precompute_plan_packet",
+        "build_layer_state_precompute_decision_packet",
         "build_lod_counter_packet",
         "build_heavy_overlay_defer_cache_packet",
         "build_runtime_optimization_review_summary_packet",
@@ -16,6 +17,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
         "renderer_output_metadata.policies.runtime_pressure_snapshot",
         "renderer_output_metadata.policies.layer_render_state",
         "renderer_output_metadata.policies.layer_state_precompute_plan",
+        "renderer_output_metadata.policies.layer_state_precompute_decision",
         "renderer_output_metadata.policies.lod_counters",
         "renderer_output_metadata.policies.heavy_overlay_defer_cache",
         "renderer_output_metadata.policies.runtime_optimization_review_summary",
@@ -192,6 +194,62 @@ def build_layer_state_precompute_plan_packet(
         "runtime_optimization_applied": False,
         "next_runtime_slice": "make_renderer_consume_frozen_layer_state_before_taichi_submit",
         "boundary": "Precompute plan is metadata evidence only; it does not reorder layers, allocate worker threads, merge compose runs or change Taichi submission.",
+    }
+
+
+def build_layer_state_precompute_decision_packet(
+    source: str,
+    layer_state_precompute_plan: dict[str, object] | None,
+    runtime_pressure_snapshot: dict[str, object] | None = None,
+) -> dict[str, object]:
+    plan = layer_state_precompute_plan if isinstance(layer_state_precompute_plan, dict) else {}
+    pressure = runtime_pressure_snapshot if isinstance(runtime_pressure_snapshot, dict) else {}
+    pressure_value = float(pressure.get("pressure", 0.0) or 0.0)
+    static_count = int(plan.get("static_batch_candidate_count", 0) or 0)
+    dynamic_count = int(plan.get("dynamic_layer_count", 0) or 0)
+    deferred_count = int(plan.get("deferred_layer_count", 0) or 0)
+    visible_count = int(plan.get("visible_layer_count", 0) or 0)
+    if visible_count <= 0:
+        decision_status = "await_visible_layers"
+        compile_action = "skip_until_layers_visible"
+        submit_action = "keep_existing_renderer_path"
+    elif deferred_count > 0 or bool(plan.get("defer_vector_overlays", False)):
+        decision_status = "defer_heavy_overlay_preview"
+        compile_action = "compile_visible_non_deferred_layers"
+        submit_action = "submit_existing_path_with_deferred_overlay_metadata"
+    elif dynamic_count > 0:
+        decision_status = "rebuild_on_dirty_state"
+        compile_action = "rebuild_dynamic_layer_state_before_submit"
+        submit_action = "keep_existing_renderer_path_until_runtime_consumer_wired"
+    elif static_count > 0 and pressure_value > 0.0:
+        decision_status = "reuse_static_batch_candidate"
+        compile_action = "reuse_static_batches_when_cache_key_stable"
+        submit_action = "candidate_for_single_renderer_plan"
+    else:
+        decision_status = "observed_no_runtime_pressure"
+        compile_action = "collect_more_runtime_pressure_samples"
+        submit_action = "keep_existing_renderer_path"
+    return {
+        "schema": "rrkal_displaytools.layer_state_precompute_decision.v1",
+        "source": source,
+        "status": decision_status,
+        "plan_schema": str(plan.get("schema", "")),
+        "runtime_pressure_schema": str(pressure.get("schema", "")),
+        "pressure": pressure_value,
+        "visible_layer_count": visible_count,
+        "static_batch_candidate_count": static_count,
+        "dynamic_layer_count": dynamic_count,
+        "deferred_layer_count": deferred_count,
+        "compile_action": compile_action,
+        "submit_action": submit_action,
+        "should_reuse_static_batches": decision_status == "reuse_static_batch_candidate",
+        "should_rebuild_dynamic_layers": dynamic_count > 0,
+        "should_defer_layers": deferred_count > 0 or bool(plan.get("defer_vector_overlays", False)),
+        "requires_runtime_consumer": True,
+        "runtime_precompute_applied": False,
+        "runtime_optimization_applied": False,
+        "next_runtime_slice": "wire_precompute_decision_into_layer_render_plan_compiler_after_parity_gate",
+        "boundary": "Decision packet is reviewer metadata only; it does not replace the existing renderer path or enable single-pass submission.",
     }
 
 

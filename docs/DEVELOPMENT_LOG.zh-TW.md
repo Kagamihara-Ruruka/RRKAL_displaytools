@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add LayerRenderState precompute decision metadata
+
+- Added `rrkal_displaytools.layer_state_precompute_decision.v1` as reviewer metadata for reuse/rebuild/defer decisions from the precompute plan.
+- Wired renderer handoff metadata to emit `policies.layer_state_precompute_decision`.
+- Exposed the decision schema/helper/field through the render-plan performance contract and inspector.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add LayerRenderState precompute plan metadata
 
 - Added `rrkal_displaytools.layer_state_precompute_plan.v1` as metadata evidence for compiling frozen layer state before renderer submission.
