@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add runtime optimization reviewer summary
+
+- Added `build_runtime_optimization_review_summary_packet()` to aggregate runtime pressure, LayerRenderState, LOD counters and heavy overlay defer/cache packets.
+- Wired renderer metadata to emit `policies.runtime_optimization_review_summary` as a compact reviewer summary.
+- Corrected the runtime optimization metadata field paths from `render_inputs.*` to the actual `policies.*` metadata location.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add heavy overlay defer/cache snapshot
 
 - Added `build_heavy_overlay_defer_cache_packet()` as the explicit reviewer packet for vector overlay defer/cache decisions.

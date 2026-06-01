@@ -186,6 +186,66 @@ def build_heavy_overlay_defer_cache_packet(
     }
 
 
+def build_runtime_optimization_review_summary_packet(
+    source: str,
+    runtime_pressure_snapshot: dict[str, object] | None,
+    layer_render_state: dict[str, object] | None,
+    lod_counters: dict[str, object] | None,
+    heavy_overlay_defer_cache: dict[str, object] | None,
+) -> dict[str, object]:
+    pressure = runtime_pressure_snapshot if isinstance(runtime_pressure_snapshot, dict) else {}
+    layer_state = layer_render_state if isinstance(layer_render_state, dict) else {}
+    lod = lod_counters if isinstance(lod_counters, dict) else {}
+    overlay = heavy_overlay_defer_cache if isinstance(heavy_overlay_defer_cache, dict) else {}
+    pressure_value = float(pressure.get("pressure", 0.0) or 0.0)
+    defer_vector_overlays = bool(overlay.get("defer_vector_overlays", False))
+    prefer_static_cache = bool(overlay.get("prefer_static_cache", False))
+    if defer_vector_overlays:
+        reviewer_status = "defer_heavy_overlay_during_interaction"
+    elif prefer_static_cache:
+        reviewer_status = "prefer_static_cache"
+    elif pressure_value > 1.08:
+        reviewer_status = "over_budget_observed"
+    else:
+        reviewer_status = "within_budget_or_warming_up"
+    return {
+        "schema": "rrkal_displaytools.runtime_optimization_review_summary.v1",
+        "source": source,
+        "status": "observed_no_runtime_mutation",
+        "reviewer_status": reviewer_status,
+        "pressure": pressure_value,
+        "target_fps": float(pressure.get("target_fps", 0.0) or 0.0),
+        "last_render_ms": float(pressure.get("last_render_ms", 0.0) or 0.0),
+        "lod_bucket": str(lod.get("lod_bucket", pressure.get("lod", "unknown")) or "unknown"),
+        "visible_layer_count": int(layer_state.get("visible_layer_count", pressure.get("visible_layer_count", 0)) or 0),
+        "visible_vector_records": int(lod.get("visible_vector_records", pressure.get("vector_record_count", 0)) or 0),
+        "layer_state_count": int(layer_state.get("layer_count", 0) or 0),
+        "defer_vector_overlays": defer_vector_overlays,
+        "prefer_static_cache": prefer_static_cache,
+        "deferred_overlay_count": int(overlay.get("deferred_overlay_count", lod.get("deferred_overlay_count", 0)) or 0),
+        "cache_hit_count": int(overlay.get("cache_hit_count", lod.get("cache_hit_count", 0)) or 0),
+        "cache_miss_count": int(overlay.get("cache_miss_count", lod.get("cache_miss_count", 0)) or 0),
+        "source_packets": [
+            "runtime_pressure_snapshot",
+            "layer_render_state",
+            "lod_counters",
+            "heavy_overlay_defer_cache",
+        ],
+        "summary_text": "Runtime optimization review: pressure={pressure:.2f}x; lod={lod}; layers={layers}; vectors={vectors}; defer={defer}; static_cache={static_cache}; cache={hits}/{misses}; runtime_mutation=false".format(
+            pressure=pressure_value,
+            lod=str(lod.get("lod_bucket", pressure.get("lod", "unknown")) or "unknown"),
+            layers=int(layer_state.get("visible_layer_count", pressure.get("visible_layer_count", 0)) or 0),
+            vectors=int(lod.get("visible_vector_records", pressure.get("vector_record_count", 0)) or 0),
+            defer=defer_vector_overlays,
+            static_cache=prefer_static_cache,
+            hits=int(overlay.get("cache_hit_count", lod.get("cache_hit_count", 0)) or 0),
+            misses=int(overlay.get("cache_miss_count", lod.get("cache_miss_count", 0)) or 0),
+        ),
+        "runtime_optimization_applied": False,
+        "boundary": "Reviewer summary aggregates existing runtime metadata only; it does not mutate render order, worker scheduling, cache governance or compose merging.",
+    }
+
+
 def layer_render_plan_performance_packet(
     source: str,
     layer_capability_matrix: dict[str, object] | None = None,
@@ -212,16 +272,19 @@ def layer_render_plan_performance_packet(
         "runtime_optimization_applied": False,
         "runtime_pressure_snapshot_schema": "rrkal_displaytools.runtime_pressure_snapshot.v1",
         "runtime_pressure_snapshot_helper": "render_core.render_plan_performance.build_runtime_pressure_snapshot_packet",
-        "runtime_pressure_snapshot_field": "renderer_output_metadata.render_inputs.runtime_pressure_snapshot",
+        "runtime_pressure_snapshot_field": "renderer_output_metadata.policies.runtime_pressure_snapshot",
         "layer_render_state_packet_schema": "rrkal_displaytools.layer_render_state_packet.v1",
         "layer_render_state_packet_helper": "render_core.render_plan_performance.build_layer_render_state_packet",
-        "layer_render_state_packet_field": "renderer_output_metadata.render_inputs.layer_render_state",
+        "layer_render_state_packet_field": "renderer_output_metadata.policies.layer_render_state",
         "lod_counter_packet_schema": "rrkal_displaytools.lod_counter_packet.v1",
         "lod_counter_packet_helper": "render_core.render_plan_performance.build_lod_counter_packet",
-        "lod_counter_packet_field": "renderer_output_metadata.render_inputs.lod_counters",
+        "lod_counter_packet_field": "renderer_output_metadata.policies.lod_counters",
         "heavy_overlay_defer_cache_snapshot_schema": "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
         "heavy_overlay_defer_cache_snapshot_helper": "render_core.render_plan_performance.build_heavy_overlay_defer_cache_packet",
-        "heavy_overlay_defer_cache_snapshot_field": "renderer_output_metadata.render_inputs.heavy_overlay_defer_cache",
+        "heavy_overlay_defer_cache_snapshot_field": "renderer_output_metadata.policies.heavy_overlay_defer_cache",
+        "runtime_optimization_review_summary_schema": "rrkal_displaytools.runtime_optimization_review_summary.v1",
+        "runtime_optimization_review_summary_helper": "render_core.render_plan_performance.build_runtime_optimization_review_summary_packet",
+        "runtime_optimization_review_summary_field": "renderer_output_metadata.policies.runtime_optimization_review_summary",
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",

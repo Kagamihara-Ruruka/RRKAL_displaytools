@@ -24,6 +24,7 @@ from render_core.render_plan_performance import (
     build_layer_render_state_packet,
     build_lod_counter_packet,
     build_runtime_pressure_snapshot_packet,
+    build_runtime_optimization_review_summary_packet,
     layer_render_plan_performance_packet,
 )
 from render_core.render_plan import (
@@ -15797,6 +15798,66 @@ class HybridRenderController:
             }
             for layer_id in self.layer_order
         }
+        render_budget = self.render_budget_decision()
+        visible_layer_count = sum(1 for visible in self.layer_visible.values() if visible)
+        visible_vector_records = int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0))
+        runtime_pressure_snapshot = build_runtime_pressure_snapshot_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            self.width,
+            self.height,
+            self.last_render_ms,
+            getattr(self.args, "target_fps", 30.0),
+            bool(getattr(self, "interaction_active", False)),
+            visible_layer_count,
+            visible_vector_records,
+            self.basemap_lod,
+            int(getattr(self, "vector_overlay_cache_hits", 0)),
+            int(getattr(self, "vector_overlay_cache_misses", 0)),
+            int(getattr(self, "vector_overlay_cache_deferred", 0)),
+            render_budget,
+        )
+        layer_render_state = build_layer_render_state_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            getattr(self, "layer_visible", {}),
+            getattr(self, "layer_opacity", {}),
+            getattr(self, "layer_blend_mode", {}),
+            getattr(self, "selected_layer_semantic_target", None),
+            getattr(self, "layer_dirty_flags", {}),
+            {},
+            self.basemap_lod,
+            None,
+            "none",
+        )
+        lod_counters = build_lod_counter_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            self.basemap_lod,
+            visible_layer_count,
+            visible_vector_records,
+            int(getattr(self, "vector_overlay_cache_deferred", 0)),
+            int(getattr(self, "vector_overlay_cache_hits", 0)),
+            int(getattr(self, "vector_overlay_cache_misses", 0)),
+            getattr(self.args, "target_fps", 30.0),
+            self.last_render_ms,
+        )
+        heavy_overlay_defer_cache = build_heavy_overlay_defer_cache_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            render_budget,
+            bool(getattr(self, "interaction_active", False)),
+            visible_vector_records,
+            int(getattr(self, "vector_overlay_cache_deferred", 0)),
+            int(getattr(self, "vector_overlay_cache_hits", 0)),
+            int(getattr(self, "vector_overlay_cache_misses", 0)),
+            self.basemap_lod,
+            getattr(self.args, "target_fps", 30.0),
+            self.last_render_ms,
+        )
+        runtime_optimization_review_summary = build_runtime_optimization_review_summary_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            runtime_pressure_snapshot,
+            layer_render_state,
+            lod_counters,
+            heavy_overlay_defer_cache,
+        )
         snapshot = {
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "purpose": "handoff snapshot before splitting taichi_global_bathymetry.py into provider/projection/overlay/render/ui modules",
@@ -15883,57 +15944,12 @@ class HybridRenderController:
                     self.basemap_lod,
                     getattr(self.args, "target_fps", 30.0),
                 ),
-                "render_budget": self.render_budget_decision(),
-                "runtime_pressure_snapshot": build_runtime_pressure_snapshot_packet(
-                    "HybridRenderController.collect_provider_manifest_bundle",
-                    self.width,
-                    self.height,
-                    self.last_render_ms,
-                    getattr(self.args, "target_fps", 30.0),
-                    bool(getattr(self, "interaction_active", False)),
-                    sum(1 for visible in self.layer_visible.values() if visible),
-                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
-                    self.basemap_lod,
-                    int(getattr(self, "vector_overlay_cache_hits", 0)),
-                    int(getattr(self, "vector_overlay_cache_misses", 0)),
-                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
-                    self.render_budget_decision(),
-                ),
-                "layer_render_state": build_layer_render_state_packet(
-                    "HybridRenderController.collect_provider_manifest_bundle",
-                    getattr(self, "layer_visible", {}),
-                    getattr(self, "layer_opacity", {}),
-                    getattr(self, "layer_blend_mode", {}),
-                    getattr(self, "selected_layer_semantic_target", None),
-                    getattr(self, "layer_dirty_flags", {}),
-                    {},
-                    self.basemap_lod,
-                    None,
-                    "none",
-                ),
-                "lod_counters": build_lod_counter_packet(
-                    "HybridRenderController.collect_provider_manifest_bundle",
-                    self.basemap_lod,
-                    sum(1 for visible in self.layer_visible.values() if visible),
-                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
-                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
-                    int(getattr(self, "vector_overlay_cache_hits", 0)),
-                    int(getattr(self, "vector_overlay_cache_misses", 0)),
-                    getattr(self.args, "target_fps", 30.0),
-                    self.last_render_ms,
-                ),
-                "heavy_overlay_defer_cache": build_heavy_overlay_defer_cache_packet(
-                    "HybridRenderController.collect_provider_manifest_bundle",
-                    self.render_budget_decision(),
-                    bool(getattr(self, "interaction_active", False)),
-                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
-                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
-                    int(getattr(self, "vector_overlay_cache_hits", 0)),
-                    int(getattr(self, "vector_overlay_cache_misses", 0)),
-                    self.basemap_lod,
-                    getattr(self.args, "target_fps", 30.0),
-                    self.last_render_ms,
-                ),
+                "render_budget": render_budget,
+                "runtime_pressure_snapshot": runtime_pressure_snapshot,
+                "layer_render_state": layer_render_state,
+                "lod_counters": lod_counters,
+                "heavy_overlay_defer_cache": heavy_overlay_defer_cache,
+                "runtime_optimization_review_summary": runtime_optimization_review_summary,
                 "point_overlay_budget": dict(self.point_overlay_budget_last),
                 "vector_overlay_cache": {
                     "entries": len(self.vector_overlay_cache),
