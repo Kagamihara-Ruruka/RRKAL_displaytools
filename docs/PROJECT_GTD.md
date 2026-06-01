@@ -49,6 +49,7 @@ Last updated: 2026-05-30
 - Move future development fully into `L:\RRKAL_displaytools`; avoid editing the old scratch source unless explicitly requested.
 - Define the minimal renderer input contract expected from RRKAL tile/cache manifests.
 - Create in-renderer layer toggles after the Qt launch panel proves the control model.
+- Keep runtime optimization scoped to displaytools: profiler, target FPS, safe preview, LOD counters, LayerRenderState, and heavy overlay defer/cache; do not fold in compression, RendererSkinAsset loading, satellite layers or RRKAL cache governance.
 - Tune profile templates after the preferred visual baseline is confirmed.
 - Separate diagnostics from render-loop code after contracts stabilize.
 - Decide which local cache artifacts should later be registered by RRKAL as renderer bridge assets.

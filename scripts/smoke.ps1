@@ -7885,6 +7885,43 @@ if (-not (Test-Path -LiteralPath (Join-Path $RepoRoot "state\decoupling\pre_deco
     throw "Pre-decoupling snapshot output file missing"
 }
 
+$runtimeOptimizationWorkOrder = $launchPacket.layer_render_plan_performance.runtime_optimization_work_order
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_work_order_schema -ne "rrkal_displaytools.runtime_optimization_work_order.v1") {
+    throw "Layer render-plan performance runtime optimization work-order schema missing"
+}
+if ($runtimeOptimizationWorkOrder.target_fps_contract.schema -ne "rrkal_displaytools.runtime_target_fps_contract.v1") {
+    throw "Runtime optimization target FPS contract schema missing"
+}
+if ($runtimeOptimizationWorkOrder.layer_render_state_contract.schema -ne "rrkal_displaytools.layer_render_state_contract.v1") {
+    throw "Runtime optimization LayerRenderState contract schema missing"
+}
+if ($runtimeOptimizationWorkOrder.lod_counter_contract.schema -ne "rrkal_displaytools.lod_counter_contract.v1") {
+    throw "Runtime optimization LOD counter contract schema missing"
+}
+if ($runtimeOptimizationWorkOrder.heavy_overlay_defer_cache_policy.schema -ne "rrkal_displaytools.heavy_overlay_defer_cache_policy.v1") {
+    throw "Runtime optimization heavy-overlay defer/cache policy schema missing"
+}
+if (@($runtimeOptimizationWorkOrder.allowed_work) -notcontains "LayerRenderState") {
+    throw "Runtime optimization work order must allow LayerRenderState"
+}
+if (@($runtimeOptimizationWorkOrder.allowed_work) -notcontains "heavy_overlay_defer_cache") {
+    throw "Runtime optimization work order must allow heavy overlay defer/cache"
+}
+if (@($runtimeOptimizationWorkOrder.forbidden_work) -notcontains "compression_integration") {
+    throw "Runtime optimization work order must forbid compression integration"
+}
+if (@($runtimeOptimizationWorkOrder.forbidden_work) -notcontains "RendererSkinAsset_loader") {
+    throw "Runtime optimization work order must forbid RendererSkinAsset loader work"
+}
+$renderPlanPerformanceInspectorContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\inspect_layer_render_plan_performance.ps1"), "-ContractOnly")
+$renderPlanPerformanceInspectorContract = ($renderPlanPerformanceInspectorContractText -join "`n") | ConvertFrom-Json
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_optimization_work_order.v1") {
+    throw "Layer render-plan performance inspector contract must expose runtime optimization work order"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
+    throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"
+}
+
 $pre7ClosurePath = Join-Path $RepoRoot "scripts\check_pre7_closure_readiness.ps1"
 if (-not (Test-Path -LiteralPath $pre7ClosurePath)) {
     throw "Pre-7 closure readiness checker is missing"

@@ -27,6 +27,11 @@ if ($ContractOnly) {
             "rrkal_displaytools.layer_render_plan_compose_pass_budget.v1",
             "rrkal_displaytools.compose_run_merge_preflight.v1",
             "rrkal_displaytools.compose_run_parity_artifact_workflow.v1",
+            "rrkal_displaytools.runtime_optimization_work_order.v1",
+            "rrkal_displaytools.runtime_target_fps_contract.v1",
+            "rrkal_displaytools.layer_render_state_contract.v1",
+            "rrkal_displaytools.lod_counter_contract.v1",
+            "rrkal_displaytools.heavy_overlay_defer_cache_policy.v1",
             "rrkal_displaytools.module_boundary_registry.v1"
         )
         default_template = $Template
@@ -66,6 +71,7 @@ $moduleBoundary = $launchPacket.module_boundary_registry
 $budget = $perf.compose_pass_budget
 $preflight = $perf.compose_run_merge_preflight
 $parityWorkflow = $perf.compose_run_parity_artifact_workflow
+$runtimeWorkOrder = $perf.runtime_optimization_work_order
 
 [ordered]@{
     schema = "rrkal_displaytools.layer_render_plan_performance_inspection.v1"
@@ -77,6 +83,15 @@ $parityWorkflow = $perf.compose_run_parity_artifact_workflow
     optimization_target = $perf.optimization_target
     performance_strategy = $perf.performance_strategy
     runtime_optimization_applied = $perf.runtime_optimization_applied
+    runtime_optimization_work_order_schema = $perf.runtime_optimization_work_order_schema
+    runtime_optimization_work_order_status = $runtimeWorkOrder.status
+    runtime_optimization_allowed_work = @($runtimeWorkOrder.allowed_work)
+    runtime_optimization_forbidden_work = @($runtimeWorkOrder.forbidden_work)
+    runtime_target_fps_schema = $runtimeWorkOrder.target_fps_contract.schema
+    layer_render_state_contract_schema = $runtimeWorkOrder.layer_render_state_contract.schema
+    lod_counter_contract_schema = $runtimeWorkOrder.lod_counter_contract.schema
+    heavy_overlay_defer_cache_policy_schema = $runtimeWorkOrder.heavy_overlay_defer_cache_policy.schema
+    first_runtime_optimization_slices = @($runtimeWorkOrder.first_safe_slices)
     current_runtime_claim = $perf.current_runtime_claim
     deferred_until = $perf.deferred_until
     compiled_plan_schema = $perf.compiled_plan_schema

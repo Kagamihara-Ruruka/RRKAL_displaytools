@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add runtime optimization work order
+
+- Added `rrkal_displaytools.runtime_optimization_work_order.v1` to the layer render-plan performance contract.
+- Recorded the allowed post-decoupling runtime optimization scope: runtime profiler, target FPS, safe preview path, LOD counters, LayerRenderState, and heavy overlay defer/cache.
+- Recorded explicit boundaries against compression integration, RendererSkinAsset loading, satellite layers, PS5/flight mode, and RRKAL discovery/download/import/cache governance.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Align workspace rule to L drive only
 
 - Updated `docs/WORKSPACE_LAYOUT.zh-TW.md` so the canonical repo is `L:\RRKAL_displaytools`.
