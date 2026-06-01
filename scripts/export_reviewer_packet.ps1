@@ -36,6 +36,7 @@ if ($ContractOnly) {
         controlled_interception_policy_field = "controlled_interception_policy"
         renderer_config_gateway_field = "renderer_config_gateway"
         performance_smoke_telemetry_field = "performance_smoke_telemetry"
+        runtime_optimization_review_summary_field = "runtime_optimization_review_summary"
         boundary = "Contract-only mode is for smoke checks; normal mode writes a local reviewer packet under state/."
     } | ConvertTo-Json -Depth 8
     exit 0
@@ -86,6 +87,7 @@ $rendererConfigChanged = @($launchPacket.renderer_config_gateway.changed_default
 if (-not $rendererConfigChanged) { $rendererConfigChanged = "none" }
 $rendererConfigGatewaySummary = "Renderer config gateway: schema=$($launchPacket.renderer_config_gateway.schema); style=$($launchPacket.renderer_config_gateway.config.style_profile); size=$($launchPacket.renderer_config_gateway.config.width)x$($launchPacket.renderer_config_gateway.config.height); topo_step=$($launchPacket.renderer_config_gateway.config.topo_step); changed=$rendererConfigChanged; boundary=config_only_no_qt_taichi_data_governance"
 $performanceSmokeSummary = "Performance smoke telemetry: schema=$($launchPacket.performance_smoke_telemetry.schema); stage_schema=$($launchPacket.performance_smoke_telemetry.stage_timing_schema); render_schema=$($launchPacket.performance_smoke_telemetry.render_telemetry_schema); command=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\performance_smoke.ps1; boundary=displaytools-only-no-rrkal-crawler-cache"
+$runtimeOptimizationReviewSummary = "Runtime optimization review: schema=$($performance.runtime_optimization_review_summary_schema); field=$($performance.runtime_optimization_review_summary_field); pressure=$($performance.runtime_pressure_snapshot_schema); layer_state=$($performance.layer_render_state_packet_schema); lod=$($performance.lod_counter_packet_schema); overlay=$($performance.heavy_overlay_defer_cache_snapshot_schema); runtime_mutation=false"
 
 $reviewerPacket = [ordered]@{
     schema = "rrkal_displaytools.reviewer_packet.v1"
@@ -105,6 +107,7 @@ $reviewerPacket = [ordered]@{
     renderer_config_gateway_summary = $rendererConfigGatewaySummary
     performance_smoke_summary = $performanceSmokeSummary
     compose_performance_summary = $composePerformanceSummary
+    runtime_optimization_review_summary = $runtimeOptimizationReviewSummary
     cross_machine_clone_readiness = $launchPacket.cross_machine_clone_readiness
     profile_launch_readiness = $launchPacket.profile_launch_readiness
     profile_ui_state_replay = $launchPacket.profile_ui_state_replay

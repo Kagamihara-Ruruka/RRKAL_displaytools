@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Surface runtime optimization in reviewer handoff
+
+- Added `runtime_optimization_review_summary` to the no-GUI reviewer packet.
+- Added runtime optimization summary schema/helper/field visibility to handoff inspection.
+- Smoke now gates reviewer exporter and handoff inspector visibility for the runtime optimization summary.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add runtime optimization reviewer summary
 
 - Added `build_runtime_optimization_review_summary_packet()` to aggregate runtime pressure, LayerRenderState, LOD counters and heavy overlay defer/cache packets.

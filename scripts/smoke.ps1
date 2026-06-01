@@ -7320,6 +7320,9 @@ if ($reviewerPacketExporterSource -notlike "*rrkal_displaytools.no_gui_reviewer_
 if ($reviewerPacketExporterSource -notlike "*compose_performance_summary*") {
     throw "No-GUI reviewer packet exporter compose performance summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*runtime_optimization_review_summary*") {
+    throw "No-GUI reviewer packet exporter runtime optimization summary missing"
+}
 if ($reviewerPacketExporterSource -notlike "*export_launch_packet.py*") {
     throw "No-GUI reviewer packet exporter launch packet bridge missing"
 }
@@ -7345,6 +7348,9 @@ if ($reviewerPacketContract.renderer_config_gateway_field -ne "renderer_config_g
 }
 if ($reviewerPacketContract.performance_smoke_telemetry_field -ne "performance_smoke_telemetry") {
     throw "No-GUI reviewer packet exporter performance smoke telemetry field missing"
+}
+if ($reviewerPacketContract.runtime_optimization_review_summary_field -ne "runtime_optimization_review_summary") {
+    throw "No-GUI reviewer packet exporter runtime optimization summary field missing"
 }
 if ($composeParitySmoke.mode -ne "contract_only_no_render_side_effect") {
     throw "Compose parity smoke contract mode mismatch"
@@ -7419,6 +7425,9 @@ if ($launchPacketSource -notmatch 'No-GUI launch packet / Qt Canvas Preview / re
 }
 
 $handoffInspectorSource = Get-Content -LiteralPath (Join-Path $BoundaryIdentityRoot "scripts\inspect_handoff.ps1") -Raw -Encoding UTF8
+if ($handoffInspectorSource -notmatch 'runtime_optimization_review_summary') {
+    throw "Handoff inspection runtime optimization review summary output is missing"
+}
 if ($handoffInspectorSource -notmatch 'boundary_identity_warning') {
     throw "Handoff inspection boundary identity warning output is missing"
 }
