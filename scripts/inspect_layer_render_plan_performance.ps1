@@ -30,6 +30,7 @@ if ($ContractOnly) {
             "rrkal_displaytools.runtime_pressure_snapshot.v1",
             "rrkal_displaytools.layer_render_state_packet.v1",
             "rrkal_displaytools.lod_counter_packet.v1",
+            "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
             "rrkal_displaytools.runtime_optimization_work_order.v1",
             "rrkal_displaytools.runtime_target_fps_contract.v1",
             "rrkal_displaytools.layer_render_state_contract.v1",
@@ -95,6 +96,9 @@ $runtimeWorkOrder = $perf.runtime_optimization_work_order
     lod_counter_packet_schema = $perf.lod_counter_packet_schema
     lod_counter_packet_helper = $perf.lod_counter_packet_helper
     lod_counter_packet_field = $perf.lod_counter_packet_field
+    heavy_overlay_defer_cache_snapshot_schema = $perf.heavy_overlay_defer_cache_snapshot_schema
+    heavy_overlay_defer_cache_snapshot_helper = $perf.heavy_overlay_defer_cache_snapshot_helper
+    heavy_overlay_defer_cache_snapshot_field = $perf.heavy_overlay_defer_cache_snapshot_field
     runtime_optimization_work_order_schema = $perf.runtime_optimization_work_order_schema
     runtime_optimization_work_order_status = $runtimeWorkOrder.status
     runtime_optimization_allowed_work = @($runtimeWorkOrder.allowed_work)

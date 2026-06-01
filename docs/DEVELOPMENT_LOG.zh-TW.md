@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add heavy overlay defer/cache snapshot
+
+- Added `build_heavy_overlay_defer_cache_packet()` as the explicit reviewer packet for vector overlay defer/cache decisions.
+- Wired renderer metadata to emit `render_inputs.heavy_overlay_defer_cache` with defer/static-cache flags, vector camera quantum, stride, cache hit/miss, deferred overlay count and defer reason.
+- Kept the slice observational only: no worker-thread change, no render-pass merge, no compression or RRKAL cache governance integration.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add LOD counter metadata packet
 
 - Added `build_lod_counter_packet()` as the LOD/counter evidence shape for post-decoupling runtime optimization.

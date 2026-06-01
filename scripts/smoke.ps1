@@ -617,6 +617,15 @@ if ($launchPacket.layer_render_plan_performance.lod_counter_packet_helper -ne "r
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_field -ne "renderer_output_metadata.render_inputs.lod_counters") {
     throw "Launch packet layer_render_plan_performance LOD counter packet field missing"
 }
+if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_schema -ne "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1") {
+    throw "Launch packet layer_render_plan_performance heavy overlay defer/cache snapshot schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_helper -ne "render_core.render_plan_performance.build_heavy_overlay_defer_cache_packet") {
+    throw "Launch packet layer_render_plan_performance heavy overlay defer/cache snapshot helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_field -ne "renderer_output_metadata.render_inputs.heavy_overlay_defer_cache") {
+    throw "Launch packet layer_render_plan_performance heavy overlay defer/cache snapshot field missing"
+}
 if ($launchPacket.layer_render_plan_performance.runtime_snapshot_schema -ne "rrkal_displaytools.layer_render_plan_runtime_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime snapshot schema missing"
 }
@@ -705,6 +714,12 @@ if ($renderPlanPerformanceModuleSource -notlike "*def build_lod_counter_packet*"
 }
 if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.lod_counter_packet.v1*") {
     throw "LOD counter packet schema marker is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*def build_heavy_overlay_defer_cache_packet*") {
+    throw "Heavy overlay defer/cache packet builder is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1*") {
+    throw "Heavy overlay defer/cache packet schema marker is missing"
 }
 $renderPlanPerformanceEntrypoints = @(
     "taichi_global_bathymetry.py",
@@ -7974,6 +7989,9 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Layer render-plan performance inspector contract must expose LOD counter packet"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1") {
+    throw "Layer render-plan performance inspector contract must expose heavy overlay defer/cache snapshot"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"

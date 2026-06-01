@@ -135,6 +135,57 @@ def build_lod_counter_packet(
     }
 
 
+def build_heavy_overlay_defer_cache_packet(
+    source: str,
+    budget_decision: dict[str, object] | None,
+    interaction_active: bool,
+    visible_vector_records: int,
+    deferred_overlay_count: int,
+    cache_hit_count: int,
+    cache_miss_count: int,
+    lod_bucket: str,
+    target_fps: float,
+    last_render_ms: float | None,
+) -> dict[str, object]:
+    budget = budget_decision if isinstance(budget_decision, dict) else {}
+    target_fps_value = max(1.0, float(target_fps))
+    target_frame_budget_ms = 1000.0 / target_fps_value
+    render_ms = float(last_render_ms or 0.0)
+    pressure = render_ms / max(target_frame_budget_ms, 1e-6) if render_ms > 0.0 else 0.0
+    defer_vector_overlays = bool(budget.get("defer_vector_overlays", False))
+    prefer_static_cache = bool(budget.get("prefer_static_cache", False))
+    if defer_vector_overlays:
+        defer_reason = "interaction_over_budget_vector_overlay"
+    elif prefer_static_cache:
+        defer_reason = "prefer_static_cache_for_heavy_overlay"
+    else:
+        defer_reason = "none"
+    return {
+        "schema": "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
+        "source": source,
+        "status": "observed_no_runtime_mutation",
+        "policy_schema": "rrkal_displaytools.heavy_overlay_defer_cache_policy.v1",
+        "lod_bucket": str(lod_bucket or "unknown"),
+        "interaction_active": bool(interaction_active),
+        "visible_vector_records": max(0, int(visible_vector_records)),
+        "defer_vector_overlays": defer_vector_overlays,
+        "prefer_static_cache": prefer_static_cache,
+        "vector_cache_degrees": float(budget.get("vector_cache_degrees", 0.0) or 0.0),
+        "vector_cache_zoom_step": float(budget.get("vector_cache_zoom_step", 0.0) or 0.0),
+        "vector_point_stride": int(budget.get("vector_point_stride", 1) or 1),
+        "defer_reason": defer_reason,
+        "deferred_overlay_count": max(0, int(deferred_overlay_count)),
+        "cache_hit_count": max(0, int(cache_hit_count)),
+        "cache_miss_count": max(0, int(cache_miss_count)),
+        "target_fps": target_fps_value,
+        "target_frame_budget_ms": target_frame_budget_ms,
+        "last_render_ms": render_ms,
+        "pressure": pressure,
+        "runtime_optimization_applied": False,
+        "boundary": "Heavy overlay defer/cache snapshot reports current policy decisions only; it does not create worker threads, change cache governance or merge render passes.",
+    }
+
+
 def layer_render_plan_performance_packet(
     source: str,
     layer_capability_matrix: dict[str, object] | None = None,
@@ -168,6 +219,9 @@ def layer_render_plan_performance_packet(
         "lod_counter_packet_schema": "rrkal_displaytools.lod_counter_packet.v1",
         "lod_counter_packet_helper": "render_core.render_plan_performance.build_lod_counter_packet",
         "lod_counter_packet_field": "renderer_output_metadata.render_inputs.lod_counters",
+        "heavy_overlay_defer_cache_snapshot_schema": "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
+        "heavy_overlay_defer_cache_snapshot_helper": "render_core.render_plan_performance.build_heavy_overlay_defer_cache_packet",
+        "heavy_overlay_defer_cache_snapshot_field": "renderer_output_metadata.render_inputs.heavy_overlay_defer_cache",
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",

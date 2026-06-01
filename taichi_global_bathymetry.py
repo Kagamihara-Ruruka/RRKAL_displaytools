@@ -20,6 +20,7 @@ from closed_loop_status import renderer_closed_loop_status_packet
 from performance_telemetry import contract_packet as performance_smoke_contract_packet
 from renderer_config_gateway import renderer_config_gateway_packet
 from render_core.render_plan_performance import (
+    build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
     build_lod_counter_packet,
     build_runtime_pressure_snapshot_packet,
@@ -15918,6 +15919,18 @@ class HybridRenderController:
                     int(getattr(self, "vector_overlay_cache_deferred", 0)),
                     int(getattr(self, "vector_overlay_cache_hits", 0)),
                     int(getattr(self, "vector_overlay_cache_misses", 0)),
+                    getattr(self.args, "target_fps", 30.0),
+                    self.last_render_ms,
+                ),
+                "heavy_overlay_defer_cache": build_heavy_overlay_defer_cache_packet(
+                    "HybridRenderController.collect_provider_manifest_bundle",
+                    self.render_budget_decision(),
+                    bool(getattr(self, "interaction_active", False)),
+                    int(getattr(self, "rendered_count", 0)) + int(getattr(self, "aircraft_rendered_count", 0)),
+                    int(getattr(self, "vector_overlay_cache_deferred", 0)),
+                    int(getattr(self, "vector_overlay_cache_hits", 0)),
+                    int(getattr(self, "vector_overlay_cache_misses", 0)),
+                    self.basemap_lod,
                     getattr(self.args, "target_fps", 30.0),
                     self.last_render_ms,
                 ),
