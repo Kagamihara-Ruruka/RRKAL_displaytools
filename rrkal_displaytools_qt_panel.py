@@ -3888,6 +3888,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "border:1px solid #6ba7c8; border-radius:8px; padding:6px 8px; font-weight:600; }"
         )
         layers_layout.addWidget(self.compose_parity_runner_label)
+        self.runtime_optimization_review_label = QtWidgets.QLabel("Runtime optimization: summary pending")
+        self.runtime_optimization_review_label.setObjectName("runtimeOptimizationReviewSummaryStrip")
+        self.runtime_optimization_review_label.setWordWrap(True)
+        self.runtime_optimization_review_label.setStyleSheet(
+            "QLabel#runtimeOptimizationReviewSummaryStrip { color:#243126; background:#e8f8ee; "
+            "border:1px solid #71b989; border-radius:8px; padding:6px 8px; font-weight:600; }"
+        )
+        layers_layout.addWidget(self.runtime_optimization_review_label)
         render_plan_cache_button = QtWidgets.QPushButton("Render plan diagnostics")
         render_plan_cache_button.setObjectName("renderPlanCacheDiagnosticsButton")
         render_plan_cache_button.setToolTip(
@@ -5668,6 +5676,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.collect_module_boundary_registry(),
         )
         packet["cache_diagnostics"] = self.collect_layer_render_plan_cache_diagnostics()
+        packet["runtime_optimization_review_summary_text"] = self.runtime_optimization_review_summary_text(packet)
         return packet
 
     def collect_cross_machine_clone_readiness(self) -> dict[str, object]:
@@ -10179,6 +10188,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.compose_pass_budget_label.setText(self.compose_pass_budget_summary_text(performance))
         if hasattr(self, "compose_parity_runner_label"):
             self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text(performance))
+        if hasattr(self, "runtime_optimization_review_label"):
+            self.runtime_optimization_review_label.setText(self.runtime_optimization_review_summary_text(performance))
         self.command_text.setPlainText(
             json.dumps(
                 {
@@ -10190,6 +10201,19 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             )
         )
         self.status.setText("Displayed layer render-plan performance and cache diagnostics")
+
+    def runtime_optimization_review_summary_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()
+        return (
+            "Runtime optimization: "
+            f"summary={packet.get('runtime_optimization_review_summary_schema', '-')}; "
+            f"field={packet.get('runtime_optimization_review_summary_field', '-')}; "
+            f"pressure={packet.get('runtime_pressure_snapshot_schema', '-')}; "
+            f"layer_state={packet.get('layer_render_state_packet_schema', '-')}; "
+            f"lod={packet.get('lod_counter_packet_schema', '-')}; "
+            f"overlay={packet.get('heavy_overlay_defer_cache_snapshot_schema', '-')}; "
+            "runtime_mutation=false"
+        )
 
     def compose_pass_budget_summary_text(self, packet: dict[str, object] | None = None) -> str:
         packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()

@@ -5942,6 +5942,12 @@ if ($qtPanelSource -notlike "*show_layer_render_plan_performance*") {
 if ($qtPanelSource -notlike "*collect_layer_render_plan_performance*") {
     throw "Qt render plan performance collector is missing"
 }
+if ($qtPanelSource -notlike "*runtimeOptimizationReviewSummaryStrip*") {
+    throw "Qt runtime optimization review summary strip is missing"
+}
+if ($qtPanelSource -notlike "*runtime_optimization_review_summary_text*") {
+    throw "Qt runtime optimization review summary formatter is missing"
+}
 $qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {
     throw "Qt render plan performance single-pass marker is missing"

@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add Qt runtime optimization summary strip
+
+- Added `runtimeOptimizationReviewSummaryStrip` to the Qt Layers panel.
+- Updated `Inspect: Render plan perf` to refresh the runtime optimization summary strip.
+- Added `runtime_optimization_review_summary_text` to the Qt render-plan performance payload.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add runtime optimization clone quickstart route
 
 - Updated clone quickstart guidance so cross-machine reviewers can find `runtime_optimization_review_summary` through reviewer packets and `inspect_layer_render_plan_performance.ps1`.
