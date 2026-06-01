@@ -7608,6 +7608,9 @@ if ($cloneQuickstartDoc -notmatch 'Inspect: Reviewer route') {
 if ($cloneQuickstartDoc -notmatch 'Inspect: Capability summary') {
     throw "Clone quickstart missing Qt capability summary guidance"
 }
+if ($cloneQuickstartDoc -notmatch 'runtime_optimization_review_summary') {
+    throw "Clone quickstart missing runtime optimization review summary guidance"
+}
 if ($cloneQuickstartDoc -notmatch 'Inspect: Extraction dry-run') {
     throw "Clone quickstart missing Qt extraction dry-run guidance"
 }

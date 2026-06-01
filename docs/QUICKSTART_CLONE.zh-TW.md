@@ -43,7 +43,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_handoff.ps1
 
 Qt 開啟後也可以在 Replay/contracts 使用 `Copy clone summary`，把 repo、setup doc、profile readiness、Qt-first、smoke-required 與 handoff-first 指令整理成可貼到交接紀錄的摘要。
 同一區也有 `Copy launch summary`，用來複製 profile readiness、portable command、launch packet fields 與 renderer capability field。
-Run/profile 區的 `Export reviewer packet` 會輸出 `state/showcase/reviewer_packet.json`，包含 clone、launch、research、visual、compose performance 摘要與 launch packet snapshot。若不開 Qt，也可執行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\export_reviewer_packet.ps1` 產生同路徑 reviewer packet。跨機器檢查效能優化狀態時，優先看 `compose_performance_summary`：它會合併 compose budget、slowest/advice、target pass model、parity runner readiness 與 `runtime_merge=false`。
+Run/profile 區的 `Export reviewer packet` 會輸出 `state/showcase/reviewer_packet.json`，包含 clone、launch、research、visual、compose performance 摘要與 launch packet snapshot。若不開 Qt，也可執行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\export_reviewer_packet.ps1` 產生同路徑 reviewer packet。跨機器檢查效能優化狀態時，優先看 `compose_performance_summary` 與 `runtime_optimization_review_summary`：前者會合併 compose budget、slowest/advice、target pass model、parity runner readiness 與 `runtime_merge=false`；後者會指向 target-FPS pressure、LayerRenderState、LOD counters 與 heavy overlay defer/cache 的 reviewer summary contract。
 
 ## 4. 跑提交級 smoke
 
@@ -121,6 +121,7 @@ Qt 面板目前可做：
 
 - Replay/contracts：先開 `Inspect: Clone ready`、`Inspect: Reviewer route`、`Inspect: Capability summary`、`Inspect: Profile replay`、`Inspect: Timeline`、`Inspect: Module seams`、`Inspect: Extraction dry-run`、`Inspect: Source map`、`Inspect: Pre-7 closure`，確認 portable command、clone/setup/smoke/handoff/Qt review 路線、目前/預計功能、profile replay coverage、Timeline runtime/keyframes、模組邊界、post-7 render-plan extraction checklist、source-map helper seam 與 pre-7 closure handoff 狀態。
 - Renderer ports：再開 `Inspect: Hydro LOD`、`Inspect: Ocean port`、`Inspect: Style routes`、`Inspect: Layer matrix`、`Inspect: Layer runtime`，確認 hydrology/LOD、sea-state scalar port、parchment/tactical renderer routes、layer capability matrix 與 layer runtime ack。
+- Performance review：再跑 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1` 或 Qt `Inspect: Render plan perf`，確認 runtime optimization review summary、target-FPS pressure、LayerRenderState、LOD counters 與 heavy overlay defer/cache metadata route。
 - Research interaction：最後開 `Inspect: Layer pick`、`Inspect: Canvas state`、`Inspect: Pin pick`、`Inspect: Cursor geo`、`Inspect: Boundary JSON`，確認 selected-layer pick、Canvas Preview/provenance、Pin pick、滑鼠經緯度、Boundary/EEZ 強調與 identity warning。
 - Visual review：再看 `Inspect: UIUX closure` 與 `Inspect: Workspace map`，確認 ready/queued 功能狀態、workspace dock 角色、研究者操作流與 visible non-goals。
 
