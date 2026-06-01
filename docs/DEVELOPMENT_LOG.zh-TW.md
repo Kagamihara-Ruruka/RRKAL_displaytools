@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add LayerRenderState metadata packet
+
+- Added `build_layer_render_state_packet()` as the first metadata shape for post-decoupling LayerRenderState optimization.
+- Wired renderer metadata to emit `render_inputs.layer_render_state` with current visibility, opacity, blend mode, dirty flags, LOD and defer reason.
+- Kept the slice observational only: no render-loop mutation, no compose-run merge, no compression or RRKAL cache governance integration.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add runtime pressure snapshot metadata
 
 - Added `build_runtime_pressure_snapshot_packet()` as the first runtime optimization evidence helper.

@@ -51,6 +51,55 @@ def build_runtime_pressure_snapshot_packet(
     }
 
 
+def build_layer_render_state_packet(
+    source: str,
+    layer_visible: dict[str, object] | None,
+    layer_opacity: dict[str, object] | None = None,
+    layer_blend_mode: dict[str, object] | None = None,
+    selected_layer_semantic_target: str | None = None,
+    dirty_flags: dict[str, object] | None = None,
+    renderer_targets: dict[str, object] | None = None,
+    lod_bucket: str = "",
+    cache_key: str | None = None,
+    defer_reason: str | None = None,
+) -> dict[str, object]:
+    visible = layer_visible if isinstance(layer_visible, dict) else {}
+    opacity = layer_opacity if isinstance(layer_opacity, dict) else {}
+    blend = layer_blend_mode if isinstance(layer_blend_mode, dict) else {}
+    targets = renderer_targets if isinstance(renderer_targets, dict) else {}
+    dirty = dirty_flags if isinstance(dirty_flags, dict) else {}
+    active_dirty_flags = [str(key) for key, value in dirty.items() if bool(value)]
+    layers = []
+    for layer_id in sorted(str(key) for key in visible.keys()):
+        layers.append(
+            {
+                "layer_id": layer_id,
+                "visible": bool(visible.get(layer_id, False)),
+                "opacity": float(opacity.get(layer_id, 1.0) or 0.0),
+                "blend_mode": str(blend.get(layer_id, "normal") or "normal"),
+                "dirty_flags": list(active_dirty_flags),
+                "renderer_target": str(targets.get(layer_id, layer_id) or layer_id),
+                "cache_key": "" if cache_key is None else str(cache_key),
+                "lod_bucket": str(lod_bucket or "unknown"),
+                "defer_reason": str(defer_reason or "none"),
+            }
+        )
+    return {
+        "schema": "rrkal_displaytools.layer_render_state_packet.v1",
+        "source": source,
+        "status": "observed_no_runtime_mutation",
+        "contract_schema": "rrkal_displaytools.layer_render_state_contract.v1",
+        "layer_count": len(layers),
+        "visible_layer_count": sum(1 for layer in layers if bool(layer.get("visible"))),
+        "selected_layer_semantic_target": selected_layer_semantic_target,
+        "active_dirty_flags": active_dirty_flags,
+        "lod_bucket": str(lod_bucket or "unknown"),
+        "layers": layers,
+        "runtime_optimization_applied": False,
+        "boundary": "LayerRenderState packet freezes existing layer UI/runtime facts for metadata review only; it does not reorder rendering or enable collapsed compose runs.",
+    }
+
+
 def layer_render_plan_performance_packet(
     source: str,
     layer_capability_matrix: dict[str, object] | None = None,
@@ -78,6 +127,9 @@ def layer_render_plan_performance_packet(
         "runtime_pressure_snapshot_schema": "rrkal_displaytools.runtime_pressure_snapshot.v1",
         "runtime_pressure_snapshot_helper": "render_core.render_plan_performance.build_runtime_pressure_snapshot_packet",
         "runtime_pressure_snapshot_field": "renderer_output_metadata.render_inputs.runtime_pressure_snapshot",
+        "layer_render_state_packet_schema": "rrkal_displaytools.layer_render_state_packet.v1",
+        "layer_render_state_packet_helper": "render_core.render_plan_performance.build_layer_render_state_packet",
+        "layer_render_state_packet_field": "renderer_output_metadata.render_inputs.layer_render_state",
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",

@@ -26,9 +26,10 @@
 
 - `rrkal_displaytools.runtime_optimization_work_order.v1` 已加入 `layer_render_plan_performance`，明確把後續效能切片限定在 profiler、target FPS、safe preview、LOD counters、LayerRenderState 與 heavy overlay defer/cache。
 - `rrkal_displaytools.runtime_pressure_snapshot.v1` 已接到 renderer metadata 的 `render_inputs.runtime_pressure_snapshot`，會回報 last render ms、target FPS/frame budget、pressure、interaction active、LOD、visible layer count、vector record count 與 heavy overlay defer/cache counters；它只做觀測，不改 render loop。
+- `rrkal_displaytools.layer_render_state_packet.v1` 已接到 renderer metadata 的 `render_inputs.layer_render_state`，會凍結目前 layer visibility、opacity、blend mode、dirty flags、renderer target、LOD bucket 與 defer reason，作為後續先編譯 LayerRenderState 再單次提交 render plan 的證據形狀。
 - 這個 work order 同時明確禁止 displaytools 在本階段接 compression integration、RendererSkinAsset loader、new satellite layers、PS5/flight mode 或 RRKAL discovery/download/import/cache governance。
 - Review command: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1`。
-- Smoke 會驗證 runtime pressure snapshot、work-order schema、target FPS contract、LayerRenderState contract、LOD counter contract 與 heavy overlay defer/cache policy。
+- Smoke 會驗證 runtime pressure snapshot、LayerRenderState packet、work-order schema、target FPS contract、LayerRenderState contract、LOD counter contract 與 heavy overlay defer/cache policy。
 
 ### Qt-first operator UI
 

@@ -20,6 +20,7 @@ from closed_loop_status import renderer_closed_loop_status_packet
 from performance_telemetry import contract_packet as performance_smoke_contract_packet
 from renderer_config_gateway import renderer_config_gateway_packet
 from render_core.render_plan_performance import (
+    build_layer_render_state_packet,
     build_runtime_pressure_snapshot_packet,
     layer_render_plan_performance_packet,
 )
@@ -15895,6 +15896,18 @@ class HybridRenderController:
                     int(getattr(self, "vector_overlay_cache_misses", 0)),
                     int(getattr(self, "vector_overlay_cache_deferred", 0)),
                     self.render_budget_decision(),
+                ),
+                "layer_render_state": build_layer_render_state_packet(
+                    "HybridRenderController.collect_provider_manifest_bundle",
+                    getattr(self, "layer_visible", {}),
+                    getattr(self, "layer_opacity", {}),
+                    getattr(self, "layer_blend_mode", {}),
+                    getattr(self, "selected_layer_semantic_target", None),
+                    getattr(self, "layer_dirty_flags", {}),
+                    {},
+                    self.basemap_lod,
+                    None,
+                    "none",
                 ),
                 "point_overlay_budget": dict(self.point_overlay_budget_last),
                 "vector_overlay_cache": {

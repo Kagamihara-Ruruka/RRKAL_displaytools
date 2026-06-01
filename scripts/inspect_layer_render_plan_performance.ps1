@@ -28,6 +28,7 @@ if ($ContractOnly) {
             "rrkal_displaytools.compose_run_merge_preflight.v1",
             "rrkal_displaytools.compose_run_parity_artifact_workflow.v1",
             "rrkal_displaytools.runtime_pressure_snapshot.v1",
+            "rrkal_displaytools.layer_render_state_packet.v1",
             "rrkal_displaytools.runtime_optimization_work_order.v1",
             "rrkal_displaytools.runtime_target_fps_contract.v1",
             "rrkal_displaytools.layer_render_state_contract.v1",
@@ -87,6 +88,9 @@ $runtimeWorkOrder = $perf.runtime_optimization_work_order
     runtime_pressure_snapshot_schema = $perf.runtime_pressure_snapshot_schema
     runtime_pressure_snapshot_helper = $perf.runtime_pressure_snapshot_helper
     runtime_pressure_snapshot_field = $perf.runtime_pressure_snapshot_field
+    layer_render_state_packet_schema = $perf.layer_render_state_packet_schema
+    layer_render_state_packet_helper = $perf.layer_render_state_packet_helper
+    layer_render_state_packet_field = $perf.layer_render_state_packet_field
     runtime_optimization_work_order_schema = $perf.runtime_optimization_work_order_schema
     runtime_optimization_work_order_status = $runtimeWorkOrder.status
     runtime_optimization_allowed_work = @($runtimeWorkOrder.allowed_work)

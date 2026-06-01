@@ -599,6 +599,15 @@ if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_helper
 if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_field -ne "renderer_output_metadata.render_inputs.runtime_pressure_snapshot") {
     throw "Launch packet layer_render_plan_performance runtime pressure snapshot field missing"
 }
+if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_schema -ne "rrkal_displaytools.layer_render_state_packet.v1") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState packet schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_helper -ne "render_core.render_plan_performance.build_layer_render_state_packet") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState packet helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_field -ne "renderer_output_metadata.render_inputs.layer_render_state") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState packet field missing"
+}
 if ($launchPacket.layer_render_plan_performance.runtime_snapshot_schema -ne "rrkal_displaytools.layer_render_plan_runtime_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime snapshot schema missing"
 }
@@ -675,6 +684,12 @@ if ($renderPlanPerformanceModuleSource -notlike "*def build_runtime_pressure_sna
 }
 if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.runtime_pressure_snapshot.v1*") {
     throw "Runtime pressure snapshot schema marker is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*def build_layer_render_state_packet*") {
+    throw "LayerRenderState packet builder is missing"
+}
+if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.layer_render_state_packet.v1*") {
+    throw "LayerRenderState packet schema marker is missing"
 }
 $renderPlanPerformanceEntrypoints = @(
     "taichi_global_bathymetry.py",
@@ -7938,6 +7953,9 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_pressure_snapshot.v1") {
     throw "Layer render-plan performance inspector contract must expose runtime pressure snapshot"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_packet.v1") {
+    throw "Layer render-plan performance inspector contract must expose LayerRenderState packet"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"
