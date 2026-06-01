@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Add runtime optimization module boundary evidence
+
+- Added `rrkal_displaytools.runtime_optimization_module_boundary.v1` to show the helper/contract module split explicitly.
+- Exposed the boundary through the layer render-plan performance packet and inspector.
+- Added smoke gates for the module boundary schema, helper path and no-runtime-mutation claim.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Split runtime optimization review helpers
 
 - Added `render_core/runtime_optimization_review.py` as the dedicated runtime optimization metadata helper module.

@@ -32,6 +32,7 @@ if ($ContractOnly) {
             "rrkal_displaytools.lod_counter_packet.v1",
             "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1",
             "rrkal_displaytools.runtime_optimization_review_summary.v1",
+            "rrkal_displaytools.runtime_optimization_module_boundary.v1",
             "rrkal_displaytools.runtime_optimization_work_order.v1",
             "rrkal_displaytools.runtime_target_fps_contract.v1",
             "rrkal_displaytools.layer_render_state_contract.v1",
@@ -77,6 +78,7 @@ $budget = $perf.compose_pass_budget
 $preflight = $perf.compose_run_merge_preflight
 $parityWorkflow = $perf.compose_run_parity_artifact_workflow
 $runtimeWorkOrder = $perf.runtime_optimization_work_order
+$runtimeModuleBoundary = $perf.runtime_optimization_module_boundary
 
 [ordered]@{
     schema = "rrkal_displaytools.layer_render_plan_performance_inspection.v1"
@@ -103,6 +105,13 @@ $runtimeWorkOrder = $perf.runtime_optimization_work_order
     runtime_optimization_review_summary_schema = $perf.runtime_optimization_review_summary_schema
     runtime_optimization_review_summary_helper = $perf.runtime_optimization_review_summary_helper
     runtime_optimization_review_summary_field = $perf.runtime_optimization_review_summary_field
+    runtime_optimization_module_boundary_schema = $perf.runtime_optimization_module_boundary_schema
+    runtime_optimization_module_boundary_helper = $perf.runtime_optimization_module_boundary_helper
+    runtime_optimization_module_boundary_status = $runtimeModuleBoundary.status
+    runtime_optimization_helper_module = $runtimeModuleBoundary.helper_module
+    runtime_optimization_contract_module = $runtimeModuleBoundary.contract_module
+    runtime_optimization_helper_exports = @($runtimeModuleBoundary.helper_exports)
+    runtime_optimization_metadata_fields = @($runtimeModuleBoundary.metadata_fields)
     runtime_optimization_work_order_schema = $perf.runtime_optimization_work_order_schema
     runtime_optimization_work_order_status = $runtimeWorkOrder.status
     runtime_optimization_allowed_work = @($runtimeWorkOrder.allowed_work)

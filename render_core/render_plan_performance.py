@@ -7,9 +7,11 @@ from render_core.runtime_optimization_review import (
     build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
     build_lod_counter_packet,
+    build_runtime_optimization_module_boundary_packet,
     build_runtime_optimization_review_summary_packet,
     build_runtime_pressure_snapshot_packet,
 )
+
 
 def layer_render_plan_performance_packet(
     source: str,
@@ -50,6 +52,9 @@ def layer_render_plan_performance_packet(
         "runtime_optimization_review_summary_schema": "rrkal_displaytools.runtime_optimization_review_summary.v1",
         "runtime_optimization_review_summary_helper": "render_core.runtime_optimization_review.build_runtime_optimization_review_summary_packet",
         "runtime_optimization_review_summary_field": "renderer_output_metadata.policies.runtime_optimization_review_summary",
+        "runtime_optimization_module_boundary_schema": "rrkal_displaytools.runtime_optimization_module_boundary.v1",
+        "runtime_optimization_module_boundary_helper": "render_core.runtime_optimization_review.build_runtime_optimization_module_boundary_packet",
+        "runtime_optimization_module_boundary": build_runtime_optimization_module_boundary_packet(source),
         "runtime_optimization_work_order_schema": "rrkal_displaytools.runtime_optimization_work_order.v1",
         "runtime_optimization_work_order": {
             "schema": "rrkal_displaytools.runtime_optimization_work_order.v1",

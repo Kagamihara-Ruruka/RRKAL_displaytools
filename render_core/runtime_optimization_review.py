@@ -3,6 +3,38 @@
 from __future__ import annotations
 
 
+def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, object]:
+    helper_exports = [
+        "build_runtime_pressure_snapshot_packet",
+        "build_layer_render_state_packet",
+        "build_lod_counter_packet",
+        "build_heavy_overlay_defer_cache_packet",
+        "build_runtime_optimization_review_summary_packet",
+    ]
+    metadata_fields = [
+        "renderer_output_metadata.policies.runtime_pressure_snapshot",
+        "renderer_output_metadata.policies.layer_render_state",
+        "renderer_output_metadata.policies.lod_counters",
+        "renderer_output_metadata.policies.heavy_overlay_defer_cache",
+        "renderer_output_metadata.policies.runtime_optimization_review_summary",
+    ]
+    return {
+        "schema": "rrkal_displaytools.runtime_optimization_module_boundary.v1",
+        "source": source,
+        "status": "helper_module_split_contract_module_unchanged",
+        "helper_module": "render_core.runtime_optimization_review",
+        "contract_module": "render_core.render_plan_performance",
+        "helper_exports": helper_exports,
+        "helper_export_count": len(helper_exports),
+        "metadata_fields": metadata_fields,
+        "metadata_field_count": len(metadata_fields),
+        "runtime_entrypoint": "HybridRenderController.project_handoff_snapshot",
+        "review_entrypoint": "scripts/inspect_layer_render_plan_performance.ps1",
+        "runtime_optimization_applied": False,
+        "boundary": "Module boundary evidence only; helper extraction does not change render order, worker scheduling, cache governance or compose merging.",
+    }
+
+
 def build_runtime_pressure_snapshot_packet(
     source: str,
     width: int,

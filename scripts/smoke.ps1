@@ -635,6 +635,21 @@ if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summ
 if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summary_field -ne "renderer_output_metadata.policies.runtime_optimization_review_summary") {
     throw "Launch packet layer_render_plan_performance runtime optimization review summary field missing"
 }
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_module_boundary_schema -ne "rrkal_displaytools.runtime_optimization_module_boundary.v1") {
+    throw "Launch packet layer_render_plan_performance runtime optimization module boundary schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_module_boundary_helper -ne "render_core.runtime_optimization_review.build_runtime_optimization_module_boundary_packet") {
+    throw "Launch packet layer_render_plan_performance runtime optimization module boundary helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_module_boundary.helper_module -ne "render_core.runtime_optimization_review") {
+    throw "Launch packet layer_render_plan_performance runtime optimization helper module mismatch"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_module_boundary.contract_module -ne "render_core.render_plan_performance") {
+    throw "Launch packet layer_render_plan_performance runtime optimization contract module mismatch"
+}
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_module_boundary.runtime_optimization_applied -ne $false) {
+    throw "Launch packet layer_render_plan_performance runtime optimization module boundary must not claim applied optimization"
+}
 if ($launchPacket.layer_render_plan_performance.runtime_snapshot_schema -ne "rrkal_displaytools.layer_render_plan_runtime_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime snapshot schema missing"
 }
@@ -736,6 +751,12 @@ if ($runtimeOptimizationReviewModuleSource -notlike "*def build_runtime_optimiza
 }
 if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.runtime_optimization_review_summary.v1*") {
     throw "Runtime optimization review summary schema marker is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_runtime_optimization_module_boundary_packet*") {
+    throw "Runtime optimization module boundary builder is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.runtime_optimization_module_boundary.v1*") {
+    throw "Runtime optimization module boundary schema marker is missing"
 }
 $renderPlanPerformanceEntrypoints = @(
     "taichi_global_bathymetry.py",
@@ -2311,6 +2332,15 @@ if ($layerRenderPlanPerformanceInspectorPacket.optimization_target -ne "precompu
 }
 if ($layerRenderPlanPerformanceInspectorPacket.runtime_optimization_applied -ne $false) {
     throw "Layer render-plan performance must not claim runtime optimization yet"
+}
+if ($layerRenderPlanPerformanceInspectorPacket.runtime_optimization_module_boundary_schema -ne "rrkal_displaytools.runtime_optimization_module_boundary.v1") {
+    throw "Layer render-plan performance runtime optimization module boundary schema missing"
+}
+if ($layerRenderPlanPerformanceInspectorPacket.runtime_optimization_helper_module -ne "render_core.runtime_optimization_review") {
+    throw "Layer render-plan performance runtime optimization helper module mismatch"
+}
+if ($layerRenderPlanPerformanceInspectorPacket.runtime_optimization_contract_module -ne "render_core.render_plan_performance") {
+    throw "Layer render-plan performance runtime optimization contract module mismatch"
 }
 if ($layerRenderPlanPerformanceInspectorPacket.compose_runtime_merge_enabled -ne $false) {
     throw "Layer render-plan compose runtime merge must remain disabled"
@@ -8041,6 +8071,9 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_optimization_review_summary.v1") {
     throw "Layer render-plan performance inspector contract must expose runtime optimization review summary"
+}
+if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.runtime_optimization_module_boundary.v1") {
+    throw "Layer render-plan performance inspector contract must expose runtime optimization module boundary"
 }
 if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "rrkal_displaytools.layer_render_state_contract.v1") {
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"
