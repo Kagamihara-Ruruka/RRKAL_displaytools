@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
@@ -62,7 +62,7 @@ function Invoke-CapturedNative {
     return Invoke-NativeWithRetry $FilePath $ArgumentList -CaptureOutput
 }
 
-Invoke-CheckedNative py @("-3", "-m", "py_compile", "rrkal_displaytools_qt_panel.py", "taichi_global_bathymetry.py", "pin_projection.py", "closed_loop_status.py", "render_core\render_plan.py", "render_core\render_plan_performance.py", "display_runtime\__init__.py", "display_runtime\earth_canvas.py", "display_runtime\protocols.py", "display_runtime\samples.py", "display_runtime\time_series_canvas.py", "scripts\export_display_shell_render_matrix.py", "scripts\export_display_runtime_contracts.py")
+Invoke-CheckedNative py @("-3", "-m", "py_compile", "rrkal_displaytools_qt_panel.py", "taichi_global_bathymetry.py", "pin_projection.py", "closed_loop_status.py", "render_core\render_plan.py", "render_core\render_plan_performance.py", "render_core\runtime_optimization_review.py", "display_runtime\__init__.py", "display_runtime\earth_canvas.py", "display_runtime\protocols.py", "display_runtime\samples.py", "display_runtime\time_series_canvas.py", "scripts\export_display_shell_render_matrix.py", "scripts\export_display_runtime_contracts.py")
 Invoke-CheckedNative py @("-3", "profile_schema.py") | Out-Null
 Invoke-CheckedNative py @("-3", "scripts\validate_profiles.py")
 $launchPacketText = Invoke-CapturedNative py @("-3", "scripts\export_launch_packet.py", "--template", "fast_synthetic")
@@ -593,7 +593,7 @@ if ($launchPacket.layer_render_plan_performance.runtime_optimization_applied -ne
 if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_schema -ne "rrkal_displaytools.runtime_pressure_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance runtime pressure snapshot schema missing"
 }
-if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_helper -ne "render_core.render_plan_performance.build_runtime_pressure_snapshot_packet") {
+if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_helper -ne "render_core.runtime_optimization_review.build_runtime_pressure_snapshot_packet") {
     throw "Launch packet layer_render_plan_performance runtime pressure snapshot helper missing"
 }
 if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_field -ne "renderer_output_metadata.policies.runtime_pressure_snapshot") {
@@ -602,7 +602,7 @@ if ($launchPacket.layer_render_plan_performance.runtime_pressure_snapshot_field 
 if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_schema -ne "rrkal_displaytools.layer_render_state_packet.v1") {
     throw "Launch packet layer_render_plan_performance LayerRenderState packet schema missing"
 }
-if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_helper -ne "render_core.render_plan_performance.build_layer_render_state_packet") {
+if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_helper -ne "render_core.runtime_optimization_review.build_layer_render_state_packet") {
     throw "Launch packet layer_render_plan_performance LayerRenderState packet helper missing"
 }
 if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_field -ne "renderer_output_metadata.policies.layer_render_state") {
@@ -611,7 +611,7 @@ if ($launchPacket.layer_render_plan_performance.layer_render_state_packet_field 
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_schema -ne "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Launch packet layer_render_plan_performance LOD counter packet schema missing"
 }
-if ($launchPacket.layer_render_plan_performance.lod_counter_packet_helper -ne "render_core.render_plan_performance.build_lod_counter_packet") {
+if ($launchPacket.layer_render_plan_performance.lod_counter_packet_helper -ne "render_core.runtime_optimization_review.build_lod_counter_packet") {
     throw "Launch packet layer_render_plan_performance LOD counter packet helper missing"
 }
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_field -ne "renderer_output_metadata.policies.lod_counters") {
@@ -620,7 +620,7 @@ if ($launchPacket.layer_render_plan_performance.lod_counter_packet_field -ne "re
 if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_schema -ne "rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1") {
     throw "Launch packet layer_render_plan_performance heavy overlay defer/cache snapshot schema missing"
 }
-if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_helper -ne "render_core.render_plan_performance.build_heavy_overlay_defer_cache_packet") {
+if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_helper -ne "render_core.runtime_optimization_review.build_heavy_overlay_defer_cache_packet") {
     throw "Launch packet layer_render_plan_performance heavy overlay defer/cache snapshot helper missing"
 }
 if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapshot_field -ne "renderer_output_metadata.policies.heavy_overlay_defer_cache") {
@@ -629,7 +629,7 @@ if ($launchPacket.layer_render_plan_performance.heavy_overlay_defer_cache_snapsh
 if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summary_schema -ne "rrkal_displaytools.runtime_optimization_review_summary.v1") {
     throw "Launch packet layer_render_plan_performance runtime optimization review summary schema missing"
 }
-if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summary_helper -ne "render_core.render_plan_performance.build_runtime_optimization_review_summary_packet") {
+if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summary_helper -ne "render_core.runtime_optimization_review.build_runtime_optimization_review_summary_packet") {
     throw "Launch packet layer_render_plan_performance runtime optimization review summary helper missing"
 }
 if ($launchPacket.layer_render_plan_performance.runtime_optimization_review_summary_field -ne "renderer_output_metadata.policies.runtime_optimization_review_summary") {
@@ -700,40 +700,41 @@ if ($launchPacket.layer_render_plan_performance.compiled_plan_adapter_payload_pr
 }
 $renderPlanPerformanceRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $renderPlanPerformanceModuleSource = Get-Content -LiteralPath (Join-Path $renderPlanPerformanceRoot "render_core\render_plan_performance.py") -Raw -Encoding UTF8
+$runtimeOptimizationReviewModuleSource = Get-Content -LiteralPath (Join-Path $renderPlanPerformanceRoot "render_core\runtime_optimization_review.py") -Raw -Encoding UTF8
 if ($renderPlanPerformanceModuleSource -notlike "*def layer_render_plan_performance_packet*") {
     throw "Shared render plan performance packet function is missing"
 }
 if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.layer_render_plan_performance.v1*") {
     throw "Shared render plan performance packet schema marker is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*def build_runtime_pressure_snapshot_packet*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_runtime_pressure_snapshot_packet*") {
     throw "Runtime pressure snapshot builder is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.runtime_pressure_snapshot.v1*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.runtime_pressure_snapshot.v1*") {
     throw "Runtime pressure snapshot schema marker is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*def build_layer_render_state_packet*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_layer_render_state_packet*") {
     throw "LayerRenderState packet builder is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.layer_render_state_packet.v1*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.layer_render_state_packet.v1*") {
     throw "LayerRenderState packet schema marker is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*def build_lod_counter_packet*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_lod_counter_packet*") {
     throw "LOD counter packet builder is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.lod_counter_packet.v1*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.lod_counter_packet.v1*") {
     throw "LOD counter packet schema marker is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*def build_heavy_overlay_defer_cache_packet*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_heavy_overlay_defer_cache_packet*") {
     throw "Heavy overlay defer/cache packet builder is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.heavy_overlay_defer_cache_snapshot.v1*") {
     throw "Heavy overlay defer/cache packet schema marker is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*def build_runtime_optimization_review_summary_packet*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_runtime_optimization_review_summary_packet*") {
     throw "Runtime optimization review summary builder is missing"
 }
-if ($renderPlanPerformanceModuleSource -notlike "*rrkal_displaytools.runtime_optimization_review_summary.v1*") {
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.runtime_optimization_review_summary.v1*") {
     throw "Runtime optimization review summary schema marker is missing"
 }
 $renderPlanPerformanceEntrypoints = @(
@@ -5948,7 +5949,7 @@ if ($qtPanelSource -notlike "*runtimeOptimizationReviewSummaryStrip*") {
 if ($qtPanelSource -notlike "*runtime_optimization_review_summary_text*") {
     throw "Qt runtime optimization review summary formatter is missing"
 }
-$qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource
+$qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource + $runtimeOptimizationReviewModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {
     throw "Qt render plan performance single-pass marker is missing"
 }
@@ -6524,7 +6525,7 @@ $displayCoreSource = @(
     (Get-Content -Raw -Encoding UTF8 display_core\__init__.py),
     (Get-Content -Raw -Encoding UTF8 display_core\render_matrix.py)
 ) -join "`n"
-$renderPlanCombinedSource = "$rendererSource`n$renderPlanCoreSource`n$renderPlanPerformanceModuleSource"
+$renderPlanCombinedSource = "$rendererSource`n$renderPlanCoreSource`n$renderPlanPerformanceModuleSource`n$runtimeOptimizationReviewModuleSource"
 if ($displayCoreSource -notlike "*rrkal_displaytools.display_shell_render_matrix.v1*") {
     throw "Display shell render matrix capability schema is missing"
 }

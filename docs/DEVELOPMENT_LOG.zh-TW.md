@@ -1,5 +1,12 @@
 # Development Log
 
+## 2026-06-01 - Split runtime optimization review helpers
+
+- Added `render_core/runtime_optimization_review.py` as the dedicated runtime optimization metadata helper module.
+- Kept `render_core/render_plan_performance.py` focused on the render-plan performance handoff contract while re-exporting helper builders for compatibility.
+- Updated Taichi imports and smoke gates to recognize the new helper module boundary.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+
 ## 2026-06-01 - Add Qt runtime optimization summary strip
 
 - Added `runtimeOptimizationReviewSummaryStrip` to the Qt Layers panel.

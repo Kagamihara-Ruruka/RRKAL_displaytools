@@ -19,13 +19,13 @@ from cursor_geodesy import cursor_raycast_ack_payload, cursor_raycast_state_payl
 from closed_loop_status import renderer_closed_loop_status_packet
 from performance_telemetry import contract_packet as performance_smoke_contract_packet
 from renderer_config_gateway import renderer_config_gateway_packet
-from render_core.render_plan_performance import (
+from render_core.render_plan_performance import layer_render_plan_performance_packet
+from render_core.runtime_optimization_review import (
     build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
     build_lod_counter_packet,
-    build_runtime_pressure_snapshot_packet,
     build_runtime_optimization_review_summary_packet,
-    layer_render_plan_performance_packet,
+    build_runtime_pressure_snapshot_packet,
 )
 from render_core.render_plan import (
     alpha_blend_compose,
