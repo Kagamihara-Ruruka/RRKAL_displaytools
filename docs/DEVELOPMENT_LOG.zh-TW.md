@@ -1,3 +1,10 @@
+## 2026-06-03 - Add warm frame benchmark evidence path
+
+- Added `--benchmark-frames` and `--benchmark-summary` to the headless/once renderer path for in-process warm-frame evidence.
+- Added `scripts/render_warm_frame_smoke.ps1` to emit ignored local warm-frame artifacts under `state/showcase/warm_frame_smoke/`.
+- Kept normal single-frame output behavior, renderer metadata schema, runtime merge state and generated `state/` governance unchanged.
+- Validation: PASS for `py -3 -m py_compile taichi_global_bathymetry.py`, `git diff --check`, `scripts/render_warm_frame_smoke.ps1 -Frames 3`, `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/render_repeated_quick_smoke.ps1 -Frames 5`, and `scripts/smoke.ps1`.
+
 ## 2026-06-03 - Extract prepare batch cache evidence helper
 
 - Added `render_core/batch_prepare.py` with `build_prepare_batch_cache_evidence()` for evidence-only vector overlay cache counters and dirty flags.

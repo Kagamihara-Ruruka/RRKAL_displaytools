@@ -17860,6 +17860,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--compose-parity-artifact-dir", default=os.environ.get("COMPOSE_PARITY_ARTIFACT_DIR"))
     parser.add_argument("--preview-frame-file", default=os.environ.get("PREVIEW_FRAME_FILE"))
     parser.add_argument("--preview-frame-interval", type=float, default=float(os.environ.get("PREVIEW_FRAME_INTERVAL", "0.75")))
+    parser.add_argument("--benchmark-frames", type=int, default=int(os.environ.get("BENCHMARK_FRAMES", "1")))
+    parser.add_argument("--benchmark-summary", default=os.environ.get("BENCHMARK_SUMMARY"))
     parser.add_argument("--rrkal-data-manifest-ref", default=os.environ.get("RRKAL_DATA_MANIFEST_REF", ""))
     parser.add_argument("--fps-log", default=str(CACHE_DIR / "fps_log.jsonl"))
     parser.add_argument("--demo-closed-loop", action=bool_action, default=parse_bool(os.environ.get("DEMO_CLOSED_LOOP"), False))
@@ -21382,7 +21384,63 @@ def main(argv: list[str] | None = None) -> None:
         print(json.dumps(manifest, ensure_ascii=False, indent=2, default=str))
         return
     if args.headless or args.once:
-        controller.render_if_needed(force=True)
+        benchmark_frames = max(1, int(getattr(args, "benchmark_frames", 1)))
+        benchmark_results = []
+        for benchmark_index in range(benchmark_frames):
+            frame_started_at = time.perf_counter()
+            controller.render_if_needed(force=True)
+            frame_wall_ms = (time.perf_counter() - frame_started_at) * 1000.0
+            compiled_plan = getattr(controller, "compiled_layer_render_plan", {})
+            compiled_plan = compiled_plan if isinstance(compiled_plan, dict) else {}
+            phase_runtime = compiled_plan.get("phase_timing_runtime")
+            phase_runtime = phase_runtime if isinstance(phase_runtime, dict) else {}
+            phase_timing = phase_runtime.get("phase_timing_ms")
+            phase_timing = phase_timing if isinstance(phase_timing, dict) else {}
+            recommendation = phase_runtime.get("bottleneck_recommendation")
+            recommendation = recommendation if isinstance(recommendation, dict) else {}
+            benchmark_results.append(
+                {
+                    "frame": benchmark_index + 1,
+                    "render_ms": float(getattr(controller, "last_render_ms", 0.0)),
+                    "frame_wall_ms": round(float(frame_wall_ms), 3),
+                    "prepare_batches_ms": phase_timing.get("prepare_batches"),
+                    "compose_overlays_ms": phase_timing.get("compose_overlays"),
+                    "postprocess_ms": phase_timing.get("postprocess"),
+                    "slowest_phase_id": phase_runtime.get("slowest_phase_id"),
+                    "slowest_phase_ms": phase_runtime.get("slowest_phase_ms"),
+                    "bottleneck_recommendation": recommendation.get("recommended_next_action"),
+                    "runtime_optimization_applied": bool(recommendation.get("runtime_optimization_applied", False)),
+                }
+            )
+        benchmark_summary_path = getattr(args, "benchmark_summary", None)
+        if benchmark_summary_path:
+            render_ms_values = [float(item["render_ms"]) for item in benchmark_results]
+            prepare_values = [
+                float(item["prepare_batches_ms"])
+                for item in benchmark_results
+                if item.get("prepare_batches_ms") is not None
+            ]
+            summary = {
+                "schema": "rrkal_displaytools.warm_frame_benchmark.v1",
+                "source": "taichi_global_bathymetry.py",
+                "mode": "headless_in_process_warm_frame_evidence",
+                "frame_count": benchmark_frames,
+                "render_ms_avg": sum(render_ms_values) / len(render_ms_values),
+                "render_ms_min": min(render_ms_values),
+                "render_ms_max": max(render_ms_values),
+                "prepare_batches_ms_avg": (
+                    sum(prepare_values) / len(prepare_values)
+                    if prepare_values
+                    else None
+                ),
+                "metadata_schema_changed": False,
+                "runtime_merge_enabled": False,
+                "results": benchmark_results,
+                "boundary": "Evidence-only headless in-process benchmark; does not enable runtime merge, change metadata schema, or alter normal single-frame output behavior.",
+            }
+            summary_path = Path(benchmark_summary_path)
+            summary_path.parent.mkdir(parents=True, exist_ok=True)
+            summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
         return
     if args.ui == "qt":
         QtHybridWindow(controller).run()
