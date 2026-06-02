@@ -1,3 +1,17 @@
+## 2026-06-03 - Add runtime blend assessment evidence
+
+- Extended `scripts/render_warm_frame_smoke.ps1` analysis with runtime-blend-focused evidence fields: `runtime_blend_layer_kinds`, `runtime_blend_steps`, `runtime_blend_pressure_classification`, `runtime_blend_assessment_limitations` and `runtime_blend_next_safe_target`.
+- Default warm-frame evidence: runtime blend runs `3` across hydrology and boundary vector overlays (`lakes`, `rivers`, `borders`); alpha compose remains `1`, style postprocess remains `1`, and multi-step alpha-compose remains `0`.
+- High-density warm-frame evidence: runtime blend runs `6` across hydrology and boundary vector overlays (`lakes`, `rivers`, `borders`, `territorial_sea`, `eez`, `high_seas`); alpha compose remains `1`, style postprocess remains `1`, and multi-step alpha-compose remains `0`.
+- Runtime blend assessment summary: current compose pressure is runtime-blend-dominant by run count and grows with executable vector overlay layers, but current metadata still cannot isolate per-runtime-blend milliseconds, queue-build time, allocation/copy cost or pixel-equivalence impact.
+- Historical assumptions vs runtime_blend evidence:
+  - Still hold: quick smoke is single-frame artifact evidence; repeated quick smoke is process-per-frame evidence; runtime merge remains disabled; metadata schema remains `rrkal_displaytools.renderer_output_metadata.v1`; renderer behavior/pixels/layer ordering/alpha semantics are unchanged; interactive FPS readiness is not claimed.
+  - Superseded: alpha-collapse is no longer the immediate compose target for the current evidence set because no multi-step alpha-compose run appears in default or high-density evidence.
+  - Requires more evidence: any runtime-blend optimization or decomposition needs subphase timing/parity design before changing renderer behavior.
+  - Current work remains evidence-only; `runtime_blend_next_safe_target=runtime_blend_subphase_timing_design` and `optimization_authorized=false`.
+- Decision classification: `runtime_blend_assessment_complete_evidence_only`.
+- Validation: PASS for `scripts/render_warm_frame_smoke.ps1` and `scripts/render_warm_frame_smoke.ps1 -HighDensityCompose`; full checkpoint validation recorded before commit.
+
 ## 2026-06-03 - Classify compose overlay pressure evidence
 
 - Extended `scripts/render_warm_frame_smoke.ps1` analysis with targeted compose pressure classification fields: `compose_pressure_classification`, `alpha_compose_collapse_candidate_present`, `runtime_blend_run_count`, `style_profile_postprocess_run_count`, `parity_workflow_recommended_now`, `optimization_authorized=false`, `recommended_next_target` and `decision_classification`.

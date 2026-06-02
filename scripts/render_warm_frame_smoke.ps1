@@ -138,6 +138,25 @@ function Get-AverageMs {
     return [math]::Round($total / $values.Count, 3)
 }
 
+function Get-RuntimeBlendLayerKind {
+    param(
+        [string]$LayerId
+    )
+
+    switch ($LayerId) {
+        { $_ -in @("lakes", "rivers") } { return "hydrology_vector_overlay" }
+        { $_ -in @("borders", "territorial_sea", "eez", "high_seas") } { return "boundary_vector_overlay" }
+        { $_ -in @("aircraft", "ais", "traffic") } { return "traffic_overlay" }
+        { $_ -in @("pin", "pins", "vehicle_icons", "vehicles") } { return "annotation_overlay" }
+        default {
+            if ([string]::IsNullOrWhiteSpace($LayerId)) {
+                return "unknown_layer"
+            }
+            return "unclassified_runtime_overlay"
+        }
+    }
+}
+
 $firstFrame = $results[0]
 $warmFrames = @($results | Select-Object -Skip 1)
 if ($warmFrames.Count -eq 0) {
@@ -226,6 +245,26 @@ $multiStepAlphaComposeRuns = @(
         [int]$_.step_count -gt 1
     }
 )
+$runtimeBlendSteps = @($composeQueue | Where-Object { [string]$_.kind -eq "runtime_blend" })
+$runtimeBlendLayerRows = @(
+    $runtimeBlendSteps | ForEach-Object {
+        $stepId = [string]$_.id
+        $layerId = [string]$_.layer_id
+        if ([string]::IsNullOrWhiteSpace($layerId)) {
+            $layerId = $stepId
+        }
+        [pscustomobject]@{
+            step_id = if ([string]::IsNullOrWhiteSpace($stepId)) { "unknown_step" } else { $stepId }
+            layer_id = if ([string]::IsNullOrWhiteSpace($layerId)) { "unknown_layer" } else { $layerId }
+            inferred_layer_kind = Get-RuntimeBlendLayerKind -LayerId $layerId
+        }
+    }
+)
+$runtimeBlendLayerKinds = @(
+    $runtimeBlendLayerRows |
+        Select-Object -ExpandProperty inferred_layer_kind -Unique |
+        Sort-Object
+)
 $runtimeBlendRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "runtime_layer_overlay" }).Count
 $alphaComposeRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "alpha_compose_overlays" }).Count
 $styleProfilePostprocessRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "postprocess" }).Count
@@ -251,6 +290,7 @@ if ($alphaComposeCollapseCandidatePresent) {
     $runtimeBlendRunCount -ge $styleProfilePostprocessRunCount
 ) {
     $composePressureClassification = "mostly_runtime_blend"
+    $runtimeBlendPressureClassification = "runtime_blend_dominant_by_run_count"
     $decisionClassification = "no_alpha_collapse_candidate_runtime_blend_dominant"
     $classificationRecommendedNextTarget = "runtime_blend_assessment"
     $targetedAlphaComposeEvidenceResult = "No multi-step alpha_compose run is present in this evidence mode; alpha collapse is not justified without a stronger target case."
@@ -260,14 +300,25 @@ if ($alphaComposeCollapseCandidatePresent) {
     $styleProfilePostprocessRunCount -gt $alphaComposeRunCount
 ) {
     $composePressureClassification = "mostly_postprocess"
+    $runtimeBlendPressureClassification = "not_runtime_blend_dominant"
     $decisionClassification = "need_more_targeted_evidence"
     $classificationRecommendedNextTarget = "postprocess_timing_evidence"
     $targetedAlphaComposeEvidenceResult = "No multi-step alpha_compose run is present, and postprocess dominates the visible run count; more targeted evidence is needed before optimization."
 } else {
     $composePressureClassification = "mixed_unknown"
+    $runtimeBlendPressureClassification = "mixed_or_unknown"
     $decisionClassification = "need_more_targeted_evidence"
     $classificationRecommendedNextTarget = "compose_overlay_evidence"
     $targetedAlphaComposeEvidenceResult = "Current evidence does not isolate alpha_compose, runtime_blend, or postprocess pressure strongly enough for an optimization target."
+}
+if ($alphaComposeCollapseCandidatePresent) {
+    $runtimeBlendPressureClassification = "alpha_compose_candidate_present"
+}
+$runtimeBlendAssessmentLimitations = "This evidence identifies runtime_blend pressure by compose queue/run counts and inferred layer kinds only. Per-runtime-blend milliseconds, queue-build time, allocation/copy cost and pixel-equivalence impact require separate renderer instrumentation or parity design and are not measured here."
+$runtimeBlendNextSafeTarget = switch ($decisionClassification) {
+    "no_alpha_collapse_candidate_runtime_blend_dominant" { "runtime_blend_subphase_timing_design" }
+    "alpha_collapse_candidate_found_but_needs_parity" { "alpha_compose_parity_workflow" }
+    default { "targeted_compose_evidence_review" }
 }
 $inputStepCount = if ($null -ne $composeQueuePacket.input_step_count) { [int]$composeQueuePacket.input_step_count } else { 0 }
 $executableStepCount = if ($null -ne $composeQueuePacket.executable_step_count) { [int]$composeQueuePacket.executable_step_count } else { $composeQueue.Count }
@@ -307,6 +358,11 @@ $composeAssessment = [ordered]@{
     multi_step_alpha_compose_run_count = $multiStepAlphaComposeRuns.Count
     alpha_compose_collapse_candidate_present = $alphaComposeCollapseCandidatePresent
     runtime_blend_run_count = $runtimeBlendRunCount
+    runtime_blend_layer_kinds = $runtimeBlendLayerKinds
+    runtime_blend_steps = $runtimeBlendLayerRows
+    runtime_blend_pressure_classification = $runtimeBlendPressureClassification
+    runtime_blend_assessment_limitations = $runtimeBlendAssessmentLimitations
+    runtime_blend_next_safe_target = $runtimeBlendNextSafeTarget
     alpha_compose_run_count = $alphaComposeRunCount
     style_profile_postprocess_run_count = $styleProfilePostprocessRunCount
     compose_pressure_classification = $composePressureClassification
@@ -353,6 +409,10 @@ $analysis = [ordered]@{
     alpha_compose_collapse_candidate_present = $alphaComposeCollapseCandidatePresent
     multi_step_alpha_compose_run_count = $multiStepAlphaComposeRuns.Count
     runtime_blend_run_count = $runtimeBlendRunCount
+    runtime_blend_layer_kinds = $runtimeBlendLayerKinds
+    runtime_blend_pressure_classification = $runtimeBlendPressureClassification
+    runtime_blend_assessment_limitations = $runtimeBlendAssessmentLimitations
+    runtime_blend_next_safe_target = $runtimeBlendNextSafeTarget
     style_profile_postprocess_run_count = $styleProfilePostprocessRunCount
     parity_workflow_recommended_now = $parityWorkflowRecommendedNow
     optimization_authorized = $false
@@ -396,6 +456,9 @@ Write-Host "Compose overlay assessment:"
     multi_step_alpha_compose_run_count = $composeAssessment.multi_step_alpha_compose_run_count
     alpha_compose_collapse_candidate_present = $composeAssessment.alpha_compose_collapse_candidate_present
     runtime_blend_run_count = $composeAssessment.runtime_blend_run_count
+    runtime_blend_layer_kinds = ($composeAssessment.runtime_blend_layer_kinds -join ",")
+    runtime_blend_pressure_classification = $composeAssessment.runtime_blend_pressure_classification
+    runtime_blend_next_safe_target = $composeAssessment.runtime_blend_next_safe_target
     alpha_compose_run_count = $composeAssessment.alpha_compose_run_count
     style_profile_postprocess_run_count = $composeAssessment.style_profile_postprocess_run_count
     compose_pressure_classification = $composeAssessment.compose_pressure_classification
