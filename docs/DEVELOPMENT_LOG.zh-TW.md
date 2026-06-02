@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity evidence summary to reviewer exports
+
+- Added `zero_diff_parity_evidence_summary` to Qt and no-GUI reviewer packet exports.
+- Added the summary to reviewer packet guidance, recommended fields, included summary fields and handoff markers.
+- Added smoke gates across launch packet, Qt reviewer packet, handoff inspection and no-GUI exporter contracts.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add parity evidence source markers
 
 - Added `zero_diff_parity_source_script` and `zero_diff_parity_manifest_path` to `inspect_render_plan_review_packet.ps1`.

@@ -38,6 +38,7 @@ if ($ContractOnly) {
         performance_smoke_telemetry_field = "performance_smoke_telemetry"
         runtime_optimization_review_summary_field = "runtime_optimization_review_summary"
         runtime_gate_status_summary_field = "runtime_gate_status_summary"
+        zero_diff_parity_evidence_summary_field = "zero_diff_parity_evidence_summary"
         boundary = "Contract-only mode is for smoke checks; normal mode writes a local reviewer packet under state/."
     } | ConvertTo-Json -Depth 8
     exit 0
@@ -90,6 +91,7 @@ $rendererConfigGatewaySummary = "Renderer config gateway: schema=$($launchPacket
 $performanceSmokeSummary = "Performance smoke telemetry: schema=$($launchPacket.performance_smoke_telemetry.schema); stage_schema=$($launchPacket.performance_smoke_telemetry.stage_timing_schema); render_schema=$($launchPacket.performance_smoke_telemetry.render_telemetry_schema); command=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\performance_smoke.ps1; boundary=displaytools-only-no-rrkal-crawler-cache"
 $runtimeOptimizationReviewSummary = "Runtime optimization review: schema=$($performance.runtime_optimization_review_summary_schema); field=$($performance.runtime_optimization_review_summary_field); pressure=$($performance.runtime_pressure_snapshot_schema); layer_state=$($performance.layer_render_state_packet_schema); lod=$($performance.lod_counter_packet_schema); overlay=$($performance.heavy_overlay_defer_cache_snapshot_schema); runtime_mutation=false"
 $runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runtime_merge=$($performance.layer_state_precompute_compose_bridge_runtime_merge_enabled); single_pass_submission=$($performance.layer_state_precompute_compose_bridge_single_pass_submission_enabled); zero_diff_parity_required=$($performance.layer_state_precompute_compose_bridge_zero_diff_parity_required); runtime_path=disabled_until_parity"
+$zeroDiffParityEvidenceSummary = "Zero-diff parity evidence: artifacts=baseline_sequential_frame_rgba.png,merged_candidate_frame_rgba.png; visual_parity_passed=required; tolerance=max_abs_diff=0,changed_pixel_count=0; source=scripts\render_compose_parity_smoke.ps1; manifest=state/render_compose_parity_smoke_manifest.json; runtime_path=disabled_until_pass"
 
 $reviewerPacket = [ordered]@{
     schema = "rrkal_displaytools.reviewer_packet.v1"
@@ -110,6 +112,7 @@ $reviewerPacket = [ordered]@{
     performance_smoke_summary = $performanceSmokeSummary
     compose_performance_summary = $composePerformanceSummary
     runtime_gate_status_summary = $runtimeGateStatusSummary
+    zero_diff_parity_evidence_summary = $zeroDiffParityEvidenceSummary
     runtime_optimization_review_summary = $runtimeOptimizationReviewSummary
     cross_machine_clone_readiness = $launchPacket.cross_machine_clone_readiness
     profile_launch_readiness = $launchPacket.profile_launch_readiness

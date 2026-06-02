@@ -1321,6 +1321,9 @@ if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains 
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "runtime_gate_status_summary") {
     throw "Launch packet reviewer recommended runtime gate summary field missing"
 }
+if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_evidence_summary") {
+    throw "Launch packet reviewer recommended zero-diff parity evidence summary field missing"
+}
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Launch packet reviewer packet layer quick actions recommended field missing"
 }
@@ -1362,6 +1365,9 @@ if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "c
 }
 if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "runtime_gate_status_summary") {
     throw "Launch packet reviewer packet runtime gate summary field missing"
+}
+if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_evidence_summary") {
+    throw "Launch packet reviewer packet zero-diff parity evidence summary field missing"
 }
 if ($launchPacket.reviewer_packet_export.included_packet_fields -notcontains "launch_packet_snapshot") {
     throw "Launch packet reviewer packet snapshot field missing"
@@ -5257,6 +5263,9 @@ if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "comp
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "runtime_gate_status_summary") {
     throw "Handoff inspection reviewer recommended runtime gate summary field missing"
 }
+if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_evidence_summary") {
+    throw "Handoff inspection reviewer recommended zero-diff parity evidence summary field missing"
+}
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Handoff inspection reviewer packet layer quick actions recommended field missing"
 }
@@ -5286,6 +5295,12 @@ if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "runtim
 }
 if ($handoff.reviewer_packet_export.runtime_gate_status_summary_field -ne "runtime_gate_status_summary") {
     throw "Handoff inspection reviewer runtime gate summary field marker missing"
+}
+if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_evidence_summary") {
+    throw "Handoff inspection reviewer packet zero-diff parity evidence summary field missing"
+}
+if ($handoff.reviewer_packet_export.zero_diff_parity_evidence_summary_field -ne "zero_diff_parity_evidence_summary") {
+    throw "Handoff inspection reviewer zero-diff parity evidence summary field marker missing"
 }
 if ($handoff.reviewer_packet_export.included_packet_fields -notcontains "hydrology_lod_readiness") {
     throw "Handoff inspection reviewer packet hydrology readiness packet field missing"
@@ -5801,6 +5816,12 @@ if ($qtPanelSource -notlike '*"compose_performance_summary": self.compose_perfor
 }
 if ($qtPanelSource -notlike '*"runtime_gate_status_summary": self.runtime_gate_status_text()*') {
     throw "Qt reviewer packet runtime gate status summary output is missing"
+}
+if ($qtPanelSource -notlike '*"zero_diff_parity_evidence_summary": self.zero_diff_parity_evidence_summary_text()*') {
+    throw "Qt reviewer packet zero-diff parity evidence summary output is missing"
+}
+if ($qtPanelSource -notlike "*def zero_diff_parity_evidence_summary_text*") {
+    throw "Qt zero-diff parity evidence summary helper is missing"
 }
 if ($qtPanelSource -notlike "*def compose_performance_reviewer_summary_text*") {
     throw "Qt compose performance reviewer summary helper is missing"
@@ -7596,6 +7617,9 @@ if ($reviewerPacketExporterSource -notlike "*runtime_optimization_review_summary
 if ($reviewerPacketExporterSource -notlike "*runtime_gate_status_summary*") {
     throw "No-GUI reviewer packet exporter runtime gate status summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_evidence_summary*") {
+    throw "No-GUI reviewer packet exporter zero-diff parity evidence summary missing"
+}
 if ($reviewerPacketExporterSource -notlike "*export_launch_packet.py*") {
     throw "No-GUI reviewer packet exporter launch packet bridge missing"
 }
@@ -7612,6 +7636,9 @@ if ($reviewerPacketContract.compose_performance_summary_field -ne "compose_perfo
 }
 if ($reviewerPacketContract.runtime_gate_status_summary_field -ne "runtime_gate_status_summary") {
     throw "No-GUI reviewer packet exporter runtime gate status summary field missing"
+}
+if ($reviewerPacketContract.zero_diff_parity_evidence_summary_field -ne "zero_diff_parity_evidence_summary") {
+    throw "No-GUI reviewer packet exporter zero-diff parity evidence summary field missing"
 }
 if ($reviewerPacketContract.decoupling_readiness_field -ne "decoupling_readiness") {
     throw "No-GUI reviewer packet exporter decoupling readiness field missing"
