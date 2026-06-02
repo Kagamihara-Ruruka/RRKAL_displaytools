@@ -1,5 +1,11 @@
-# Development Log
+﻿# Development Log
 
+## 2026-06-02 - Surface precompute compose bridge in Qt summary
+
+- Added `layer_state_precompute_compose_bridge` fields to the Qt runtime optimization summary strip.
+- Kept the change UI-summary only; runtime merge and single-pass submission remain disabled.
+- Added smoke gates for the Qt compose bridge summary text and field path.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add LayerRenderState precompute compose bridge metadata
 
 - Added `rrkal_displaytools.layer_state_precompute_compose_bridge.v1` to connect precompute decisions to compose/run review metadata.

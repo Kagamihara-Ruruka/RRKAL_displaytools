@@ -6042,6 +6042,12 @@ if ($qtPanelSource -notlike "*precompute_decision=*") {
 if ($qtPanelSource -notlike "*layer_state_precompute_decision_field*") {
     throw "Qt runtime optimization summary missing precompute decision field"
 }
+if ($qtPanelSource -notlike "*compose_bridge=*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge text"
+}
+if ($qtPanelSource -notlike "*layer_state_precompute_compose_bridge_field*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge field"
+}
 $qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource + $runtimeOptimizationReviewModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {
     throw "Qt render plan performance single-pass marker is missing"

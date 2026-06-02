@@ -10215,6 +10215,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"precompute_plan={packet.get('layer_state_precompute_plan_schema', '-')}; "
             f"precompute_decision={packet.get('layer_state_precompute_decision_schema', '-')}; "
             f"decision_field={packet.get('layer_state_precompute_decision_field', '-')}; "
+            f"compose_bridge={packet.get('layer_state_precompute_compose_bridge_schema', '-')}; "
+            f"bridge_field={packet.get('layer_state_precompute_compose_bridge_field', '-')}; "
             f"lod={packet.get('lod_counter_packet_schema', '-')}; "
             f"overlay={packet.get('heavy_overlay_defer_cache_snapshot_schema', '-')}; "
             "runtime_mutation=false"
