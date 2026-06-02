@@ -10266,7 +10266,13 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         )
 
     def copy_runtime_gate_status_summary(self) -> None:
-        summary = self.runtime_gate_status_text() + "\n" + self.zero_diff_parity_evidence_summary_text()
+        summary = (
+            self.runtime_gate_status_text()
+            + "\n"
+            + self.zero_diff_parity_evidence_summary_text()
+            + "\n"
+            + self.zero_diff_parity_artifact_producer_summary_text()
+        )
         QtWidgets.QApplication.clipboard().setText(summary)
         self.status.setText("Copied runtime gate status summary")
 
@@ -10318,6 +10324,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"bridge_gate=single_pass_submission:{packet.get('layer_state_precompute_compose_bridge_single_pass_submission_enabled', '-')}; "
             f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             f"parity_evidence={self.zero_diff_parity_evidence_summary_text()}; "
+            f"artifact_producer={self.zero_diff_parity_artifact_producer_summary_text()}; "
             "evidence=compose_parity_runner; "
             "runtime_merge=false"
         )
@@ -10346,6 +10353,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"bridge_gate=single_pass_submission:{packet.get('layer_state_precompute_compose_bridge_single_pass_submission_enabled', '-')}; "
             f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             f"parity_evidence={self.zero_diff_parity_evidence_summary_text()}; "
+            f"artifact_producer={self.zero_diff_parity_artifact_producer_summary_text()}; "
             f"final={final_stage}; "
             "runtime_merge=false; "
             "next=post_07_render_plan_compose_extraction"

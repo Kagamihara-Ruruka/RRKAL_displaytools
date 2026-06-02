@@ -6138,8 +6138,8 @@ if ($qtPanelSource -notlike "*Copy runtime gate*") {
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_summary*") {
     throw "Qt runtime gate copy handler is missing"
 }
-if ($qtPanelSource -notlike '*self.runtime_gate_status_text() + "\n" + self.zero_diff_parity_evidence_summary_text()*') {
-    throw "Qt runtime gate copy handler must include zero-diff parity evidence summary"
+if ($qtPanelSource -notlike '*self.runtime_gate_status_text()*self.zero_diff_parity_evidence_summary_text()*self.zero_diff_parity_artifact_producer_summary_text()*') {
+    throw "Qt runtime gate copy handler must include zero-diff parity evidence and artifact producer summaries"
 }
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_button.clicked.connect*") {
     throw "Qt runtime gate copy action is not wired"
@@ -6185,6 +6185,10 @@ if ($qtPanelSource -notlike "*parity_gate=zero_diff_required:*") {
 }
 if ($qtPanelSource -notlike "*parity_evidence={self.zero_diff_parity_evidence_summary_text()}*") {
     throw "Qt compose/work-order summaries must include zero-diff parity evidence summary"
+}
+$artifactProducerHandoffCount = ([regex]::Matches($qtPanelSource, [regex]::Escape("artifact_producer={self.zero_diff_parity_artifact_producer_summary_text()}"))).Count
+if ($artifactProducerHandoffCount -lt 2) {
+    throw "Qt compose/work-order summaries must include zero-diff parity artifact producer summary"
 }
 if ($qtPanelSource -notlike "*Render-plan work order:*bridge_gate=single_pass_submission:*") {
     throw "Qt render-plan work order summary missing compose bridge single-pass gate handoff text"

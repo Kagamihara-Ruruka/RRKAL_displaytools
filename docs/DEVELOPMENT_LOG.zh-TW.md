@@ -1,4 +1,10 @@
-﻿# Development Log
+﻿## 2026-06-02 - Add artifact producer to copy handoff summaries
+
+- Added parity artifact producer summary to `Copy runtime gate`, `Copy compose budget`, and `Render-plan work order` handoff text.
+- Kept the change handoff-only: no renderer artifact diff, runtime merge, or single-pass path was enabled.
+- Added smoke gates for runtime gate copy and compose/work-order artifact producer handoff text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+# Development Log
 
 ## 2026-06-02 - Add parity artifact producer summary to reviewer exports
 
