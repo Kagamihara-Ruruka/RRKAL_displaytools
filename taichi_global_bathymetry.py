@@ -11482,6 +11482,7 @@ class HybridRenderController:
         self.aircraft_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.vehicle_icon_overlay_rgba = np.zeros_like(self.globe_rgba)
+        self.empty_overlay_rgba = np.zeros_like(self.globe_rgba)
         self.frame_rgba = np.zeros_like(self.globe_rgba)
         self.globe_mask = np.zeros((args.height, args.width), dtype=np.uint8)
         self.pin_records, self.selected_pin_id = load_pin_records(
@@ -13441,7 +13442,7 @@ class HybridRenderController:
         if not force and not self.hydrology_dirty and self.hydrology_view_key == view_key:
             return
         cache_key = ("hydrology", view_key)
-        cached = None if force else self._lookup_vector_overlay_cache(cache_key)
+        cached = self._lookup_vector_overlay_cache(cache_key)
         if cached is not None:
             self.lake_overlay_rgba, self.river_overlay_rgba = cached
             self.hydrology_view_key = view_key
@@ -13450,7 +13451,7 @@ class HybridRenderController:
         for layer_id, attr in (("lakes", "lake_overlay_rgba"), ("rivers", "river_overlay_rgba")):
             overlay = self.hydrology_overlays.get(layer_id)
             if overlay is None or not self.layer_visible.get(layer_id, True):
-                setattr(self, attr, np.zeros_like(self.globe_rgba))
+                setattr(self, attr, self.empty_overlay_rgba)
                 continue
             spec = HYDROLOGY_SPECS[layer_id]
             render_profile = self.hydrology_render_profile.decision(self.basemap_lod, layer_id)
@@ -13486,7 +13487,7 @@ class HybridRenderController:
         if not force and not self.boundary_dirty and self.boundary_view_key == view_key:
             return
         cache_key = ("boundary", view_key)
-        cached = None if force else self._lookup_vector_overlay_cache(cache_key)
+        cached = self._lookup_vector_overlay_cache(cache_key)
         if cached is not None:
             if isinstance(cached, tuple) and len(cached) == 2:
                 self.boundary_overlay_rgba, self.boundary_layer_rgba = cached
@@ -13496,6 +13497,19 @@ class HybridRenderController:
             self.boundary_view_key = view_key
             self.boundary_dirty = False
             self.boundary_hover_dirty = False
+            return
+        visible_boundary_layers = [
+            (layer_id, spec, self.boundary_overlays.get(layer_id))
+            for layer_id, spec in BOUNDARY_SPECS.items()
+            if self.boundary_overlays.get(layer_id) is not None and self.layer_visible.get(layer_id, True)
+        ]
+        if not visible_boundary_layers:
+            self.boundary_overlay_rgba = self.empty_overlay_rgba
+            self.boundary_layer_rgba = {}
+            self.boundary_view_key = view_key
+            self.boundary_dirty = False
+            self.boundary_hover_dirty = False
+            self._cache_vector_overlay(cache_key, (self.boundary_overlay_rgba, self.boundary_layer_rgba))
             return
         composite = np.zeros_like(self.globe_rgba)
         layer_rgba: dict[str, np.ndarray] = {}
@@ -13530,10 +13544,7 @@ class HybridRenderController:
             highlight_phase = (time.time() * max(0.05, breath_speed / 50.0)) % 1.0
         else:
             highlight_phase = 0.25
-        for layer_id, spec in BOUNDARY_SPECS.items():
-            overlay = self.boundary_overlays.get(layer_id)
-            if overlay is None or not self.layer_visible.get(layer_id, True):
-                continue
+        for layer_id, spec, overlay in visible_boundary_layers:
             render_params = build_boundary_render_params(
                 self.args,
                 layer_id,
@@ -16249,7 +16260,7 @@ class HybridRenderController:
                 self.current_aircraft_sampled_projected = pd.DataFrame(columns=["screen_x", "screen_y"])
                 self.aircraft_visible_count = 0
                 self.aircraft_rendered_count = 0
-                self.aircraft_overlay_rgba = np.zeros_like(self.globe_rgba)
+                self.aircraft_overlay_rgba = self.empty_overlay_rgba
             if self.layer_visible.get("pins", True) and self.pin_records:
                 self.current_pin_projections = project_pins_to_screen(
                     self.pin_records,
@@ -16279,7 +16290,7 @@ class HybridRenderController:
             else:
                 self.current_pin_projections = []
                 self.pin_visible_count = 0
-                self.pin_overlay_rgba = np.zeros_like(self.globe_rgba)
+                self.pin_overlay_rgba = self.empty_overlay_rgba
             if self.layer_allowed_in_mode("vehicle_icons") and self.layer_visible.get("vehicle_icons", False):
                 self.vehicle_icon_overlay_rgba = mask_overlay_to_globe(
                     render_vehicle_icon_overlay(
@@ -16293,7 +16304,7 @@ class HybridRenderController:
                     self.globe_mask,
                 )
             else:
-                self.vehicle_icon_overlay_rgba = np.zeros_like(self.globe_rgba)
+                self.vehicle_icon_overlay_rgba = self.empty_overlay_rgba
             if defer_vector_overlays:
                 self.vector_overlay_cache_deferred += 1
                 self.hydrology_dirty = True
