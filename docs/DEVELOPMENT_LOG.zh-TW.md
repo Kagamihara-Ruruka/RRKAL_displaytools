@@ -1,4 +1,10 @@
-﻿## 2026-06-02 - Add artifact producer to copy handoff summaries
+﻿## 2026-06-02 - Add runner manifest status summary
+
+- Added `compose_parity_runner_manifest_status_summary` to Qt and no-GUI reviewer packet handoff output.
+- Included runner manifest schema, path, writer script, status field, diff status field, precommit gate field, and skip-diff status in the summary.
+- Kept the change review/contract-only: no renderer run, artifact diff, runtime merge, or single-pass path was enabled.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+## 2026-06-02 - Add artifact producer to copy handoff summaries
 
 - Added parity artifact producer summary to `Copy runtime gate`, `Copy compose budget`, and `Render-plan work order` handoff text.
 - Kept the change handoff-only: no renderer artifact diff, runtime merge, or single-pass path was enabled.

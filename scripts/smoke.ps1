@@ -5841,14 +5841,23 @@ if ($qtPanelSource -notlike '*"zero_diff_parity_evidence_summary": self.zero_dif
 if ($qtPanelSource -notlike '*"zero_diff_parity_artifact_producer_summary": self.zero_diff_parity_artifact_producer_summary_text()*') {
     throw "Qt reviewer packet zero-diff parity artifact producer summary output is missing"
 }
+if ($qtPanelSource -notlike '*"compose_parity_runner_manifest_status_summary": self.compose_parity_runner_manifest_status_summary_text()*') {
+    throw "Qt reviewer packet compose parity runner manifest status summary output is missing"
+}
 if ($qtPanelSource -notlike "*def zero_diff_parity_evidence_summary_text*") {
     throw "Qt zero-diff parity evidence summary helper is missing"
 }
 if ($qtPanelSource -notlike "*def zero_diff_parity_artifact_producer_summary_text*") {
     throw "Qt zero-diff parity artifact producer summary helper is missing"
 }
+if ($qtPanelSource -notlike "*def compose_parity_runner_manifest_status_summary_text*") {
+    throw "Qt compose parity runner manifest status summary helper is missing"
+}
 if ($qtPanelSource -notlike "*def compose_performance_reviewer_summary_text*") {
     throw "Qt compose performance reviewer summary helper is missing"
+}
+if ($qtPanelSource -notlike "*compose_parity_runner_manifest_status_summary_text(packet)*") {
+    throw "Qt compose performance reviewer summary must include runner manifest status"
 }
 if ($qtPanelSource -notlike '*"hydrology_lod_readiness": self.collect_hydrology_lod_readiness()*') {
     throw "Qt reviewer packet hydrology readiness output is missing"
@@ -7658,6 +7667,12 @@ if ($composeParityArtifactRunnerSource -notlike "*state/compose_parity*") {
 if ($composeParityArtifactRunnerSource -notlike "*compose_parity_artifact_runner.json*") {
     throw "Compose parity artifact runner manifest path is missing"
 }
+if ($composeParityArtifactRunnerSource -notlike "*completed_diff_skipped*") {
+    throw "Compose parity artifact runner manifest skip-diff status is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*diff_status = `$diffStatus*") {
+    throw "Compose parity artifact runner manifest diff status field is missing"
+}
 $reviewerPacketExporterPath = Join-Path $RepoRoot "scripts\export_reviewer_packet.ps1"
 if (-not (Test-Path -LiteralPath $reviewerPacketExporterPath)) {
     throw "No-GUI reviewer packet exporter script is missing"
@@ -7681,6 +7696,12 @@ if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_evidence_summary*"
 if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_artifact_producer_summary*") {
     throw "No-GUI reviewer packet exporter zero-diff parity artifact producer summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*compose_parity_runner_manifest_status_summary*") {
+    throw "No-GUI reviewer packet exporter runner manifest status summary missing"
+}
+if ($reviewerPacketExporterSource -notlike "*skip_diff_status=completed_diff_skipped*") {
+    throw "No-GUI reviewer packet exporter runner manifest skip-diff status missing"
+}
 if ($reviewerPacketExporterSource -notlike "*export_launch_packet.py*") {
     throw "No-GUI reviewer packet exporter launch packet bridge missing"
 }
@@ -7703,6 +7724,9 @@ if ($reviewerPacketContract.zero_diff_parity_evidence_summary_field -ne "zero_di
 }
 if ($reviewerPacketContract.zero_diff_parity_artifact_producer_summary_field -ne "zero_diff_parity_artifact_producer_summary") {
     throw "No-GUI reviewer packet exporter zero-diff parity artifact producer summary field missing"
+}
+if ($reviewerPacketContract.compose_parity_runner_manifest_status_summary_field -ne "compose_parity_runner_manifest_status_summary") {
+    throw "No-GUI reviewer packet exporter runner manifest status summary field missing"
 }
 if ($reviewerPacketContract.decoupling_readiness_field -ne "decoupling_readiness") {
     throw "No-GUI reviewer packet exporter decoupling readiness field missing"

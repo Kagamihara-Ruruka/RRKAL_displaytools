@@ -5811,6 +5811,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "runtime_gate_status_summary": self.runtime_gate_status_text(),
             "zero_diff_parity_evidence_summary": self.zero_diff_parity_evidence_summary_text(),
             "zero_diff_parity_artifact_producer_summary": self.zero_diff_parity_artifact_producer_summary_text(),
+            "compose_parity_runner_manifest_status_summary": self.compose_parity_runner_manifest_status_summary_text(),
             "goal_closure_scorecard": self.collect_goal_closure_scorecard(),
             "cross_machine_clone_readiness": self.collect_cross_machine_clone_readiness(),
             "profile_launch_readiness": self.collect_profile_launch_readiness(),
@@ -10370,6 +10371,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.compose_pass_budget_summary_text(packet)
             + " | "
             + self.compose_parity_runner_readiness_text(packet)
+            + " | "
+            + self.compose_parity_runner_manifest_status_summary_text(packet)
         )
 
     def compose_parity_runner_readiness_text(self, packet: dict[str, object] | None = None) -> str:
@@ -10391,6 +10394,24 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"ready={runner_ready}; "
             f"script={runner_script}; "
             f"manifest={runner_manifest}; "
+            "runtime_merge=false"
+        )
+
+    def compose_parity_runner_manifest_status_summary_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()
+        workflow = packet.get("compose_run_parity_artifact_workflow")
+        workflow = workflow if isinstance(workflow, dict) else {}
+        runner_schema = packet.get("compose_run_parity_artifact_runner_schema", "-")
+        runner_manifest = workflow.get("runner_manifest", "state/compose_parity/compose_parity_artifact_runner.json")
+        return (
+            "Compose parity runner manifest: "
+            f"schema={runner_schema}; "
+            f"path={runner_manifest}; "
+            "written_by=scripts\\render_compose_parity_artifacts.ps1; "
+            "status_field=status; "
+            "diff_status_field=diff_status; "
+            "precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; "
+            "skip_diff_status=completed_diff_skipped; "
             "runtime_merge=false"
         )
 
