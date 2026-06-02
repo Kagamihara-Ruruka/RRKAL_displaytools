@@ -1,3 +1,10 @@
+## 2026-06-02 - Extract preview frame writer helper
+
+- Added `render_core/preview.py` to own the file-based preview PNG write/atomic replace helper.
+- Updated `HybridRenderController.write_preview_frame_if_due()` to keep interval gating and error handling while delegating image output.
+- Kept preview artifact path, preview PNG behavior, renderer metadata schema, runtime merge state and generated `state/` behavior unchanged.
+- Validation: PASS (`py -3 -m py_compile render_core\preview.py taichi_global_bathymetry.py`, `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-02 - Extract phase timing normalization helpers
 
 - Added render-plan timing helpers for phase timing normalization and slowest-phase selection.

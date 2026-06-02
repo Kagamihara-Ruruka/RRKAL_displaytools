@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import datetime
 import gzip
 import io
@@ -61,6 +61,7 @@ from render_core.render_plan import (
     select_layer_render_plan_composition_input,
 )
 from render_core.metadata import build_renderer_output_metadata_payload
+from render_core.preview import write_preview_frame_png
 from pin_projection import pin_projection_contract_packet, project_pins_to_screen
 try:
     import xarray as xr
@@ -14624,11 +14625,7 @@ class HybridRenderController:
         if not force and now - self.preview_frame_last_write < self.preview_frame_interval:
             return
         try:
-            from PIL import Image
-
-            tmp_path = self.preview_frame_path.with_name(self.preview_frame_path.name + ".tmp.png")
-            Image.fromarray(self.frame_rgba, mode="RGBA").save(tmp_path)
-            tmp_path.replace(self.preview_frame_path)
+            write_preview_frame_png(self.frame_rgba, self.preview_frame_path)
             self.preview_frame_last_write = now
         except Exception as exc:
             print(f"Unable to write preview frame: {exc}")
