@@ -1,3 +1,9 @@
+## 2026-06-03 - Add compose overlay assessment evidence
+
+- Extended `scripts/render_warm_frame_smoke.ps1` to read the existing renderer metadata sidecar and add compose queue/run/skip counts to ignored `state/showcase/warm_frame_smoke/analysis.json`.
+- Assessment records executable step count, skipped step reasons, queue kind counts, compose run counts and multi-step alpha-compose run availability without changing renderer output paths, layer ordering, alpha blending, metadata schema or runtime merge state.
+- Validation: PASS for `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/render_warm_frame_smoke.ps1`, `scripts/smoke.ps1`, `git diff --check` and generated-artifact ignore audit.
+
 ## 2026-06-03 - Add warm frame smoke aggregate report
 
 - Enhanced `scripts/render_warm_frame_smoke.ps1` to derive first-frame timing, warm-frame averages and slowest-phase distribution from the existing warm-frame summary.
