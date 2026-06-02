@@ -52,11 +52,11 @@ Current render-plan / metadata evidence:
 
 ## Safe next helper boundary
 
-Recommended helper name:
+Implemented helper name:
 
 - `render_core.batch_prepare.build_prepare_batch_cache_evidence()`
 
-Allowed first implementation:
+Current first implementation:
 
 - Build a serializable evidence packet from already-collected counters and dirty flags.
 - Do not decide cache reuse.

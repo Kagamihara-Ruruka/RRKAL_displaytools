@@ -64,6 +64,7 @@ from render_core.render_plan import (
 from render_core.metadata import build_renderer_output_metadata_payload
 from render_core.preview import write_preview_frame_png
 from render_core.layer_state import build_layer_runtime_snapshot_input
+from render_core.batch_prepare import build_prepare_batch_cache_evidence
 from pin_projection import pin_projection_contract_packet, project_pins_to_screen
 try:
     import xarray as xr
@@ -15903,6 +15904,22 @@ class HybridRenderController:
             lod_counters,
             heavy_overlay_defer_cache,
         )
+        prepare_batch_cache_evidence = build_prepare_batch_cache_evidence(
+            source="HybridRenderController.project_handoff_snapshot",
+            entries=len(self.vector_overlay_cache),
+            limit=self._vector_cache_limit(),
+            hits=int(getattr(self, "vector_overlay_cache_hits", 0)),
+            misses=int(getattr(self, "vector_overlay_cache_misses", 0)),
+            deferred=int(getattr(self, "vector_overlay_cache_deferred", 0)),
+            dirty_flags={
+                "globe_dirty": bool(getattr(self, "globe_dirty", False)),
+                "overlay_dirty": bool(getattr(self, "overlay_dirty", False)),
+                "hydrology_dirty": bool(getattr(self, "hydrology_dirty", False)),
+                "boundary_dirty": bool(getattr(self, "boundary_dirty", False)),
+                "boundary_hover_dirty": bool(getattr(self, "boundary_hover_dirty", False)),
+            },
+            prepare_phase="project_handoff_snapshot",
+        )
         snapshot = {
             "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "purpose": "handoff snapshot before splitting taichi_global_bathymetry.py into provider/projection/overlay/render/ui modules",
@@ -15999,13 +16016,7 @@ class HybridRenderController:
                 "heavy_overlay_defer_cache": heavy_overlay_defer_cache,
                 "runtime_optimization_review_summary": runtime_optimization_review_summary,
                 "point_overlay_budget": dict(self.point_overlay_budget_last),
-                "vector_overlay_cache": {
-                    "entries": len(self.vector_overlay_cache),
-                    "limit": self._vector_cache_limit(),
-                    "hits": self.vector_overlay_cache_hits,
-                    "misses": self.vector_overlay_cache_misses,
-                    "deferred": self.vector_overlay_cache_deferred,
-                },
+                "vector_overlay_cache": prepare_batch_cache_evidence,
                 "layer_state": layer_state,
             },
             "module_split": MODULE_SPLIT_BLUEPRINT,

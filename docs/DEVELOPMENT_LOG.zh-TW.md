@@ -1,3 +1,10 @@
+## 2026-06-03 - Extract prepare batch cache evidence helper
+
+- Added `render_core/batch_prepare.py` with `build_prepare_batch_cache_evidence()` for evidence-only vector overlay cache counters and dirty flags.
+- Updated `HybridRenderController.project_handoff_snapshot()` to use the helper while keeping cache reuse, defer decisions, overlay arrays, renderer metadata schema, runtime merge state and render output behavior unchanged.
+- Updated `docs/STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md` to mark the helper as implemented.
+- Validation: PASS (`py -3 -m py_compile taichi_global_bathymetry.py render_core\batch_prepare.py`, `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-03 - Add static batch prepare source map
 
 - Added `docs/STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md` to map `prepare_batches`, vector overlay cache/defer evidence and the safe first helper boundary before cache behavior work.
