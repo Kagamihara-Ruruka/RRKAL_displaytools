@@ -10737,7 +10737,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 "Ocean 3D material controls and safe preview",
                 "Timeline playback/export readiness",
                 "cross-machine reviewer route",
-                "runtime gate status strip/copy/reviewer summary",
+                "runtime gate status strip/copy/reviewer summary with zero-diff parity evidence summary",
                 "pre-07 decoupling gate",
             ],
             "planned_capabilities": [

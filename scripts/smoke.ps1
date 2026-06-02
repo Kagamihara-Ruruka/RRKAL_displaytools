@@ -2210,6 +2210,9 @@ if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "re
 if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" })) {
     throw "Capability summary runtime gate status review capability missing"
 }
+if (($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" }).description -notlike "*zero-diff parity evidence summary*") {
+    throw "Capability summary runtime gate status review missing parity evidence summary"
+}
 if (-not (($capabilitySummary.boundaries -join "`n") -match "RRKAL owns dataset discovery")) {
     throw "Capability summary RRKAL boundary missing"
 }
@@ -6075,7 +6078,7 @@ if ($qtPanelSource -notlike "*Replay/contracts: inspect researcher first-run rou
 if ($qtPanelSource -notlike "*Replay/contracts: inspect current and planned capability summary JSON*") {
     throw "Qt capability summary tooltip is missing"
 }
-if ($qtPanelSource -notlike "*runtime gate status strip/copy/reviewer summary*") {
+if ($qtPanelSource -notlike "*runtime gate status strip/copy/reviewer summary with zero-diff parity evidence summary*") {
     throw "Qt capability summary missing runtime gate status capability"
 }
 if ($qtPanelSource -notlike "*Renderer ports: inspect scalar ocean material and sea-state handoff JSON*") {

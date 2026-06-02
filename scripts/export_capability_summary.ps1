@@ -99,7 +99,7 @@ $summary = [ordered]@{
         [ordered]@{
             id = "runtime_gate_status_review"
             status = "review_ready_no_runtime_mutation"
-            description = "Runtime gate status is visible in Qt, copy actions, diagnostics JSON, reviewer packets, handoff inspection and render-plan review packets while runtime merge and single-pass submission stay disabled until zero-diff parity."
+            description = "Runtime gate status and zero-diff parity evidence summary are visible in Qt, copy actions, diagnostics JSON, reviewer packets, handoff inspection and render-plan review packets while runtime merge and single-pass submission stay disabled until zero-diff parity."
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1"
         },
         [ordered]@{
