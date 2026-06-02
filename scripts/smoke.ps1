@@ -6063,6 +6063,15 @@ if ($qtPanelSource -notlike "*runtime_gate_status_text*") {
 if ($qtPanelSource -notlike "*runtime_gate_status_summary*") {
     throw "Qt render-plan diagnostics JSON missing runtime gate status summary"
 }
+if ($qtPanelSource -notlike "*Copy runtime gate*") {
+    throw "Qt runtime gate copy button is missing"
+}
+if ($qtPanelSource -notlike "*copy_runtime_gate_status_summary*") {
+    throw "Qt runtime gate copy handler is missing"
+}
+if ($qtPanelSource -notlike "*copy_runtime_gate_status_button.clicked.connect*") {
+    throw "Qt runtime gate copy action is not wired"
+}
 if ($qtPanelSource -notlike "*Runtime gate status:*") {
     throw "Qt runtime gate status text is missing"
 }

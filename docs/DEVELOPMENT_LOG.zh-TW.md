@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add copyable runtime gate action
+
+- Added a `Copy runtime gate` action under Renderer diagnostics.
+- Wired the action to copy the same runtime gate status used by the Qt strip and diagnostics JSON.
+- Added smoke gates for the button label, handler and clicked connection.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add runtime gate summary to diagnostics JSON
 
 - Added `runtime_gate_status_summary` to the Qt render-plan diagnostics JSON output.

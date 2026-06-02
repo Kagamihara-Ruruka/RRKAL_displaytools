@@ -4143,6 +4143,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         copy_compose_budget_button = QtWidgets.QPushButton("Copy compose budget")
         render_plan_perf_button = QtWidgets.QPushButton("Inspect: Render plan perf")
         copy_render_plan_work_order_button = QtWidgets.QPushButton("Copy render-plan work order")
+        copy_runtime_gate_status_button = QtWidgets.QPushButton("Copy runtime gate")
         smoke_button = QtWidgets.QPushButton("Smoke check")
         launch_button = QtWidgets.QPushButton("啟動地球儀")
         restart_button = QtWidgets.QPushButton("套用並重啟")
@@ -4216,6 +4217,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             (copy_compose_budget_button, "Renderer diagnostics: copy compose budget timing, bottleneck advice and runtime-merge status."),
             (render_plan_perf_button, "Renderer diagnostics: inspect queued layer render-plan precompute and single-pass performance contract."),
             (copy_render_plan_work_order_button, "Renderer diagnostics: copy the post-decoupling render-plan compose work order as one reviewer handoff line."),
+            (copy_runtime_gate_status_button, "Renderer diagnostics: copy runtime merge, single-pass submission and zero-diff parity gate status."),
         ):
             button.setToolTip(tooltip)
             button.setAccessibleDescription(tooltip)
@@ -4298,6 +4300,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         copy_compose_budget_button.clicked.connect(self.copy_compose_pass_budget_summary)
         render_plan_perf_button.clicked.connect(self.show_layer_render_plan_performance)
         copy_render_plan_work_order_button.clicked.connect(self.copy_render_plan_work_order_summary)
+        copy_runtime_gate_status_button.clicked.connect(self.copy_runtime_gate_status_summary)
         smoke_button.clicked.connect(self.run_smoke_check)
         launch_button.clicked.connect(self.launch_renderer)
         restart_button.clicked.connect(self.restart_renderer)
@@ -4308,7 +4311,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             ("Inspect: Renderer ports", (hydro_lod_button, copy_hydro_lod_summary_button, ocean_port_button, ocean_3d_controls_action_button, copy_ocean_summary_button, copy_ocean_guard_summary_button, ocean_3d_board_audit_button, copy_ocean_3d_board_audit_button, style_routes_button, copy_style_routes_summary_button, layer_matrix_button, layer_runtime_button)),
             ("Inspect: Research interaction", (layer_pick_button, selection_state_button, copy_selection_summary_button, copy_layer_controls_guide_button, copy_layer_navigation_summary_button, layer_ops_button, canvas_state_button, pin_pick_button, copy_pin_summary_action_button, cursor_geo_button, copy_cursor_summary_button, boundary_state_button, copy_boundary_summary_button, copy_research_summary_button)),
             ("Inspect: Visual review", (visual_readiness_button, uiux_closure_status_button, workspace_map_button, copy_visual_summary_button, copy_visual_closure_summary_button, style_thumbnails_button, copy_style_thumbs_command_button, copy_style_thumb_status_button, thumbnail_button, live_preview_button)),
-            ("Renderer diagnostics", (capabilities_button, closed_loop_button, layer_manifest_button, render_plan_perf_button, copy_compose_budget_button, copy_compose_parity_button, copy_render_plan_work_order_button, smoke_button)),
+            ("Renderer diagnostics", (capabilities_button, closed_loop_button, layer_manifest_button, render_plan_perf_button, copy_compose_budget_button, copy_compose_parity_button, copy_render_plan_work_order_button, copy_runtime_gate_status_button, smoke_button)),
             ("Process", (launch_button, restart_button, stop_button)),
         )
         review_path_hint = QtWidgets.QLabel(
@@ -10252,6 +10255,11 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"zero_diff_parity_required={packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', True)}; "
             "runtime_path=disabled_until_parity"
         )
+
+    def copy_runtime_gate_status_summary(self) -> None:
+        summary = self.runtime_gate_status_text()
+        QtWidgets.QApplication.clipboard().setText(summary)
+        self.status.setText("Copied runtime gate status summary")
 
     def compose_pass_budget_summary_text(self, packet: dict[str, object] | None = None) -> str:
         packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()
