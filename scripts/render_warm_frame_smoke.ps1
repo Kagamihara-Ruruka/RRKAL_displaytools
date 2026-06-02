@@ -226,6 +226,49 @@ $multiStepAlphaComposeRuns = @(
         [int]$_.step_count -gt 1
     }
 )
+$runtimeBlendRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "runtime_layer_overlay" }).Count
+$alphaComposeRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "alpha_compose_overlays" }).Count
+$styleProfilePostprocessRunCount = @($composeRuns | Where-Object { [string]$_.run_kind -eq "postprocess" }).Count
+if ($runtimeBlendRunCount -eq 0 -and $queueKindCounts.ContainsKey("runtime_blend")) {
+    $runtimeBlendRunCount = [int]$queueKindCounts["runtime_blend"]
+}
+if ($alphaComposeRunCount -eq 0 -and $queueKindCounts.ContainsKey("alpha_compose")) {
+    $alphaComposeRunCount = [int]$queueKindCounts["alpha_compose"]
+}
+if ($styleProfilePostprocessRunCount -eq 0 -and $queueKindCounts.ContainsKey("style_profile_postprocess")) {
+    $styleProfilePostprocessRunCount = [int]$queueKindCounts["style_profile_postprocess"]
+}
+$alphaComposeCollapseCandidatePresent = $multiStepAlphaComposeRuns.Count -gt 0
+$parityWorkflowRecommendedNow = $alphaComposeCollapseCandidatePresent
+if ($alphaComposeCollapseCandidatePresent) {
+    $composePressureClassification = "mostly_alpha_compose"
+    $decisionClassification = "alpha_collapse_candidate_found_but_needs_parity"
+    $classificationRecommendedNextTarget = "alpha_compose_parity_workflow"
+    $targetedAlphaComposeEvidenceResult = "At least one multi-step alpha_compose run is present; collapse work still requires parity evidence before any optimization."
+} elseif (
+    $runtimeBlendRunCount -gt 0 -and
+    $runtimeBlendRunCount -gt $alphaComposeRunCount -and
+    $runtimeBlendRunCount -ge $styleProfilePostprocessRunCount
+) {
+    $composePressureClassification = "mostly_runtime_blend"
+    $decisionClassification = "no_alpha_collapse_candidate_runtime_blend_dominant"
+    $classificationRecommendedNextTarget = "runtime_blend_assessment"
+    $targetedAlphaComposeEvidenceResult = "No multi-step alpha_compose run is present in this evidence mode; alpha collapse is not justified without a stronger target case."
+} elseif (
+    $styleProfilePostprocessRunCount -gt 0 -and
+    $styleProfilePostprocessRunCount -gt $runtimeBlendRunCount -and
+    $styleProfilePostprocessRunCount -gt $alphaComposeRunCount
+) {
+    $composePressureClassification = "mostly_postprocess"
+    $decisionClassification = "need_more_targeted_evidence"
+    $classificationRecommendedNextTarget = "postprocess_timing_evidence"
+    $targetedAlphaComposeEvidenceResult = "No multi-step alpha_compose run is present, and postprocess dominates the visible run count; more targeted evidence is needed before optimization."
+} else {
+    $composePressureClassification = "mixed_unknown"
+    $decisionClassification = "need_more_targeted_evidence"
+    $classificationRecommendedNextTarget = "compose_overlay_evidence"
+    $targetedAlphaComposeEvidenceResult = "Current evidence does not isolate alpha_compose, runtime_blend, or postprocess pressure strongly enough for an optimization target."
+}
 $inputStepCount = if ($null -ne $composeQueuePacket.input_step_count) { [int]$composeQueuePacket.input_step_count } else { 0 }
 $executableStepCount = if ($null -ne $composeQueuePacket.executable_step_count) { [int]$composeQueuePacket.executable_step_count } else { $composeQueue.Count }
 $skippedStepCount = if ($null -ne $composeQueuePacket.skipped_step_count) { [int]$composeQueuePacket.skipped_step_count } else { $skippedSteps.Count }
@@ -262,6 +305,14 @@ $composeAssessment = [ordered]@{
     compose_run_count = $composeRunCount
     compose_merge_candidate_run_count = $composeMergeCandidateRunCount
     multi_step_alpha_compose_run_count = $multiStepAlphaComposeRuns.Count
+    alpha_compose_collapse_candidate_present = $alphaComposeCollapseCandidatePresent
+    runtime_blend_run_count = $runtimeBlendRunCount
+    alpha_compose_run_count = $alphaComposeRunCount
+    style_profile_postprocess_run_count = $styleProfilePostprocessRunCount
+    compose_pressure_classification = $composePressureClassification
+    parity_workflow_recommended_now = $parityWorkflowRecommendedNow
+    decision_classification = $decisionClassification
+    targeted_alpha_compose_evidence_result = $targetedAlphaComposeEvidenceResult
     queue_kind_counts = $queueKindRows
     skip_reason_counts = $skipReasonRows
     executable_step_ids = $executableStepIds
@@ -275,7 +326,8 @@ $composeAssessment = [ordered]@{
     compose_postprocess_ms = Get-AverageMs -Rows $warmFrames -PropertyName "postprocess_ms"
     compose_copy_or_allocation_ms = $null
     merge_candidate_count = $composeMergeCandidateRunCount
-    recommended_next_target = $recommendedNextTarget
+    timing_recommended_next_target = $recommendedNextTarget
+    recommended_next_target = $classificationRecommendedNextTarget
     optimization_authorized = $false
     subphase_timing_limitation = "Renderer metadata currently exposes aggregate compose_overlays and postprocess timing only; runtime_blend, alpha_compose, queue-build and allocation timing would require renderer instrumentation and is intentionally not added in this evidence-only script."
     runtime_merge_enabled = $false
@@ -295,7 +347,16 @@ $analysis = [ordered]@{
     warm_frame_prepare_batches_ms_avg = Get-AverageMs -Rows $warmFrames -PropertyName "prepare_batches_ms"
     warm_frame_compose_overlays_ms_avg = Get-AverageMs -Rows $warmFrames -PropertyName "compose_overlays_ms"
     final_warm_slowest_phase_id = [string]$lastWarmFrame.slowest_phase_id
-    recommended_next_target = $recommendedNextTarget
+    timing_recommended_next_target = $recommendedNextTarget
+    recommended_next_target = $classificationRecommendedNextTarget
+    compose_pressure_classification = $composePressureClassification
+    alpha_compose_collapse_candidate_present = $alphaComposeCollapseCandidatePresent
+    multi_step_alpha_compose_run_count = $multiStepAlphaComposeRuns.Count
+    runtime_blend_run_count = $runtimeBlendRunCount
+    style_profile_postprocess_run_count = $styleProfilePostprocessRunCount
+    parity_workflow_recommended_now = $parityWorkflowRecommendedNow
+    optimization_authorized = $false
+    decision_classification = $decisionClassification
     slowest_phase_counts = $slowestPhaseRows
     metadata_schema_changed = $false
     runtime_merge_enabled = $false
@@ -318,7 +379,10 @@ Write-Host "Warm frame smoke analysis: $analysisPath"
     warm_frame_prepare_batches_ms_avg = $analysis.warm_frame_prepare_batches_ms_avg
     warm_frame_compose_overlays_ms_avg = $analysis.warm_frame_compose_overlays_ms_avg
     final_warm_slowest_phase_id = $analysis.final_warm_slowest_phase_id
+    timing_recommended_next_target = $analysis.timing_recommended_next_target
     recommended_next_target = $analysis.recommended_next_target
+    decision_classification = $analysis.decision_classification
+    compose_pressure_classification = $analysis.compose_pressure_classification
 } | Format-List
 $slowestPhaseRows | Format-Table -AutoSize
 
@@ -330,6 +394,14 @@ Write-Host "Compose overlay assessment:"
     compose_run_count = $composeAssessment.compose_run_count
     compose_merge_candidate_run_count = $composeAssessment.compose_merge_candidate_run_count
     multi_step_alpha_compose_run_count = $composeAssessment.multi_step_alpha_compose_run_count
+    alpha_compose_collapse_candidate_present = $composeAssessment.alpha_compose_collapse_candidate_present
+    runtime_blend_run_count = $composeAssessment.runtime_blend_run_count
+    alpha_compose_run_count = $composeAssessment.alpha_compose_run_count
+    style_profile_postprocess_run_count = $composeAssessment.style_profile_postprocess_run_count
+    compose_pressure_classification = $composeAssessment.compose_pressure_classification
+    parity_workflow_recommended_now = $composeAssessment.parity_workflow_recommended_now
+    decision_classification = $composeAssessment.decision_classification
+    recommended_next_target = $composeAssessment.recommended_next_target
     optimization_authorized = $composeAssessment.optimization_authorized
     hidden_overlays_skipped = $composeAssessment.hidden_overlays_skipped
     transparent_or_empty_overlays_skipped = $composeAssessment.transparent_or_empty_overlays_skipped

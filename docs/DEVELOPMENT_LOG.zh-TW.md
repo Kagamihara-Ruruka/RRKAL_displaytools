@@ -1,3 +1,16 @@
+## 2026-06-03 - Classify compose overlay pressure evidence
+
+- Extended `scripts/render_warm_frame_smoke.ps1` analysis with targeted compose pressure classification fields: `compose_pressure_classification`, `alpha_compose_collapse_candidate_present`, `runtime_blend_run_count`, `style_profile_postprocess_run_count`, `parity_workflow_recommended_now`, `optimization_authorized=false`, `recommended_next_target` and `decision_classification`.
+- Default warm-frame evidence classified compose pressure as `mostly_runtime_blend`: runtime blend runs `3`, alpha compose runs `1`, style profile postprocess runs `1`, multi-step alpha-compose runs `0`.
+- High-density warm-frame evidence also classified compose pressure as `mostly_runtime_blend`: runtime blend runs `6`, alpha compose runs `1`, style profile postprocess runs `1`, multi-step alpha-compose runs `0`.
+- Decision classification: `no_alpha_collapse_candidate_runtime_blend_dominant`; parity workflow is not recommended yet because no multi-step alpha-compose collapse candidate exists.
+- Historical assumptions vs current evidence:
+  - Still hold: quick smoke is single-frame artifact evidence; repeated quick smoke is process-per-frame evidence; runtime merge remains disabled; metadata schema remains `rrkal_displaytools.renderer_output_metadata.v1`; compose collapse requires parity/zero-diff evidence before any optimization; interactive FPS readiness is not claimed.
+  - Superseded: `prepare_batches` as the only relevant bottleneck now applies to process-per-frame evidence, while in-process warm-frame evidence points the next safe assessment toward `compose_overlays` pressure and specifically `runtime_blend_assessment`.
+  - Needs more evidence before code change: fine compose sub-phase timing, real runtime-blend cost isolation, and any renderer behavior change that could alter pixels, layer order or alpha blending.
+  - Current work remains evidence-only: no renderer core change, no output path change, no metadata schema change, no runtime merge enablement and no generated `state/` artifacts committed.
+- Validation: PASS for `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/render_warm_frame_smoke.ps1`, `scripts/render_warm_frame_smoke.ps1 -HighDensityCompose`, `scripts/smoke.ps1`; `smoke.ps1` retried one cloud-drive file-access step and then passed.
+
 ## 2026-06-03 - Add high-density compose overlay evidence
 
 - Added opt-in `scripts/render_warm_frame_smoke.ps1 -HighDensityCompose` mode to exercise more existing overlay toggles while keeping default warm-frame behavior unchanged.
