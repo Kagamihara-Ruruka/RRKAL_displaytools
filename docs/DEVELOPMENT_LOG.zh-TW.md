@@ -1,3 +1,10 @@
+## 2026-06-03 - Add render plan compile source map
+
+- Added `docs/RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md` to map `HybridRenderController.compile_layer_render_plan()` before compile facade extraction.
+- Added the source-map document to `docs/DOCS_INDEX.zh-TW.md`.
+- Kept this checkpoint docs-only: no renderer runtime behavior, cache behavior, metadata schema, runtime merge state or generated `state/` behavior changed.
+- Validation: PASS (`scripts/smoke.ps1` with extended timeout and `git diff --check`).
+
 ## 2026-06-03 - Extract layer runtime snapshot input helper
 
 - Added `render_core/layer_state.py` with `build_layer_runtime_snapshot_input()` as a pure packet helper for renderer layer-state snapshot inputs.

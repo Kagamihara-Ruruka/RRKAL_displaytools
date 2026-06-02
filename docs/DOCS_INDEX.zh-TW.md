@@ -19,6 +19,7 @@
 - `DISPLAY_SHELL_RENDER_MATRIX.zh-TW.md`: DisplayShell / Canvas / Render Matrix contracts, display runtime landing zones, and no-GUI review/check commands.
 - `RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md`: renderer backend mapping, render flow, monolith responsibility audit, and staged decomposition candidates for demo-readiness review.
 - `LAYER_STATE_SOURCE_MAP.zh-TW.md`: layer visibility/opacity/blend/selected-target/dirty-flag source map before layer-state helper extraction.
+- `RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md`: compile-layer-render-plan source map before compile facade / payload helper extraction.
 
 ## Positioning
 
