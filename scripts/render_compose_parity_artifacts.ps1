@@ -3,13 +3,49 @@ param(
     [int]$Width = 640,
     [int]$Height = 360,
     [string]$TaichiArch = "cpu",
-    [switch]$SkipDiff
+    [switch]$SkipDiff,
+    [switch]$ContractOnly
 )
 
 $ErrorActionPreference = "Stop"
 
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $RepoRoot
+
+if ($ContractOnly) {
+    $runnerManifest = Join-Path $ArtifactDir "compose_parity_artifact_runner.json"
+    $smokeManifest = Join-Path $ArtifactDir "render_compose_parity_smoke_manifest.json"
+    [ordered]@{
+        schema = "rrkal_displaytools.compose_run_parity_artifact_runner.v1"
+        source = "scripts/render_compose_parity_artifacts.ps1"
+        status = "contract_only_no_render_side_effect"
+        contract_only = $true
+        writes_manifest = $false
+        runs_renderer = $false
+        runs_diff = $false
+        runtime_merge_enabled = $false
+        artifact_dir = $ArtifactDir
+        runner_manifest = $runnerManifest
+        smoke_manifest = $smokeManifest
+        contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/render_compose_parity_artifacts.ps1 -ContractOnly"
+        manual_run_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/render_compose_parity_artifacts.ps1 -SkipDiff"
+        diff_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/render_compose_parity_smoke.ps1 -BaselinePath state/compose_parity/baseline_sequential_frame_rgba.png -CandidatePath state/compose_parity/merged_candidate_frame_rgba.png -ManifestPath state/compose_parity/render_compose_parity_smoke_manifest.json -WriteManifest"
+        precommit_gate = [ordered]@{
+            schema = "rrkal_displaytools.compose_run_parity_precommit_gate.v1"
+            required_before_runtime_merge = $true
+            pass_fields = @(
+                "visual_parity_passed",
+                "max_abs_diff",
+                "changed_pixel_count",
+                "precommit_gate_passed"
+            )
+            pass_condition = "precommit_gate_passed true only after visual_parity_passed=true, max_abs_diff=0 and changed_pixel_count=0"
+            runtime_merge_enabled = $false
+        }
+        boundary = "Contract-only mode does not create artifact directories, launch Taichi, render frames, diff images, write manifests, or enable runtime merge."
+    } | ConvertTo-Json -Depth 8
+    exit 0
+}
 
 function Resolve-RunnerPath {
     param([string]$PathValue)

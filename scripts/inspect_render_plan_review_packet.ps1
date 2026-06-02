@@ -32,6 +32,7 @@ if ($ContractOnly) {
         zero_diff_parity_manifest_path = "state/render_compose_parity_smoke_manifest.json"
         zero_diff_parity_artifact_producer_script = "scripts\render_compose_parity_artifacts.ps1"
         zero_diff_parity_artifact_producer_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -SkipDiff"
+        zero_diff_parity_artifact_runner_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -ContractOnly"
         zero_diff_parity_artifact_runner_schema = "rrkal_displaytools.compose_run_parity_artifact_runner.v1"
         zero_diff_parity_artifact_runner_manifest_path = "state/compose_parity/compose_parity_artifact_runner.json"
         zero_diff_parity_artifact_runner_status_field = "compose_parity_artifact_runner.status"
@@ -87,6 +88,7 @@ $composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: sch
     zero_diff_parity_manifest_path = "state/render_compose_parity_smoke_manifest.json"
     zero_diff_parity_artifact_producer_script = "scripts\render_compose_parity_artifacts.ps1"
     zero_diff_parity_artifact_producer_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -SkipDiff"
+    zero_diff_parity_artifact_runner_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -ContractOnly"
     zero_diff_parity_artifact_runner_schema = "rrkal_displaytools.compose_run_parity_artifact_runner.v1"
     zero_diff_parity_artifact_runner_manifest_path = "state/compose_parity/compose_parity_artifact_runner.json"
     zero_diff_parity_artifact_runner_status_field = "compose_parity_artifact_runner.status"
@@ -101,6 +103,7 @@ $composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: sch
     next_runtime_gate_action = "run_zero_diff_parity_contract_before_enabling_single_pass_submission"
     clone_first_review_commands = @(
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -ContractOnly",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_metadata_summary.ps1",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_single_pass_preflight.ps1"
     )

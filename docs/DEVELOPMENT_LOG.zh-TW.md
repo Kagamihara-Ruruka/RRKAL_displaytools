@@ -1,4 +1,10 @@
-﻿## 2026-06-02 - Add copyable precommit gate summary
+﻿## 2026-06-02 - Add artifact runner contract-only entry
+
+- Added `-ContractOnly` to `render_compose_parity_artifacts.ps1` so clone/review flows can inspect the artifact runner contract without creating directories, launching Taichi, rendering frames, diffing images or writing manifests.
+- Surfaced the runner contract command in the render-plan review packet and clone-first review commands.
+- Added smoke gates that invoke artifact runner contract-only mode and verify no-render/no-write/no-diff boundaries plus the precommit gate contract.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+## 2026-06-02 - Add copyable precommit gate summary
 
 - Added `compose_parity_precommit_gate_summary` to Qt reviewer packets, runtime gate copy text and no-GUI reviewer packet output.
 - Included the runner gate path, runtime-merge requirement, zero-diff pass condition and contract command in the short handoff text. Synced launch packet, renderer capabilities and handoff reviewer contracts to prevent reviewer-field drift.

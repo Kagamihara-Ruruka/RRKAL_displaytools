@@ -7479,6 +7479,9 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_producer_script -n
 if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_producer_command -notlike "*render_compose_parity_artifacts.ps1 -SkipDiff*") {
     throw "Renderer render plan review packet contract parity artifact producer command missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_contract_command -notlike "*render_compose_parity_artifacts.ps1 -ContractOnly*") {
+    throw "Renderer render plan review packet contract parity artifact runner contract command missing"
+}
 if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_manifest_path -ne "state/compose_parity/compose_parity_artifact_runner.json") {
     throw "Renderer render plan review packet contract parity artifact runner manifest missing"
 }
@@ -7563,6 +7566,9 @@ if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_script -ne "scrip
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_command -notlike "*render_compose_parity_artifacts.ps1 -SkipDiff*") {
     throw "Renderer render plan review packet parity artifact producer command missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_contract_command -notlike "*render_compose_parity_artifacts.ps1 -ContractOnly*") {
+    throw "Renderer render plan review packet parity artifact runner contract command missing"
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_schema -ne "rrkal_displaytools.compose_run_parity_artifact_runner.v1") {
     throw "Renderer render plan review packet parity artifact runner schema missing"
@@ -7760,6 +7766,12 @@ if ($composeParityArtifactRunnerSource -notlike "*render_compose_parity_smoke.ps
 if ($composeParityArtifactRunnerSource -notlike "*SkipDiff*") {
     throw "Compose parity artifact runner skip-diff option is missing"
 }
+if ($composeParityArtifactRunnerSource -notlike "*ContractOnly*") {
+    throw "Compose parity artifact runner contract-only option is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*contract_only_no_render_side_effect*") {
+    throw "Compose parity artifact runner contract-only side-effect boundary is missing"
+}
 if ($composeParityArtifactRunnerSource -notlike "*state/compose_parity*") {
     throw "Compose parity artifact runner artifact dir default is missing"
 }
@@ -7783,6 +7795,32 @@ if ($composeParityArtifactRunnerSource -notlike "*precommit_gate_passed true onl
 }
 if ($composeParityArtifactRunnerSource -notlike "*runtime_merge_enabled = `$false*") {
     throw "Compose parity artifact runner precommit gate must keep runtime merge disabled"
+}
+$composeParityArtifactRunnerContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $composeParityArtifactRunnerPath, "-ContractOnly")
+if ($LASTEXITCODE -ne 0) {
+    throw "Compose parity artifact runner contract mode failed"
+}
+$composeParityArtifactRunnerContract = ($composeParityArtifactRunnerContractText -join "`n") | ConvertFrom-Json
+if ($composeParityArtifactRunnerContract.schema -ne "rrkal_displaytools.compose_run_parity_artifact_runner.v1") {
+    throw "Compose parity artifact runner contract schema missing"
+}
+if ($composeParityArtifactRunnerContract.status -ne "contract_only_no_render_side_effect") {
+    throw "Compose parity artifact runner contract status mismatch"
+}
+if ($composeParityArtifactRunnerContract.writes_manifest -ne $false) {
+    throw "Compose parity artifact runner contract must not write manifests"
+}
+if ($composeParityArtifactRunnerContract.runs_renderer -ne $false) {
+    throw "Compose parity artifact runner contract must not run renderer"
+}
+if ($composeParityArtifactRunnerContract.runs_diff -ne $false) {
+    throw "Compose parity artifact runner contract must not run diff"
+}
+if ($composeParityArtifactRunnerContract.precommit_gate.schema -ne "rrkal_displaytools.compose_run_parity_precommit_gate.v1") {
+    throw "Compose parity artifact runner contract precommit gate schema missing"
+}
+if ($composeParityArtifactRunnerContract.precommit_gate.required_before_runtime_merge -ne $true) {
+    throw "Compose parity artifact runner contract runtime merge gate requirement missing"
 }
 $reviewerPacketExporterPath = Join-Path $RepoRoot "scripts\export_reviewer_packet.ps1"
 if (-not (Test-Path -LiteralPath $reviewerPacketExporterPath)) {
