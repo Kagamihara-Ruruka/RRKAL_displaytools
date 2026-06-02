@@ -1,4 +1,10 @@
-﻿## 2026-06-02 - Surface runner manifest status in capability review
+﻿## 2026-06-02 - Add runner manifest precommit gate contract
+
+- Added a `precommit_gate` contract object to `render_compose_parity_artifacts.ps1` runner manifests.
+- Surfaced the runner precommit gate schema, field path and runtime-merge requirement in the render-plan review packet.
+- Kept the change contract-only: no renderer run, artifact diff, runtime merge, or single-pass path was enabled.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+## 2026-06-02 - Surface runner manifest status in capability review
 
 - Added `compose_parity_runner_manifest_status` to the capability summary current capabilities.
 - Added runner manifest schema/status/diff/skip-diff fields and a copyable status summary to the render-plan review packet contract and output.

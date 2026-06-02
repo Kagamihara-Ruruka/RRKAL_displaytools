@@ -7452,6 +7452,15 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_diff_status
 if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_skip_diff_status -ne "completed_diff_skipped") {
     throw "Renderer render plan review packet contract parity artifact runner skip-diff status missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_precommit_gate_schema -ne "rrkal_displaytools.compose_run_parity_precommit_gate.v1") {
+    throw "Renderer render plan review packet contract parity artifact runner precommit gate schema missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_precommit_gate_field -ne "compose_parity_artifact_runner.precommit_gate") {
+    throw "Renderer render plan review packet contract parity artifact runner precommit gate field missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_precommit_gate_required_before_runtime_merge -ne $true) {
+    throw "Renderer render plan review packet contract parity artifact runner precommit gate requirement missing"
+}
 if ($renderPlanReviewPacketContract.zero_diff_parity_diff_status_field -ne "render_compose_parity_smoke.diff_status") {
     throw "Renderer render plan review packet contract parity diff status field missing"
 }
@@ -7476,6 +7485,9 @@ if ($renderPlanReviewPacket.compose_parity_runner_manifest_status_summary -notli
 }
 if ($renderPlanReviewPacket.compose_parity_runner_manifest_status_summary -notlike "*runtime_merge=false*") {
     throw "Renderer render plan review packet runner manifest status summary must keep runtime merge disabled"
+}
+if ($renderPlanReviewPacket.compose_parity_runner_manifest_status_summary -notlike "*precommit_gate=compose_parity_artifact_runner.precommit_gate*") {
+    throw "Renderer render plan review packet runner manifest status summary missing runner precommit gate"
 }
 if ($renderPlanReviewPacket.zero_diff_parity_required -ne $true) {
     throw "Renderer render plan review packet zero-diff parity requirement missing"
@@ -7521,6 +7533,15 @@ if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_diff_status_field -
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_skip_diff_status -ne "completed_diff_skipped") {
     throw "Renderer render plan review packet parity artifact runner skip-diff status missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_precommit_gate_schema -ne "rrkal_displaytools.compose_run_parity_precommit_gate.v1") {
+    throw "Renderer render plan review packet parity artifact runner precommit gate schema missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_precommit_gate_field -ne "compose_parity_artifact_runner.precommit_gate") {
+    throw "Renderer render plan review packet parity artifact runner precommit gate field missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_precommit_gate_required_before_runtime_merge -ne $true) {
+    throw "Renderer render plan review packet parity artifact runner precommit gate requirement missing"
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_diff_manifest_path -ne "state/compose_parity/render_compose_parity_smoke_manifest.json") {
     throw "Renderer render plan review packet parity artifact diff manifest missing"
@@ -7708,6 +7729,18 @@ if ($composeParityArtifactRunnerSource -notlike "*completed_diff_skipped*") {
 }
 if ($composeParityArtifactRunnerSource -notlike "*diff_status = `$diffStatus*") {
     throw "Compose parity artifact runner manifest diff status field is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*rrkal_displaytools.compose_run_parity_precommit_gate.v1*") {
+    throw "Compose parity artifact runner precommit gate schema is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*required_before_runtime_merge = `$true*") {
+    throw "Compose parity artifact runner precommit gate runtime merge requirement is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*precommit_gate_passed true only after visual_parity_passed=true*") {
+    throw "Compose parity artifact runner precommit gate pass condition is missing"
+}
+if ($composeParityArtifactRunnerSource -notlike "*runtime_merge_enabled = `$false*") {
+    throw "Compose parity artifact runner precommit gate must keep runtime merge disabled"
 }
 $reviewerPacketExporterPath = Join-Path $RepoRoot "scripts\export_reviewer_packet.ps1"
 if (-not (Test-Path -LiteralPath $reviewerPacketExporterPath)) {

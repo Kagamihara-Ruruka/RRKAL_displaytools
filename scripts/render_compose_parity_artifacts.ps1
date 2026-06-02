@@ -98,6 +98,22 @@ $packet = [ordered]@{
     python_fallback = "py -3"
     diff_command = $diffCommand
     diff_status = $diffStatus
+    precommit_gate = [ordered]@{
+        schema = "rrkal_displaytools.compose_run_parity_precommit_gate.v1"
+        required_before_runtime_merge = $true
+        contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/render_compose_parity_smoke.ps1 -ContractOnly"
+        artifact_diff_command = $diffCommand
+        manifest_path = $smokeManifest
+        pass_fields = @(
+            "visual_parity_passed",
+            "max_abs_diff",
+            "changed_pixel_count",
+            "precommit_gate_passed"
+        )
+        pass_condition = "precommit_gate_passed true only after visual_parity_passed=true, max_abs_diff=0 and changed_pixel_count=0"
+        skip_diff_status = "completed_diff_skipped"
+        runtime_merge_enabled = $false
+    }
     artifact_dir = $ArtifactDir
     artifacts = [ordered]@{
         renderer_output = $rendererOutput

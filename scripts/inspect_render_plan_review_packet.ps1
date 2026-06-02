@@ -37,10 +37,13 @@ if ($ContractOnly) {
         zero_diff_parity_artifact_runner_status_field = "compose_parity_artifact_runner.status"
         zero_diff_parity_artifact_runner_diff_status_field = "compose_parity_artifact_runner.diff_status"
         zero_diff_parity_artifact_runner_skip_diff_status = "completed_diff_skipped"
+        zero_diff_parity_artifact_runner_precommit_gate_schema = "rrkal_displaytools.compose_run_parity_precommit_gate.v1"
+        zero_diff_parity_artifact_runner_precommit_gate_field = "compose_parity_artifact_runner.precommit_gate"
+        zero_diff_parity_artifact_runner_precommit_gate_required_before_runtime_merge = $true
         zero_diff_parity_artifact_diff_manifest_path = "state/compose_parity/render_compose_parity_smoke_manifest.json"
         zero_diff_parity_diff_status_field = "render_compose_parity_smoke.diff_status"
         zero_diff_parity_precommit_gate_field = "render_compose_parity_smoke.precommit_gate_passed"
-        compose_parity_runner_manifest_status_summary = "Compose parity runner manifest: schema=rrkal_displaytools.compose_run_parity_artifact_runner.v1; path=state/compose_parity/compose_parity_artifact_runner.json; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
+        compose_parity_runner_manifest_status_summary = "Compose parity runner manifest: schema=rrkal_displaytools.compose_run_parity_artifact_runner.v1; path=state/compose_parity/compose_parity_artifact_runner.json; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate=compose_parity_artifact_runner.precommit_gate; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
         boundary = "Reviewer packet only; it does not launch Qt, Taichi, render frames, write metadata, or enable runtime single-pass composition."
         portable = $true
     } | ConvertTo-Json -Depth 8
@@ -51,7 +54,7 @@ $metadataSummary = powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Pat
 $singlePassPreflight = powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "scripts\inspect_render_plan_single_pass_preflight.ps1") | ConvertFrom-Json
 $ready = $metadataSummary.status -eq "ready" -and $singlePassPreflight.status -eq "ready"
 $runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runtime_merge=False; single_pass_submission=$($singlePassPreflight.runtime_single_pass_enabled); zero_diff_parity_required=True; runtime_path=disabled_until_parity"
-$composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: schema=rrkal_displaytools.compose_run_parity_artifact_runner.v1; path=state/compose_parity/compose_parity_artifact_runner.json; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
+$composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: schema=rrkal_displaytools.compose_run_parity_artifact_runner.v1; path=state/compose_parity/compose_parity_artifact_runner.json; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate=compose_parity_artifact_runner.precommit_gate; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
 
 [ordered]@{
     schema = $schema
@@ -89,6 +92,9 @@ $composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: sch
     zero_diff_parity_artifact_runner_status_field = "compose_parity_artifact_runner.status"
     zero_diff_parity_artifact_runner_diff_status_field = "compose_parity_artifact_runner.diff_status"
     zero_diff_parity_artifact_runner_skip_diff_status = "completed_diff_skipped"
+    zero_diff_parity_artifact_runner_precommit_gate_schema = "rrkal_displaytools.compose_run_parity_precommit_gate.v1"
+    zero_diff_parity_artifact_runner_precommit_gate_field = "compose_parity_artifact_runner.precommit_gate"
+    zero_diff_parity_artifact_runner_precommit_gate_required_before_runtime_merge = $true
     zero_diff_parity_artifact_diff_manifest_path = "state/compose_parity/render_compose_parity_smoke_manifest.json"
     zero_diff_parity_diff_status_field = "render_compose_parity_smoke.diff_status"
     zero_diff_parity_precommit_gate_field = "render_compose_parity_smoke.precommit_gate_passed"
