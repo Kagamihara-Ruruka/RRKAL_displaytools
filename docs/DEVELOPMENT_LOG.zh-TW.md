@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add compose bridge gates to copyable budget summary
+
+- Added compose bridge single-pass submission and zero-diff parity gate values to the copyable compose budget summary.
+- Kept the summary as handoff text only; runtime merge and single-pass submission remain disabled.
+- Added smoke gates for the copyable compose budget gate text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Surface compose bridge runtime gates in Qt summary
 
 - Added compose bridge runtime merge, single-pass submission and zero-diff parity gate metadata to `layer_render_plan_performance`.

@@ -6078,6 +6078,12 @@ if ($qtPanelSource -notlike "*zero_diff_parity=*") {
 if ($qtPanelSource -notlike "*layer_state_precompute_compose_bridge_zero_diff_parity_field*") {
     throw "Qt runtime optimization summary missing precompute compose bridge parity field"
 }
+if ($qtPanelSource -notlike "*bridge_gate=single_pass_submission:*") {
+    throw "Qt compose budget summary missing compose bridge single-pass gate handoff text"
+}
+if ($qtPanelSource -notlike "*parity_gate=zero_diff_required:*") {
+    throw "Qt compose budget summary missing compose bridge parity gate handoff text"
+}
 $qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource + $runtimeOptimizationReviewModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {
     throw "Qt render plan performance single-pass marker is missing"

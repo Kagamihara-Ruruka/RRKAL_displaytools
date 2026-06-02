@@ -10250,6 +10250,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"slowest={slowest_phase}; "
             f"advice={advice}; "
             f"target={target}; "
+            f"bridge_gate=single_pass_submission:{packet.get('layer_state_precompute_compose_bridge_single_pass_submission_enabled', '-')}; "
+            f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             "evidence=compose_parity_runner; "
             "runtime_merge=false"
         )
