@@ -1,3 +1,10 @@
+## 2026-06-02 - Renderer backend mapping audit
+
+- Added `docs/RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md` as a docs-only mapping of quick/repeated render evidence, backend entrypoints, render plan dependencies, metadata fields, profiler timing, preview artifacts and decomposition candidates.
+- Added the audit document to `docs/DOCS_INDEX.zh-TW.md`.
+- Kept the audit scoped to displaytools; no renderer runtime behavior, metadata schema, runtime merge, cross-repo integration or generated state artifacts were changed.
+- Validation: PASS (`scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1`, and `git diff --check`).
+
 ﻿## 2026-06-02 - Add artifact runner contract-only entry
 
 - Added `-ContractOnly` to `render_compose_parity_artifacts.ps1` so clone/review flows can inspect the artifact runner contract without creating directories, launching Taichi, rendering frames, diffing images or writing manifests.

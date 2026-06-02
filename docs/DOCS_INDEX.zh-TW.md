@@ -17,6 +17,7 @@
 - `RRKAL_HANDOFF_CONTRACT.zh-TW.md`: no-GUI RRKAL/displaytools integration contract.
 - `CAPABILITY_SUMMARY.zh-TW.md`: current program capability summary for push reports and GitHub review.
 - `DISPLAY_SHELL_RENDER_MATRIX.zh-TW.md`: DisplayShell / Canvas / Render Matrix contracts, display runtime landing zones, and no-GUI review/check commands.
+- `RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md`: renderer backend mapping, render flow, monolith responsibility audit, and staged decomposition candidates for demo-readiness review.
 
 ## Positioning
 
