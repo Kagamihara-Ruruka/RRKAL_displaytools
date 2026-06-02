@@ -731,21 +731,28 @@ def build_layer_render_plan_bottleneck_recommendation(
     }
 
 
+def _normalize_phase_timing_ms(phase_timing_ms: dict[str, float]) -> dict[str, float]:
+    return {
+        str(phase_id): round(float(elapsed_ms), 3)
+        for phase_id, elapsed_ms in phase_timing_ms.items()
+        if isinstance(phase_id, str)
+    }
+
+
+def _select_slowest_phase(measured: dict[str, float]) -> tuple[str | None, float]:
+    if not measured:
+        return None, 0.0
+    slowest_phase_id = max(measured, key=lambda key: measured[key])
+    return slowest_phase_id, measured.get(slowest_phase_id, 0.0)
+
+
 def build_layer_render_plan_phase_timing_runtime_packet(
     phase_timing_ms: dict[str, float],
     frame_index: int,
     total_ms: float,
 ) -> dict[str, object]:
-    measured = {
-        str(phase_id): round(float(elapsed_ms), 3)
-        for phase_id, elapsed_ms in phase_timing_ms.items()
-        if isinstance(phase_id, str)
-    }
-    slowest_phase_id = None
-    slowest_phase_ms = 0.0
-    if measured:
-        slowest_phase_id = max(measured, key=lambda key: measured[key])
-        slowest_phase_ms = measured.get(slowest_phase_id, 0.0)
+    measured = _normalize_phase_timing_ms(phase_timing_ms)
+    slowest_phase_id, slowest_phase_ms = _select_slowest_phase(measured)
     threshold_ms = 33.3
     packet = {
         "schema": "rrkal_displaytools.layer_render_plan_phase_timing_runtime.v1",

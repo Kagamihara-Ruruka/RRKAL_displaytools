@@ -1,3 +1,9 @@
+## 2026-06-02 - Extract phase timing normalization helpers
+
+- Added render-plan timing helpers for phase timing normalization and slowest-phase selection.
+- Kept `rrkal_displaytools.layer_render_plan_phase_timing_runtime.v1`, renderer metadata schema, runtime merge state and render output behavior unchanged.
+- Validation: PASS (`scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-02 - Extract repeated quick smoke summary helper
 
 - Added script-local repeated quick smoke summary helpers so frame execution and evidence summary payload construction are separated.
