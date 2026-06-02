@@ -1,3 +1,10 @@
+## 2026-06-03 - Extract render plan compile input helper
+
+- Added `render_core.render_plan.build_layer_render_plan_compile_input()` to package controller-collected compile inputs before cache key and adapter payload construction.
+- Updated `HybridRenderController.compile_layer_render_plan()` to use the compile input packet while keeping cache key, invalidation, batch decision, reuse branch, metadata schema, runtime merge state and render output behavior unchanged.
+- Updated `docs/RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md` to mark the helper as implemented.
+- Validation: PASS (`py -3 -m py_compile taichi_global_bathymetry.py render_core\render_plan.py`, `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-03 - Add render plan compile source map
 
 - Added `docs/RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md` to map `HybridRenderController.compile_layer_render_plan()` before compile facade extraction.

@@ -1020,6 +1020,40 @@ def build_layer_render_plan_adapter_payload(
     }
 
 
+def build_layer_render_plan_compile_input(
+    *,
+    composition_steps: list[dict[str, object]],
+    runtime_snapshot: dict[str, object],
+    compose_queue_packet: dict[str, object],
+    style_profile: object,
+    boundary_layer_ids: list[str],
+    layer_opacity: dict[str, object],
+    layer_blend: dict[str, object],
+    phase_timing_runtime: dict[str, object],
+    cached_plan_available: bool,
+    previous_cache_key: object,
+    frame_index: int,
+) -> dict[str, object]:
+    return {
+        "schema": "rrkal_displaytools.layer_render_plan_compile_input.v1",
+        "source": "render_core.render_plan.build_layer_render_plan_compile_input",
+        "status": "packaged",
+        "runtime_path_unchanged": True,
+        "composition_steps": composition_steps,
+        "runtime_snapshot": runtime_snapshot,
+        "compose_queue_packet": compose_queue_packet,
+        "style_profile": style_profile,
+        "boundary_layer_ids": boundary_layer_ids,
+        "layer_opacity": layer_opacity,
+        "layer_blend": layer_blend,
+        "phase_timing_runtime": phase_timing_runtime,
+        "cached_plan_available": bool(cached_plan_available),
+        "previous_cache_key": previous_cache_key,
+        "frame_index": int(frame_index),
+        "boundary": "Controller-collected compile inputs only; no cache decision, overlay lookup, rendering, metadata schema change, or runtime merge enablement.",
+    }
+
+
 def build_layer_render_plan_adapter_payload_contract(
     adapter_payload: dict[str, object],
 ) -> dict[str, object]:

@@ -48,6 +48,7 @@ from render_core.render_plan import (
     build_layer_render_plan_cache_invalidation_reasons,
     build_layer_render_plan_cache_invalidation_scope,
     build_layer_render_plan_cache_key,
+    build_layer_render_plan_compile_input,
     build_layer_render_plan_execution_phases,
     build_layer_render_plan_execution_summary,
     build_layer_render_plan_metadata_summary,
@@ -14340,13 +14341,29 @@ class HybridRenderController:
         compose_queue_packet = self.layer_render_plan_compose_queue(composition_steps)
         visible_layers = runtime_snapshot.get("visible_layers") if isinstance(runtime_snapshot.get("visible_layers"), list) else []
         visible_layer_ids = [str(layer_id) for layer_id in visible_layers]
-        cache_key = build_layer_render_plan_cache_key(
-            runtime_snapshot,
-            composition_steps,
+        phase_timing_runtime = getattr(self, "layer_render_plan_phase_timing_runtime", {})
+        phase_timing_runtime = phase_timing_runtime if isinstance(phase_timing_runtime, dict) else {}
+        cached_plan = getattr(self, "compiled_layer_render_plan", None)
+        compile_input = build_layer_render_plan_compile_input(
+            composition_steps=composition_steps,
+            runtime_snapshot=runtime_snapshot,
+            compose_queue_packet=compose_queue_packet,
             style_profile=getattr(self.args, "style_profile", "scientific"),
             boundary_layer_ids=sorted(str(layer_id) for layer_id in self.boundary_layer_rgba),
             layer_opacity={layer_id: self.layer_opacity_percent(layer_id) for layer_id in visible_layer_ids},
             layer_blend={layer_id: self.layer_blend_mode(layer_id) for layer_id in visible_layer_ids},
+            phase_timing_runtime=phase_timing_runtime,
+            cached_plan_available=isinstance(cached_plan, dict),
+            previous_cache_key=getattr(self, "compiled_layer_render_plan_cache_key", None),
+            frame_index=int(getattr(self, "frame_index", 0)),
+        )
+        cache_key = build_layer_render_plan_cache_key(
+            compile_input["runtime_snapshot"],
+            compile_input["composition_steps"],
+            style_profile=compile_input["style_profile"],
+            boundary_layer_ids=compile_input["boundary_layer_ids"],
+            layer_opacity=compile_input["layer_opacity"],
+            layer_blend=compile_input["layer_blend"],
         )
         invalidation_reasons = build_layer_render_plan_cache_invalidation_reasons(
             runtime_snapshot,
@@ -14360,7 +14377,7 @@ class HybridRenderController:
         execution_summary = build_layer_render_plan_execution_summary(apply_path, batch_decisions)
         execution_phases = build_layer_render_plan_execution_phases(apply_path, batch_decisions, execution_summary)
         phase_timing_contract = build_layer_render_plan_phase_timing_contract(execution_phases)
-        phase_timing_runtime = getattr(self, "layer_render_plan_phase_timing_runtime", {})
+        phase_timing_runtime = compile_input["phase_timing_runtime"]
         phase_timing_runtime = phase_timing_runtime if isinstance(phase_timing_runtime, dict) else {}
         bottleneck_recommendation = phase_timing_runtime.get("bottleneck_recommendation") if isinstance(phase_timing_runtime.get("bottleneck_recommendation"), dict) else build_layer_render_plan_bottleneck_recommendation(phase_timing_runtime)
         adapter_payload = build_layer_render_plan_adapter_payload(
@@ -14378,17 +14395,16 @@ class HybridRenderController:
             phase_timing_runtime,
             bottleneck_recommendation,
         )
-        cached_plan = getattr(self, "compiled_layer_render_plan", None)
         if isinstance(cached_plan, dict) and getattr(self, "compiled_layer_render_plan_cache_key", None) == cache_key:
             return build_reused_compiled_layer_render_plan_packet_from_adapter_payload(
                 cached_plan,
                 adapter_payload,
-                int(getattr(self, "frame_index", 0)),
+                compile_input["frame_index"],
             )
         self.compiled_layer_render_plan_cache_key = cache_key
         return build_compiled_layer_render_plan_packet_from_adapter_payload(
             adapter_payload,
-            int(getattr(self, "frame_index", 0)),
+            compile_input["frame_index"],
             source="HybridRenderController.compile_layer_render_plan",
         )
 

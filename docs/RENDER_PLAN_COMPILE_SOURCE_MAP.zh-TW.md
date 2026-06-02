@@ -66,11 +66,11 @@ Already available pure helpers:
 
 ## Recommended next helper boundary
 
-Recommended helper name:
+Implemented helper name:
 
 - `render_core.render_plan.build_layer_render_plan_compile_input()`
 
-Allowed first implementation:
+Current first implementation:
 
 - Package controller-collected values into a serializable compile input payload.
 - Do not compute new cache decisions in the helper yet.
