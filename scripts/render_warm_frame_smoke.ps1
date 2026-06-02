@@ -5,12 +5,17 @@ param(
     [string]$StyleProfile = "scientific",
     [int]$Width = 640,
     [int]$Height = 360,
-    [int]$TopoStep = 96
+    [int]$TopoStep = 96,
+    [switch]$HighDensityCompose
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $RepoRoot
+
+if ($HighDensityCompose -and $OutputDir -eq "state\showcase\warm_frame_smoke") {
+    $OutputDir = "state\showcase\warm_frame_smoke_high_density"
+}
 
 $artifactDir = Join-Path $RepoRoot $OutputDir
 New-Item -ItemType Directory -Force -Path $artifactDir | Out-Null
@@ -20,29 +25,55 @@ $previewPath = Join-Path $artifactDir "preview.png"
 $summaryPath = Join-Path $artifactDir "summary.json"
 $analysisPath = Join-Path $artifactDir "analysis.json"
 $metadataPath = "$outputPath.metadata.json"
+$densityMode = if ($HighDensityCompose) { "high_density_compose" } else { "bounded_quick_equivalent" }
 
-py -3 taichi_global_bathymetry.py `
-    --headless `
-    --once `
-    --demo-closed-loop `
-    --style-profile $StyleProfile `
-    --topo-source synthetic `
-    --topo-step $TopoStep `
-    --width $Width `
-    --height $Height `
-    --no-lake-layer `
-    --no-river-layer `
-    --no-border-layer `
-    --no-territorial-sea-layer `
-    --no-eez-layer `
-    --no-high-seas-layer `
-    --no-aircraft-layer `
-    --no-pin-layer `
-    --output $outputPath `
-    --preview-frame-file $previewPath `
-    --preview-frame-interval 0.05 `
-    --benchmark-frames $Frames `
-    --benchmark-summary $summaryPath
+$rendererArgs = @(
+    "taichi_global_bathymetry.py",
+    "--headless",
+    "--once",
+    "--demo-closed-loop",
+    "--style-profile", $StyleProfile,
+    "--topo-source", "synthetic",
+    "--topo-step", $TopoStep,
+    "--width", $Width,
+    "--height", $Height
+)
+if ($HighDensityCompose) {
+    $rendererArgs += @(
+        "--lake-layer",
+        "--river-layer",
+        "--border-layer",
+        "--territorial-sea-layer",
+        "--eez-layer",
+        "--high-seas-layer",
+        "--aircraft-layer",
+        "--pin-layer",
+        "--vehicle-icons"
+    )
+} else {
+    $rendererArgs += @(
+        "--no-lake-layer",
+        "--no-river-layer",
+        "--no-border-layer",
+        "--no-territorial-sea-layer",
+        "--no-eez-layer",
+        "--no-high-seas-layer",
+        "--no-aircraft-layer",
+        "--no-pin-layer"
+    )
+}
+$rendererArgs += @(
+    "--output", $outputPath,
+    "--preview-frame-file", $previewPath,
+    "--preview-frame-interval", 0.05,
+    "--benchmark-frames", $Frames,
+    "--benchmark-summary", $summaryPath
+)
+
+& py -3 @rendererArgs
+if ($LASTEXITCODE -ne 0) {
+    throw "Warm frame renderer command failed with exit code $LASTEXITCODE"
+}
 
 if (-not (Test-Path -LiteralPath $outputPath)) {
     throw "Warm frame smoke render output missing: $outputPath"
@@ -223,6 +254,7 @@ $skippedStepIds = @(
 )
 $composeAssessment = [ordered]@{
     schema = "rrkal_displaytools.compose_overlay_assessment.v1"
+    density_mode = $densityMode
     source_metadata = $metadataPath
     input_step_count = $inputStepCount
     executable_step_count = $executableStepCount
@@ -236,6 +268,16 @@ $composeAssessment = [ordered]@{
     skipped_step_ids = $skippedStepIds
     transparent_or_empty_overlays_skipped = ($skipReasonCounts.ContainsKey("transparent_overlay") -or $skipReasonCounts.ContainsKey("missing_overlay"))
     hidden_overlays_skipped = $skipReasonCounts.ContainsKey("hidden_layer")
+    compose_overlays_ms = if ($null -ne $lastWarmFrame.compose_overlays_ms) { [math]::Round([double]$lastWarmFrame.compose_overlays_ms, 3) } else { $null }
+    compose_queue_build_ms = $null
+    compose_runtime_blend_ms = $null
+    compose_alpha_compose_ms = $null
+    compose_postprocess_ms = Get-AverageMs -Rows $warmFrames -PropertyName "postprocess_ms"
+    compose_copy_or_allocation_ms = $null
+    merge_candidate_count = $composeMergeCandidateRunCount
+    recommended_next_target = $recommendedNextTarget
+    optimization_authorized = $false
+    subphase_timing_limitation = "Renderer metadata currently exposes aggregate compose_overlays and postprocess timing only; runtime_blend, alpha_compose, queue-build and allocation timing would require renderer instrumentation and is intentionally not added in this evidence-only script."
     runtime_merge_enabled = $false
     metadata_schema_changed = $false
     output_pixels_changed = $false
@@ -245,6 +287,7 @@ $analysis = [ordered]@{
     schema = "rrkal_displaytools.warm_frame_smoke_analysis.v1"
     source_summary = $summaryPath
     source_metadata = $metadataPath
+    density_mode = $densityMode
     frame_count = $Frames
     first_frame_render_ms = [math]::Round([double]$firstFrame.render_ms, 3)
     warm_frame_count = $warmFrames.Count
@@ -263,6 +306,7 @@ $analysis = [ordered]@{
 $analysis | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $analysisPath -Encoding UTF8
 
 Write-Host "Warm frame smoke summary: $summaryPath"
+Write-Host "Warm frame density mode: $densityMode"
 $summary.results |
     Select-Object frame, render_ms, frame_wall_ms, prepare_batches_ms, compose_overlays_ms, slowest_phase_id, bottleneck_recommendation |
     Format-Table -AutoSize
@@ -286,6 +330,7 @@ Write-Host "Compose overlay assessment:"
     compose_run_count = $composeAssessment.compose_run_count
     compose_merge_candidate_run_count = $composeAssessment.compose_merge_candidate_run_count
     multi_step_alpha_compose_run_count = $composeAssessment.multi_step_alpha_compose_run_count
+    optimization_authorized = $composeAssessment.optimization_authorized
     hidden_overlays_skipped = $composeAssessment.hidden_overlays_skipped
     transparent_or_empty_overlays_skipped = $composeAssessment.transparent_or_empty_overlays_skipped
 } | Format-List

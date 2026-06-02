@@ -1,3 +1,15 @@
+## 2026-06-03 - Add high-density compose overlay evidence
+
+- Added opt-in `scripts/render_warm_frame_smoke.ps1 -HighDensityCompose` mode to exercise more existing overlay toggles while keeping default warm-frame behavior unchanged.
+- Extended ignored `state/showcase/warm_frame_smoke*/analysis.json` with density mode, compose overlay timing fields, merge-candidate count and `optimization_authorized=false`.
+- Documented the sub-phase timing limit: current metadata exposes aggregate `compose_overlays` and `postprocess` timing, while queue-build, runtime-blend, alpha-compose and allocation timing require renderer instrumentation and are not added here.
+- Historical assumptions vs current evidence:
+  - Still hold: quick smoke is single-frame artifact evidence; repeated quick smoke is process-per-frame evidence; runtime merge remains disabled; compose collapse requires parity/zero-diff evidence; interactive FPS readiness is not claimed.
+  - Superseded: `prepare_batches` as the only current bottleneck now applies to process-per-frame evidence, while warm frames show `compose_overlays` as the next observed target.
+  - Needs more evidence before code change: multi-step alpha-compose runs, overlay-dense composition behavior, and fine compose sub-phase timing.
+  - Current work remains evidence-only; no alpha blending, layer ordering, pixel output, metadata schema or runtime merge behavior is changed.
+- Validation: PASS for default warm smoke, high-density warm smoke, quick smoke, repeated quick smoke, smoke, `git diff --check` and generated-artifact ignore audit.
+
 ## 2026-06-03 - Add compose overlay assessment evidence
 
 - Extended `scripts/render_warm_frame_smoke.ps1` to read the existing renderer metadata sidecar and add compose queue/run/skip counts to ignored `state/showcase/warm_frame_smoke/analysis.json`.
