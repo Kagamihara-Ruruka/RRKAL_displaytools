@@ -1,3 +1,10 @@
+## 2026-06-03 - Add layer state source map
+
+- Added `docs/LAYER_STATE_SOURCE_MAP.zh-TW.md` to map layer visibility, opacity, blend, selected semantic target, dirty flags and runtime snapshot inputs before implementation.
+- Added the source-map document to `docs/DOCS_INDEX.zh-TW.md`.
+- Kept this checkpoint docs-only: no renderer runtime behavior, metadata schema, runtime merge state or generated `state/` behavior changed.
+- Validation: PASS (`scripts/smoke.ps1` with extended timeout and `git diff --check`).
+
 ## 2026-06-03 - Consolidate renderer decomposition audit status
 
 - Updated `docs/RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md` to mark completed low-risk renderer decomposition candidates.
