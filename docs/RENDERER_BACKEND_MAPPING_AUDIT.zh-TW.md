@@ -2,7 +2,7 @@
 
 Date: 2026-06-02
 Scope: `RRKAL_displaytools` only
-Status: docs-only audit
+Status: active decomposition map
 
 This audit maps the current renderer preview/demo path from UI or script action to backend entrypoint, render plan, metadata, profiler evidence, and preview artifacts. It is intended to make the current backend flow easier to explain before the next decomposition slice.
 
@@ -89,25 +89,36 @@ Current interpretation:
 
 | Candidate | Proposed module / helper | Current source location | Expected benefit | Risk | Test path | Output / metadata schema |
 | --- | --- | --- | --- | --- | --- | --- |
-| Render metadata payload builder | `render_core.metadata.build_renderer_output_metadata_payload()` | `HybridRenderController.write_output_metadata()` | Makes metadata schema ownership explicit and testable | Low | `render_quick_smoke.ps1`, metadata schema check, `smoke.ps1` | Must remain unchanged |
-| Repeated evidence summary helper | `scripts/repeated_quick_smoke_summary.py` or PowerShell helper function | `scripts/render_repeated_quick_smoke.ps1` | Easier to test summary aggregation without launching renderer | Low | `render_repeated_quick_smoke.ps1 -Frames 3` | No schema change to renderer metadata; summary schema can stay script-local |
-| Timing summary formatter | `render_core.timing.format_phase_timing_summary()` | `render_if_needed()` / metadata consumers | Makes bottleneck reporting easier to explain and reuse | Low | quick/repeated smoke; inspect metadata | Renderer metadata fields unchanged |
-| Preview evidence writer | `render_core.preview.write_preview_frame()` | `write_preview_frame_if_due()` | Separates file output from controller logic | Low/Medium | quick smoke preview file check | Output image path and preview bytes behavior should remain equivalent |
+| Render metadata payload builder | `render_core.metadata.build_renderer_output_metadata_payload()` | `HybridRenderController.write_output_metadata()` | Makes metadata schema ownership explicit and testable | Low | `render_quick_smoke.ps1`, metadata schema check, `smoke.ps1` | Completed; schema unchanged |
+| Repeated evidence summary helper | script-local `New-RepeatedQuickSmokeSummary` helper | `scripts/render_repeated_quick_smoke.ps1` | Easier to test summary aggregation without launching renderer | Low | `render_repeated_quick_smoke.ps1 -Frames 3` | Completed; renderer metadata schema unchanged |
+| Timing summary formatter | `_normalize_phase_timing_ms()` / `_select_slowest_phase()` in `render_core.render_plan` | `build_layer_render_plan_phase_timing_runtime_packet()` | Makes bottleneck reporting easier to explain and reuse | Low | quick/repeated smoke; inspect metadata | Completed; renderer metadata fields unchanged |
+| Preview evidence writer | `render_core.preview.write_preview_frame_png()` | `write_preview_frame_if_due()` | Separates file output from controller logic | Low/Medium | quick smoke preview file check | Completed; output image path and preview bytes behavior unchanged |
 | Layer state packet builder | `render_core.layer_state.build_layer_runtime_snapshot_input()` | `refresh_layer_runtime_state()`, `layer_render_plan_runtime_snapshot()` | Reduces UI/runtime/controller coupling | Medium | smoke, layer inspectors, quick smoke | Metadata schema unchanged |
 | Render plan compile facade | `render_core.render_plan.compile_from_controller_payload()` | `compile_layer_render_plan()` | Moves plan packet assembly out of controller | Medium | render plan inspectors, smoke, quick smoke | Metadata schema unchanged |
 | Static batch prepare cache | `render_core.batch_prepare` / `renderer_runtime.static_batch_cache` | `render_if_needed()`, `_render_hydrology_if_needed()`, `_render_boundaries_if_needed()` | Directly targets `prepare_batches` bottleneck | Medium/High | repeated quick smoke, quick smoke, smoke; compare metadata timing | Output image should remain equivalent; metadata schema unchanged |
 | Renderer core extraction | `render_core.taichi_globe_runtime` | `TaichiGlobeRenderer` and controller render loop | Long-term module clarity | High | image parity, repeated renderer evidence, smoke | Requires explicit parity gate; do not start as first slice |
 
+## Completed extraction status
+
+Completed low-risk candidates:
+
+- `render_core.metadata.build_renderer_output_metadata_payload()`
+- script-local repeated quick smoke summary helper
+- render-plan phase timing normalization helpers
+- `render_core.preview.write_preview_frame_png()`
+
+All completed candidates kept renderer output metadata schema unchanged, runtime merge disabled, generated `state/` artifacts ignored, and quick/repeated/smoke gates passing at their checkpoints.
+
 ## Recommended next safe step
 
-First extraction candidate: metadata payload builder.
+Next candidate: layer state source-map before implementation.
 
 Reason:
 
-- It is easier to verify than changing batch prepare behavior.
-- It makes schema ownership explicit.
-- It does not need output pixel changes.
-- It supports later backend mapping and UI handoff explanations.
+- `Layer state packet builder` is medium risk because UI state, runtime state files, dirty flags and selected semantic target share controller state.
+- Start with a source-map / contract inventory, not behavior movement.
+- Only after the source-map identifies a pure packet boundary should a helper extraction be attempted.
+- Quick/repeated render evidence and smoke must remain the checkpoint gates.
 
 Required gate before commit:
 

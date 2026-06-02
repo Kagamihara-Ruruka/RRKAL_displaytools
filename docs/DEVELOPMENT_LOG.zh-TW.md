@@ -1,3 +1,10 @@
+## 2026-06-03 - Consolidate renderer decomposition audit status
+
+- Updated `docs/RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md` to mark completed low-risk renderer decomposition candidates.
+- Moved the recommended next safe step from metadata payload extraction to a layer state source-map before implementation.
+- Kept this checkpoint docs-only: no renderer runtime behavior, metadata schema, runtime merge state or generated `state/` behavior changed.
+- Validation: PASS (`scripts/smoke.ps1` with extended timeout and `git diff --check`).
+
 ## 2026-06-02 - Extract preview frame writer helper
 
 - Added `render_core/preview.py` to own the file-based preview PNG write/atomic replace helper.
