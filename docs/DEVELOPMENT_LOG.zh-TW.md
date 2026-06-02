@@ -1,3 +1,9 @@
+## 2026-06-03 - Add warm frame smoke aggregate report
+
+- Enhanced `scripts/render_warm_frame_smoke.ps1` to derive first-frame timing, warm-frame averages and slowest-phase distribution from the existing warm-frame summary.
+- Added ignored local `state/showcase/warm_frame_smoke/analysis.json` output for evidence review without changing renderer output paths, renderer metadata schema, runtime merge state or pixels.
+- Validation: PASS for `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/render_warm_frame_smoke.ps1`, `scripts/smoke.ps1`, `git diff --check` and generated-artifact ignore audit.
+
 ## 2026-06-03 - Add warm frame benchmark evidence path
 
 - Added `--benchmark-frames` and `--benchmark-summary` to the headless/once renderer path for in-process warm-frame evidence.
