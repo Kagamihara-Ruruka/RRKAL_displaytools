@@ -1,3 +1,15 @@
+## 2026-06-03 - Design runtime blend subphase timing evidence
+
+- Added `docs/RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md` as a docs-only design note for runtime-blend subphase timing after `9fc7b14`.
+- Historical assumptions vs runtime_blend subphase timing design:
+  - Still hold: quick smoke is single-frame artifact evidence; repeated quick smoke is process-per-frame evidence; runtime merge remains disabled; renderer metadata schema remains `rrkal_displaytools.renderer_output_metadata.v1`; no interactive FPS readiness is claimed.
+  - Superseded: alpha-collapse is not the immediate compose target for the current evidence set because default and high-density warm evidence both have `multi_step_alpha_compose_run_count=0`.
+  - Requires parity before behavior changes: runtime-blend optimization, blend/mask/array-copy rewrites, runtime merge, layer-order changes and any output-affecting compose change.
+  - Current work remains design/evidence-only; no renderer core instrumentation, no optimization, no pixel behavior change and no metadata schema change are implemented.
+- Code-path inspection summary: `runtime_blend` steps are generated in `render_core.render_plan.build_layer_render_plan_composition_steps()` and executed sequentially in `HybridRenderController.apply_layer_render_plan_composition()`, where current timing is folded into aggregate `compose_overlays`.
+- Decision classification: `requires_non_invasive_instrumentation_review`; the next safe action is an `o_1`-reviewed opt-in timing packet design before touching renderer execution code.
+- Baseline before docs change: PASS for quick smoke, repeated quick smoke, default warm smoke, high-density warm smoke and smoke.
+
 ## 2026-06-03 - Add runtime blend assessment evidence
 
 - Extended `scripts/render_warm_frame_smoke.ps1` analysis with runtime-blend-focused evidence fields: `runtime_blend_layer_kinds`, `runtime_blend_steps`, `runtime_blend_pressure_classification`, `runtime_blend_assessment_limitations` and `runtime_blend_next_safe_target`.
