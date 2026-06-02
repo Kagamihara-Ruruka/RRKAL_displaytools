@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity evidence source markers
+
+- Added `zero_diff_parity_source_script` and `zero_diff_parity_manifest_path` to `inspect_render_plan_review_packet.ps1`.
+- Made the render-plan review packet point directly to the parity smoke source and manifest path without running artifact diff.
+- Added smoke gates for the contract and runtime source/manifest markers.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add zero-diff parity evidence summary
 
 - Added `zero_diff_parity_evidence_summary` to `inspect_render_plan_review_packet.ps1`.

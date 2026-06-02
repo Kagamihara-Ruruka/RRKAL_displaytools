@@ -7355,6 +7355,12 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_checklist -notcont
 if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_summary -notlike "*runtime_path=disabled_until_pass*") {
     throw "Renderer render plan review packet contract parity evidence summary missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_source_script -ne "scripts\render_compose_parity_smoke.ps1") {
+    throw "Renderer render plan review packet contract parity source script missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_manifest_path -ne "state/render_compose_parity_smoke_manifest.json") {
+    throw "Renderer render plan review packet contract parity manifest path missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7391,6 +7397,12 @@ if ($renderPlanReviewPacket.zero_diff_parity_evidence_summary -notlike "*visual_
 }
 if ($renderPlanReviewPacket.zero_diff_parity_evidence_summary -notlike "*changed_pixel_count=0*") {
     throw "Renderer render plan review packet parity evidence summary missing changed-pixel tolerance"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_source_script -ne "scripts\render_compose_parity_smoke.ps1") {
+    throw "Renderer render plan review packet parity source script missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_manifest_path -ne "state/render_compose_parity_smoke_manifest.json") {
+    throw "Renderer render plan review packet parity manifest path missing"
 }
 if ($renderPlanReviewPacket.next_runtime_gate_action -ne "run_zero_diff_parity_contract_before_enabling_single_pass_submission") {
     throw "Renderer render plan review packet next runtime gate action missing"
