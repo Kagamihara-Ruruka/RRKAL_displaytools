@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity evidence to compose handoff summaries
+
+- Added zero-diff parity evidence summary to `Copy compose budget` and `Render-plan work order` handoff text.
+- Kept runtime merge and single-pass submission disabled; the added text only clarifies the next parity gate.
+- Added smoke coverage so both compose handoff summaries continue to include the parity evidence helper.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add parity evidence to copy runtime gate
 
 - Extended `Copy runtime gate` to copy both runtime gate status and zero-diff parity evidence summary.

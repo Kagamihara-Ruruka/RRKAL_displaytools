@@ -6162,6 +6162,9 @@ if ($qtPanelSource -notlike "*bridge_gate=single_pass_submission:*") {
 if ($qtPanelSource -notlike "*parity_gate=zero_diff_required:*") {
     throw "Qt compose budget summary missing compose bridge parity gate handoff text"
 }
+if ($qtPanelSource -notlike "*parity_evidence={self.zero_diff_parity_evidence_summary_text()}*") {
+    throw "Qt compose/work-order summaries must include zero-diff parity evidence summary"
+}
 if ($qtPanelSource -notlike "*Render-plan work order:*bridge_gate=single_pass_submission:*") {
     throw "Qt render-plan work order summary missing compose bridge single-pass gate handoff text"
 }
