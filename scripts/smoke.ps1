@@ -7391,6 +7391,18 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_source_script -ne "scripts\
 if ($renderPlanReviewPacketContract.zero_diff_parity_manifest_path -ne "state/render_compose_parity_smoke_manifest.json") {
     throw "Renderer render plan review packet contract parity manifest path missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_producer_script -ne "scripts\render_compose_parity_artifacts.ps1") {
+    throw "Renderer render plan review packet contract parity artifact producer script missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_producer_command -notlike "*render_compose_parity_artifacts.ps1 -SkipDiff*") {
+    throw "Renderer render plan review packet contract parity artifact producer command missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_manifest_path -ne "state/compose_parity/compose_parity_artifact_runner.json") {
+    throw "Renderer render plan review packet contract parity artifact runner manifest missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_diff_status_field -ne "render_compose_parity_smoke.diff_status") {
+    throw "Renderer render plan review packet contract parity diff status field missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7433,6 +7445,18 @@ if ($renderPlanReviewPacket.zero_diff_parity_source_script -ne "scripts\render_c
 }
 if ($renderPlanReviewPacket.zero_diff_parity_manifest_path -ne "state/render_compose_parity_smoke_manifest.json") {
     throw "Renderer render plan review packet parity manifest path missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_script -ne "scripts\render_compose_parity_artifacts.ps1") {
+    throw "Renderer render plan review packet parity artifact producer script missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_command -notlike "*render_compose_parity_artifacts.ps1 -SkipDiff*") {
+    throw "Renderer render plan review packet parity artifact producer command missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_diff_manifest_path -ne "state/compose_parity/render_compose_parity_smoke_manifest.json") {
+    throw "Renderer render plan review packet parity artifact diff manifest missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_precommit_gate_field -ne "render_compose_parity_smoke.precommit_gate_passed") {
+    throw "Renderer render plan review packet parity precommit gate field missing"
 }
 if ($renderPlanReviewPacket.next_runtime_gate_action -ne "run_zero_diff_parity_contract_before_enabling_single_pass_submission") {
     throw "Renderer render plan review packet next runtime gate action missing"

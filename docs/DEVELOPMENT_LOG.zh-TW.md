@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity artifact producer review contract
+
+- Added parity artifact producer script/command, runner manifest, artifact diff manifest and diff/precommit gate fields to `inspect_render_plan_review_packet.ps1`.
+- Kept the fields review-only; the packet still does not run the renderer or artifact diff.
+- Added smoke gates for the contract and runtime review packet producer/diff status markers.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add parity evidence to compose handoff summaries
 
 - Added zero-diff parity evidence summary to `Copy compose budget` and `Render-plan work order` handoff text.
