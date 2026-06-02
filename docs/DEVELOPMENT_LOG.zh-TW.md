@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity evidence to copy runtime gate
+
+- Extended `Copy runtime gate` to copy both runtime gate status and zero-diff parity evidence summary.
+- Kept the visible runtime gate strip concise while making the clipboard handoff text complete.
+- Added smoke coverage for the combined copy handler text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add parity evidence to capability summary
 
 - Updated Qt and no-GUI capability summaries to mention `zero_diff_parity_evidence_summary` as part of runtime gate review.

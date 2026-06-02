@@ -10263,7 +10263,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
         )
 
     def copy_runtime_gate_status_summary(self) -> None:
-        summary = self.runtime_gate_status_text()
+        summary = self.runtime_gate_status_text() + "\n" + self.zero_diff_parity_evidence_summary_text()
         QtWidgets.QApplication.clipboard().setText(summary)
         self.status.setText("Copied runtime gate status summary")
 

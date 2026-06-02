@@ -6117,6 +6117,9 @@ if ($qtPanelSource -notlike "*Copy runtime gate*") {
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_summary*") {
     throw "Qt runtime gate copy handler is missing"
 }
+if ($qtPanelSource -notlike '*self.runtime_gate_status_text() + "\n" + self.zero_diff_parity_evidence_summary_text()*') {
+    throw "Qt runtime gate copy handler must include zero-diff parity evidence summary"
+}
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_button.clicked.connect*") {
     throw "Qt runtime gate copy action is not wired"
 }
