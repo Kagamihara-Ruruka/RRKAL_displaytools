@@ -19,6 +19,7 @@ if ($ContractOnly) {
             "scripts/inspect_render_plan_single_pass_preflight.ps1"
         )
         included_summary_fields = @("runtime_gate_status_summary")
+        zero_diff_parity_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly"
         boundary = "Reviewer packet only; it does not launch Qt, Taichi, render frames, write metadata, or enable runtime single-pass composition."
         portable = $true
     } | ConvertTo-Json -Depth 8
@@ -46,6 +47,9 @@ $runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runti
     runtime_single_pass_enabled = $singlePassPreflight.runtime_single_pass_enabled
     runtime_gate_status_summary = $runtimeGateStatusSummary
     runtime_gate_status_summary_field = "runtime_gate_status_summary"
+    zero_diff_parity_required = $true
+    zero_diff_parity_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly"
+    next_runtime_gate_action = "run_zero_diff_parity_contract_before_enabling_single_pass_submission"
     clone_first_review_commands = @(
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_metadata_summary.ps1",

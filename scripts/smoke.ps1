@@ -7343,6 +7343,9 @@ $renderPlanReviewPacketContract = powershell -NoProfile -ExecutionPolicy Bypass 
 if ($renderPlanReviewPacketContract.included_summary_fields -notcontains "runtime_gate_status_summary") {
     throw "Renderer render plan review packet contract runtime gate summary field missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_contract_command -notlike "*render_compose_parity_smoke.ps1 -ContractOnly*") {
+    throw "Renderer render plan review packet contract zero-diff parity command missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7358,6 +7361,15 @@ if ($renderPlanReviewPacket.runtime_gate_status_summary_field -ne "runtime_gate_
 }
 if ($renderPlanReviewPacket.runtime_gate_status_summary -notlike "*single_pass_submission=False*") {
     throw "Renderer render plan review packet runtime gate summary must keep single-pass disabled"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_required -ne $true) {
+    throw "Renderer render plan review packet zero-diff parity requirement missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_contract_command -notlike "*render_compose_parity_smoke.ps1 -ContractOnly*") {
+    throw "Renderer render plan review packet zero-diff parity contract command missing"
+}
+if ($renderPlanReviewPacket.next_runtime_gate_action -ne "run_zero_diff_parity_contract_before_enabling_single_pass_submission") {
+    throw "Renderer render plan review packet next runtime gate action missing"
 }
 if ($renderPlanReviewPacket.adapter_payload_status_field -ne "adapter_payload_status") {
     throw "Renderer render plan review packet adapter payload status field missing"

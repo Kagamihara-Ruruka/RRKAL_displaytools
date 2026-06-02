@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity gate command to render-plan review packet
+
+- Added zero-diff parity requirement, contract command and next runtime gate action to `inspect_render_plan_review_packet.ps1`.
+- Kept the parity command contract-only; it does not enable runtime merge or single-pass submission.
+- Added smoke gates for the parity command and next gate action.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add runtime gate capability summary entry
 
 - Added `runtime_gate_status_review` to the no-GUI capability summary exporter.
