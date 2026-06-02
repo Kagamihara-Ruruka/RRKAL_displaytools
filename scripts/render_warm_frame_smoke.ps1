@@ -6,15 +6,22 @@ param(
     [int]$Width = 640,
     [int]$Height = 360,
     [int]$TopoStep = 96,
-    [switch]$HighDensityCompose
+    [switch]$HighDensityCompose,
+    [switch]$RuntimeBlendTiming
 )
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 Set-Location $RepoRoot
 
-if ($HighDensityCompose -and $OutputDir -eq "state\showcase\warm_frame_smoke") {
-    $OutputDir = "state\showcase\warm_frame_smoke_high_density"
+if ($OutputDir -eq "state\showcase\warm_frame_smoke") {
+    if ($RuntimeBlendTiming -and $HighDensityCompose) {
+        $OutputDir = "state\showcase\warm_frame_smoke_runtime_blend_timing_high_density"
+    } elseif ($RuntimeBlendTiming) {
+        $OutputDir = "state\showcase\warm_frame_smoke_runtime_blend_timing"
+    } elseif ($HighDensityCompose) {
+        $OutputDir = "state\showcase\warm_frame_smoke_high_density"
+    }
 }
 
 $artifactDir = Join-Path $RepoRoot $OutputDir
@@ -69,6 +76,9 @@ $rendererArgs += @(
     "--benchmark-frames", $Frames,
     "--benchmark-summary", $summaryPath
 )
+if ($RuntimeBlendTiming) {
+    $rendererArgs += @("--runtime-blend-timing")
+}
 
 & py -3 @rendererArgs
 if ($LASTEXITCODE -ne 0) {
@@ -107,6 +117,9 @@ if ($summary.runtime_merge_enabled -ne $false) {
 }
 if ($summary.metadata_schema_changed -ne $false) {
     throw "Warm frame benchmark must not change metadata schema"
+}
+if ($RuntimeBlendTiming -and $summary.runtime_blend_timing_enabled -ne $true) {
+    throw "Warm frame runtime blend timing evidence was requested but not enabled in summary"
 }
 
 $results = @($summary.results)
@@ -320,6 +333,36 @@ $runtimeBlendNextSafeTarget = switch ($decisionClassification) {
     "alpha_collapse_candidate_found_but_needs_parity" { "alpha_compose_parity_workflow" }
     default { "targeted_compose_evidence_review" }
 }
+$runtimeBlendTimingEnabled = $summary.runtime_blend_timing_enabled -eq $true
+$runtimeBlendTimingPackets = @(
+    $results | ForEach-Object {
+        $packet = $_.runtime_blend_timing
+        if ($packet -and $packet.runtime_blend_timing_enabled -eq $true) {
+            $packet
+        }
+    }
+)
+$lastRuntimeBlendTimingPacket = if ($runtimeBlendTimingPackets.Count -gt 0) { $runtimeBlendTimingPackets[-1] } else { [pscustomobject]@{} }
+$runtimeBlendStepTimingRows = @(
+    $results | ForEach-Object {
+        $frameNumber = $_.frame
+        $packet = $_.runtime_blend_timing
+        if ($packet -and $packet.runtime_blend_timing_enabled -eq $true) {
+            @($packet.runtime_blend_step_timings) | ForEach-Object {
+                [pscustomobject]@{
+                    frame = $frameNumber
+                    runtime_blend_step_id = $_.step_id
+                    runtime_blend_layer_name = $_.layer_name
+                    runtime_blend_layer_kind = $_.layer_kind
+                    runtime_blend_step_ms = $_.runtime_blend_step_ms
+                    timing_includes_possible_sync_wait = $_.timing_includes_possible_sync_wait
+                    first_runtime_blend_step_may_include_data_ready_wait = $_.first_runtime_blend_step_may_include_data_ready_wait
+                    not_a_pixel_or_optimization_change = $_.not_a_pixel_or_optimization_change
+                }
+            }
+        }
+    }
+)
 $inputStepCount = if ($null -ne $composeQueuePacket.input_step_count) { [int]$composeQueuePacket.input_step_count } else { 0 }
 $executableStepCount = if ($null -ne $composeQueuePacket.executable_step_count) { [int]$composeQueuePacket.executable_step_count } else { $composeQueue.Count }
 $skippedStepCount = if ($null -ne $composeQueuePacket.skipped_step_count) { [int]$composeQueuePacket.skipped_step_count } else { $skippedSteps.Count }
@@ -361,6 +404,16 @@ $composeAssessment = [ordered]@{
     runtime_blend_layer_kinds = $runtimeBlendLayerKinds
     runtime_blend_steps = $runtimeBlendLayerRows
     runtime_blend_pressure_classification = $runtimeBlendPressureClassification
+    runtime_blend_timing_enabled = $runtimeBlendTimingEnabled
+    runtime_blend_timing_scope = $summary.runtime_blend_timing_scope
+    runtime_blend_step_timings = $runtimeBlendStepTimingRows
+    runtime_blend_total_ms = $lastRuntimeBlendTimingPacket.runtime_blend_total_ms
+    runtime_blend_total_ms_avg = $summary.runtime_blend_total_ms_avg
+    runtime_blend_timing_limitations = $summary.runtime_blend_timing_limitations
+    gpu_cpu_sync_misattribution_risk = $summary.gpu_cpu_sync_misattribution_risk
+    timing_includes_possible_sync_wait = $summary.timing_includes_possible_sync_wait
+    first_runtime_blend_step_may_include_data_ready_wait = $summary.first_runtime_blend_step_may_include_data_ready_wait
+    not_a_pixel_or_optimization_change = if ($RuntimeBlendTiming) { $summary.not_a_pixel_or_optimization_change } else { $true }
     runtime_blend_assessment_limitations = $runtimeBlendAssessmentLimitations
     runtime_blend_next_safe_target = $runtimeBlendNextSafeTarget
     alpha_compose_run_count = $alphaComposeRunCount
@@ -411,6 +464,16 @@ $analysis = [ordered]@{
     runtime_blend_run_count = $runtimeBlendRunCount
     runtime_blend_layer_kinds = $runtimeBlendLayerKinds
     runtime_blend_pressure_classification = $runtimeBlendPressureClassification
+    runtime_blend_timing_enabled = $runtimeBlendTimingEnabled
+    runtime_blend_timing_scope = $summary.runtime_blend_timing_scope
+    runtime_blend_step_timings = $runtimeBlendStepTimingRows
+    runtime_blend_total_ms = $lastRuntimeBlendTimingPacket.runtime_blend_total_ms
+    runtime_blend_total_ms_avg = $summary.runtime_blend_total_ms_avg
+    runtime_blend_timing_limitations = $summary.runtime_blend_timing_limitations
+    gpu_cpu_sync_misattribution_risk = $summary.gpu_cpu_sync_misattribution_risk
+    timing_includes_possible_sync_wait = $summary.timing_includes_possible_sync_wait
+    first_runtime_blend_step_may_include_data_ready_wait = $summary.first_runtime_blend_step_may_include_data_ready_wait
+    not_a_pixel_or_optimization_change = if ($RuntimeBlendTiming) { $summary.not_a_pixel_or_optimization_change } else { $true }
     runtime_blend_assessment_limitations = $runtimeBlendAssessmentLimitations
     runtime_blend_next_safe_target = $runtimeBlendNextSafeTarget
     style_profile_postprocess_run_count = $styleProfilePostprocessRunCount
@@ -458,6 +521,10 @@ Write-Host "Compose overlay assessment:"
     runtime_blend_run_count = $composeAssessment.runtime_blend_run_count
     runtime_blend_layer_kinds = ($composeAssessment.runtime_blend_layer_kinds -join ",")
     runtime_blend_pressure_classification = $composeAssessment.runtime_blend_pressure_classification
+    runtime_blend_timing_enabled = $composeAssessment.runtime_blend_timing_enabled
+    runtime_blend_total_ms = $composeAssessment.runtime_blend_total_ms
+    runtime_blend_total_ms_avg = $composeAssessment.runtime_blend_total_ms_avg
+    gpu_cpu_sync_misattribution_risk = $composeAssessment.gpu_cpu_sync_misattribution_risk
     runtime_blend_next_safe_target = $composeAssessment.runtime_blend_next_safe_target
     alpha_compose_run_count = $composeAssessment.alpha_compose_run_count
     style_profile_postprocess_run_count = $composeAssessment.style_profile_postprocess_run_count
@@ -471,3 +538,9 @@ Write-Host "Compose overlay assessment:"
 } | Format-List
 $queueKindRows | Format-Table -AutoSize
 $skipReasonRows | Format-Table -AutoSize
+if ($runtimeBlendTimingEnabled) {
+    Write-Host "Runtime blend timing evidence:"
+    $runtimeBlendStepTimingRows |
+        Select-Object frame, runtime_blend_step_id, runtime_blend_layer_name, runtime_blend_layer_kind, runtime_blend_step_ms, first_runtime_blend_step_may_include_data_ready_wait |
+        Format-Table -AutoSize
+}

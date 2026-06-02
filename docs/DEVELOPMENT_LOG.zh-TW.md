@@ -1,3 +1,10 @@
+## 2026-06-03 - c_3 opt-in runtime blend timing evidence
+
+- Scope: added opt-in runtime_blend step timing evidence for warm-frame smoke review.
+- Behavior: default quick/repeated/warm render behavior remains unchanged unless `--runtime-blend-timing` / `-RuntimeBlendTiming` is supplied.
+- Evidence boundary: writes timing rows into warm-frame benchmark summary/analysis artifacts under ignored `state/showcase/warm_frame_smoke_runtime_blend_timing*`.
+- Safety: renderer metadata schema remains `rrkal_displaytools.renderer_output_metadata.v1`; runtime merge remains disabled; no alpha, blending, ordering, or pixel-output change is intended.
+- Limitation: step timings may include CPU/GPU sync or data-ready wait, especially the first runtime_blend step.
 ## 2026-06-03 - Design runtime blend subphase timing evidence
 
 - Added `docs/RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md` as a docs-only design note for runtime-blend subphase timing after `9fc7b14`.

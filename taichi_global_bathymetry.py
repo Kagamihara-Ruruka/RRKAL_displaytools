@@ -12182,6 +12182,19 @@ class HybridRenderController:
     def compose_runtime_blend(self, background: np.ndarray, layer_id: str, overlay: np.ndarray) -> np.ndarray:
         return alpha_blend_compose(background, overlay, self.layer_blend_mode(layer_id) or "Normal")
 
+    def runtime_blend_layer_kind(self, layer_id: str) -> str:
+        if layer_id in {"lakes", "rivers"}:
+            return "hydrology_vector_overlay"
+        if layer_id in {"borders", "territorial_sea", "eez", "high_seas"}:
+            return "boundary_vector_overlay"
+        if layer_id in {"aircraft", "ais", "traffic"}:
+            return "traffic_overlay"
+        if layer_id in {"pin", "pins", "vehicle_icons", "vehicles"}:
+            return "annotation_overlay"
+        if not layer_id:
+            return "unknown_layer"
+        return "unclassified_runtime_overlay"
+
     def boundary_aggregate_blend_mode(self) -> str:
         for layer_id in ("borders", "territorial_sea", "eez", "high_seas"):
             mode = self.layer_blend_mode(layer_id)
@@ -14154,6 +14167,8 @@ class HybridRenderController:
             getattr(self.args, "style_profile", "scientific")
         )
         step_timing_ms: dict[str, float] = {}
+        runtime_blend_timing_enabled = bool(getattr(self.args, "runtime_blend_timing", False))
+        runtime_blend_step_timings: list[dict[str, object]] = []
         for step in plan_steps:
             if not isinstance(step, dict):
                 continue
@@ -14164,7 +14179,28 @@ class HybridRenderController:
             dispatch_packet = build_layer_render_plan_composition_dispatch_packet(action, overlay is not None)
             dispatch = str(dispatch_packet.get("dispatch") or "")
             if dispatch == "runtime_blend":
+                runtime_blend_started_at = time.perf_counter()
                 frame = self.compose_runtime_blend(frame, layer_id, overlay)
+                runtime_blend_elapsed_ms = (time.perf_counter() - runtime_blend_started_at) * 1000.0
+                if runtime_blend_timing_enabled:
+                    step_id = str(step.get("id") or layer_id or "unknown_step")
+                    is_first_runtime_blend_step = len(runtime_blend_step_timings) == 0
+                    runtime_blend_step_timings.append(
+                        {
+                            "step_id": step_id,
+                            "layer_id": layer_id or "unknown_layer",
+                            "layer_name": layer_id or "unknown_layer",
+                            "layer_kind": self.runtime_blend_layer_kind(layer_id),
+                            "dispatch": dispatch,
+                            "phase_id": str(dispatch_packet.get("phase_id") or "compose_overlays"),
+                            "queue_order": step.get("queue_order"),
+                            "runtime_blend_step_ms": round(float(runtime_blend_elapsed_ms), 3),
+                            "blend_mode": str(action.get("blend_mode") or "Normal"),
+                            "timing_includes_possible_sync_wait": True,
+                            "first_runtime_blend_step_may_include_data_ready_wait": is_first_runtime_blend_step,
+                            "not_a_pixel_or_optimization_change": True,
+                        }
+                    )
             elif dispatch == "alpha_blend":
                 frame = alpha_blend_compose(frame, overlay, str(action.get("blend_mode") or "Normal"))
             elif dispatch == "alpha_compose":
@@ -14180,6 +14216,36 @@ class HybridRenderController:
         timing_packet = build_layer_render_plan_composition_timing_packet(step_timing_ms)
         self.layer_render_step_timing_packet = timing_packet
         self.layer_render_step_timing_ms = timing_packet.get("phase_timing_ms", {})
+        if runtime_blend_timing_enabled:
+            runtime_blend_total_ms = sum(
+                float(step.get("runtime_blend_step_ms", 0.0))
+                for step in runtime_blend_step_timings
+            )
+            self.runtime_blend_timing_packet = {
+                "schema": "rrkal_displaytools.runtime_blend_step_timing.v1",
+                "source": "HybridRenderController.apply_layer_render_plan_composition",
+                "runtime_blend_timing_enabled": True,
+                "runtime_blend_timing_scope": "runtime_blend dispatch branch inside apply_layer_render_plan_composition",
+                "runtime_blend_step_count": len(runtime_blend_step_timings),
+                "runtime_blend_total_ms": round(float(runtime_blend_total_ms), 3),
+                "runtime_blend_step_timings": runtime_blend_step_timings,
+                "runtime_blend_timing_limitations": "Per-step timing wraps runtime_blend dispatch only. It may include CPU/GPU synchronization or data-ready wait, especially on the first runtime_blend step, and must not be interpreted as an optimization result.",
+                "gpu_cpu_sync_misattribution_risk": "possible_first_runtime_blend_step_wait",
+                "timing_includes_possible_sync_wait": True,
+                "first_runtime_blend_step_may_include_data_ready_wait": bool(runtime_blend_step_timings),
+                "not_a_pixel_or_optimization_change": True,
+                "optimization_authorized": False,
+                "runtime_merge_enabled": False,
+                "metadata_schema_changed": False,
+                "output_pixels_changed": False,
+            }
+        else:
+            self.runtime_blend_timing_packet = {
+                "schema": "rrkal_displaytools.runtime_blend_step_timing.v1",
+                "runtime_blend_timing_enabled": False,
+                "optimization_authorized": False,
+                "not_a_pixel_or_optimization_change": True,
+            }
         return frame
 
     def merge_alpha_compose_overlay_run(self, overlays: list[np.ndarray]) -> np.ndarray | None:
@@ -17862,6 +17928,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preview-frame-interval", type=float, default=float(os.environ.get("PREVIEW_FRAME_INTERVAL", "0.75")))
     parser.add_argument("--benchmark-frames", type=int, default=int(os.environ.get("BENCHMARK_FRAMES", "1")))
     parser.add_argument("--benchmark-summary", default=os.environ.get("BENCHMARK_SUMMARY"))
+    parser.add_argument("--runtime-blend-timing", action=bool_action, default=parse_bool(os.environ.get("RUNTIME_BLEND_TIMING"), False))
     parser.add_argument("--rrkal-data-manifest-ref", default=os.environ.get("RRKAL_DATA_MANIFEST_REF", ""))
     parser.add_argument("--fps-log", default=str(CACHE_DIR / "fps_log.jsonl"))
     parser.add_argument("--demo-closed-loop", action=bool_action, default=parse_bool(os.environ.get("DEMO_CLOSED_LOOP"), False))
@@ -21398,20 +21465,22 @@ def main(argv: list[str] | None = None) -> None:
             phase_timing = phase_timing if isinstance(phase_timing, dict) else {}
             recommendation = phase_runtime.get("bottleneck_recommendation")
             recommendation = recommendation if isinstance(recommendation, dict) else {}
-            benchmark_results.append(
-                {
-                    "frame": benchmark_index + 1,
-                    "render_ms": float(getattr(controller, "last_render_ms", 0.0)),
-                    "frame_wall_ms": round(float(frame_wall_ms), 3),
-                    "prepare_batches_ms": phase_timing.get("prepare_batches"),
-                    "compose_overlays_ms": phase_timing.get("compose_overlays"),
-                    "postprocess_ms": phase_timing.get("postprocess"),
-                    "slowest_phase_id": phase_runtime.get("slowest_phase_id"),
-                    "slowest_phase_ms": phase_runtime.get("slowest_phase_ms"),
-                    "bottleneck_recommendation": recommendation.get("recommended_next_action"),
-                    "runtime_optimization_applied": bool(recommendation.get("runtime_optimization_applied", False)),
-                }
-            )
+            benchmark_item = {
+                "frame": benchmark_index + 1,
+                "render_ms": float(getattr(controller, "last_render_ms", 0.0)),
+                "frame_wall_ms": round(float(frame_wall_ms), 3),
+                "prepare_batches_ms": phase_timing.get("prepare_batches"),
+                "compose_overlays_ms": phase_timing.get("compose_overlays"),
+                "postprocess_ms": phase_timing.get("postprocess"),
+                "slowest_phase_id": phase_runtime.get("slowest_phase_id"),
+                "slowest_phase_ms": phase_runtime.get("slowest_phase_ms"),
+                "bottleneck_recommendation": recommendation.get("recommended_next_action"),
+                "runtime_optimization_applied": bool(recommendation.get("runtime_optimization_applied", False)),
+            }
+            if bool(getattr(args, "runtime_blend_timing", False)):
+                timing_packet = getattr(controller, "runtime_blend_timing_packet", {})
+                benchmark_item["runtime_blend_timing"] = timing_packet if isinstance(timing_packet, dict) else {}
+            benchmark_results.append(benchmark_item)
         benchmark_summary_path = getattr(args, "benchmark_summary", None)
         if benchmark_summary_path:
             render_ms_values = [float(item["render_ms"]) for item in benchmark_results]
@@ -21438,6 +21507,30 @@ def main(argv: list[str] | None = None) -> None:
                 "results": benchmark_results,
                 "boundary": "Evidence-only headless in-process benchmark; does not enable runtime merge, change metadata schema, or alter normal single-frame output behavior.",
             }
+            if bool(getattr(args, "runtime_blend_timing", False)):
+                runtime_blend_packets = [
+                    item.get("runtime_blend_timing")
+                    for item in benchmark_results
+                    if isinstance(item.get("runtime_blend_timing"), dict)
+                ]
+                runtime_blend_totals = [
+                    float(packet.get("runtime_blend_total_ms"))
+                    for packet in runtime_blend_packets
+                    if packet.get("runtime_blend_total_ms") is not None
+                ]
+                summary["runtime_blend_timing_enabled"] = True
+                summary["runtime_blend_timing_scope"] = "runtime_blend dispatch branch inside apply_layer_render_plan_composition"
+                summary["runtime_blend_total_ms_avg"] = (
+                    sum(runtime_blend_totals) / len(runtime_blend_totals)
+                    if runtime_blend_totals
+                    else None
+                )
+                summary["runtime_blend_timing_limitations"] = "Per-step timing wraps runtime_blend dispatch only. It may include CPU/GPU synchronization or data-ready wait, especially on the first runtime_blend step, and must not be interpreted as an optimization result."
+                summary["gpu_cpu_sync_misattribution_risk"] = "possible_first_runtime_blend_step_wait"
+                summary["timing_includes_possible_sync_wait"] = True
+                summary["first_runtime_blend_step_may_include_data_ready_wait"] = True
+                summary["not_a_pixel_or_optimization_change"] = True
+                summary["optimization_authorized"] = False
             summary_path = Path(benchmark_summary_path)
             summary_path.parent.mkdir(parents=True, exist_ok=True)
             summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2, default=str), encoding="utf-8")

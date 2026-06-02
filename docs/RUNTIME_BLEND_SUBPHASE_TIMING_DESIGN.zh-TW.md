@@ -95,3 +95,13 @@ Future runtime-blend timing instrumentation should require:
 - Pixel parity check before any optimization, merge, blend rewrite, array-copy rewrite or layer-order change.
 
 Decision classification: `requires_non_invasive_instrumentation_review`.
+
+## 2026-06-03 implementation checkpoint
+
+- Status: an opt-in evidence path now records runtime_blend per-step timing during warm-frame benchmark runs.
+- Entry point: `HybridRenderController.apply_layer_render_plan_composition()` records timing only when runtime blend timing is explicitly enabled.
+- CLI/script opt-in: `taichi_global_bathymetry.py --runtime-blend-timing` and `scripts/render_warm_frame_smoke.ps1 -RuntimeBlendTiming`.
+- Output: ignored warm-frame benchmark `summary.json` and `analysis.json` files under `state/showcase/warm_frame_smoke_runtime_blend_timing*`.
+- Compatibility: renderer output metadata sidecar remains `rrkal_displaytools.renderer_output_metadata.v1`; runtime merge remains disabled.
+- Rendering boundary: this is timing evidence only. It does not change alpha, blending, layer ordering, output paths, or expected output pixels.
+- Measurement limitation: runtime_blend step timing can include CPU/GPU synchronization or data-ready wait. The first runtime_blend step is especially likely to include non-blend wait time, so evidence must not be used as optimization proof without a follow-up parity gate.
