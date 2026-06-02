@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add compose bridge gates to render-plan work order
+
+- Added compose bridge single-pass submission and zero-diff parity gate values to the copyable render-plan work order summary.
+- Kept the work order as handoff text only; runtime merge and single-pass submission remain disabled.
+- Added smoke gates for the render-plan work order gate text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add compose bridge gates to copyable budget summary
 
 - Added compose bridge single-pass submission and zero-diff parity gate values to the copyable compose budget summary.

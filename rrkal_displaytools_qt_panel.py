@@ -10277,6 +10277,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"runs={packet.get('compiled_plan_compose_runs_schema', '-')}; "
             f"target={budget.get('target_pass_model', '-')}; "
             f"parity={workflow.get('precommit_command', packet.get('compose_run_parity_smoke_precommit_command', '-'))}; "
+            f"bridge_gate=single_pass_submission:{packet.get('layer_state_precompute_compose_bridge_single_pass_submission_enabled', '-')}; "
+            f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             f"final={final_stage}; "
             "runtime_merge=false; "
             "next=post_07_render_plan_compose_extraction"
