@@ -97,6 +97,12 @@ $summary = [ordered]@{
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_layer_render_plan_performance.ps1"
         },
         [ordered]@{
+            id = "runtime_gate_status_review"
+            status = "review_ready_no_runtime_mutation"
+            description = "Runtime gate status is visible in Qt, copy actions, diagnostics JSON, reviewer packets, handoff inspection and render-plan review packets while runtime merge and single-pass submission stay disabled until zero-diff parity."
+            review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1"
+        },
+        [ordered]@{
             id = "display_shell_render_matrix"
             status = "contract_ready"
             description = "DisplayShell / Canvas / Layer / Render Matrix contracts expose EarthCanvas and TimeSeriesCanvas samples, renderer registry dispatch and no-GUI pass/fail gates."

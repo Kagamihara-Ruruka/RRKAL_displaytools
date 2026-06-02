@@ -2201,6 +2201,9 @@ if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "pr
 if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "render_plan_compose_source_map" })) {
     throw "Capability summary render-plan source-map capability missing"
 }
+if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" })) {
+    throw "Capability summary runtime gate status review capability missing"
+}
 if (-not (($capabilitySummary.boundaries -join "`n") -match "RRKAL owns dataset discovery")) {
     throw "Capability summary RRKAL boundary missing"
 }

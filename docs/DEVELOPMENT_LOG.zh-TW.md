@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add runtime gate capability summary entry
+
+- Added `runtime_gate_status_review` to the no-GUI capability summary exporter.
+- Documented that runtime gate status is visible through Qt, copy actions, diagnostics JSON, reviewer packets, handoff inspection and render-plan review packets.
+- Added smoke coverage so the post-push capability summary reports this closed review surface.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add runtime gate summary to handoff inspection
 
 - Added a `runtime_gate_status_summary_field` marker to `scripts/inspect_handoff.ps1` reviewer packet export output.
