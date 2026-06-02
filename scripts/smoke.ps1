@@ -1324,6 +1324,9 @@ if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains 
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_evidence_summary") {
     throw "Launch packet reviewer recommended zero-diff parity evidence summary field missing"
 }
+if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
+    throw "Launch packet reviewer recommended zero-diff parity artifact producer summary field missing"
+}
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Launch packet reviewer packet layer quick actions recommended field missing"
 }
@@ -1368,6 +1371,9 @@ if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "r
 }
 if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_evidence_summary") {
     throw "Launch packet reviewer packet zero-diff parity evidence summary field missing"
+}
+if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
+    throw "Launch packet reviewer packet zero-diff parity artifact producer summary field missing"
 }
 if ($launchPacket.reviewer_packet_export.included_packet_fields -notcontains "launch_packet_snapshot") {
     throw "Launch packet reviewer packet snapshot field missing"
@@ -2210,8 +2216,8 @@ if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "re
 if (-not ($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" })) {
     throw "Capability summary runtime gate status review capability missing"
 }
-if (($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" }).description -notlike "*zero-diff parity evidence summary*") {
-    throw "Capability summary runtime gate status review missing parity evidence summary"
+if (($capabilitySummary.current_capabilities | Where-Object { $_.id -eq "runtime_gate_status_review" }).description -notlike "*parity artifact producer summary*") {
+    throw "Capability summary runtime gate status review missing parity artifact producer summary"
 }
 if (-not (($capabilitySummary.boundaries -join "`n") -match "RRKAL owns dataset discovery")) {
     throw "Capability summary RRKAL boundary missing"
@@ -5269,6 +5275,9 @@ if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "runt
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_evidence_summary") {
     throw "Handoff inspection reviewer recommended zero-diff parity evidence summary field missing"
 }
+if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
+    throw "Handoff inspection reviewer recommended zero-diff parity artifact producer summary field missing"
+}
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Handoff inspection reviewer packet layer quick actions recommended field missing"
 }
@@ -5304,6 +5313,12 @@ if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "zero_d
 }
 if ($handoff.reviewer_packet_export.zero_diff_parity_evidence_summary_field -ne "zero_diff_parity_evidence_summary") {
     throw "Handoff inspection reviewer zero-diff parity evidence summary field marker missing"
+}
+if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
+    throw "Handoff inspection reviewer packet zero-diff parity artifact producer summary field missing"
+}
+if ($handoff.reviewer_packet_export.zero_diff_parity_artifact_producer_summary_field -ne "zero_diff_parity_artifact_producer_summary") {
+    throw "Handoff inspection reviewer zero-diff parity artifact producer summary field marker missing"
 }
 if ($handoff.reviewer_packet_export.included_packet_fields -notcontains "hydrology_lod_readiness") {
     throw "Handoff inspection reviewer packet hydrology readiness packet field missing"
@@ -5823,8 +5838,14 @@ if ($qtPanelSource -notlike '*"runtime_gate_status_summary": self.runtime_gate_s
 if ($qtPanelSource -notlike '*"zero_diff_parity_evidence_summary": self.zero_diff_parity_evidence_summary_text()*') {
     throw "Qt reviewer packet zero-diff parity evidence summary output is missing"
 }
+if ($qtPanelSource -notlike '*"zero_diff_parity_artifact_producer_summary": self.zero_diff_parity_artifact_producer_summary_text()*') {
+    throw "Qt reviewer packet zero-diff parity artifact producer summary output is missing"
+}
 if ($qtPanelSource -notlike "*def zero_diff_parity_evidence_summary_text*") {
     throw "Qt zero-diff parity evidence summary helper is missing"
+}
+if ($qtPanelSource -notlike "*def zero_diff_parity_artifact_producer_summary_text*") {
+    throw "Qt zero-diff parity artifact producer summary helper is missing"
 }
 if ($qtPanelSource -notlike "*def compose_performance_reviewer_summary_text*") {
     throw "Qt compose performance reviewer summary helper is missing"
@@ -7653,6 +7674,9 @@ if ($reviewerPacketExporterSource -notlike "*runtime_gate_status_summary*") {
 if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_evidence_summary*") {
     throw "No-GUI reviewer packet exporter zero-diff parity evidence summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_artifact_producer_summary*") {
+    throw "No-GUI reviewer packet exporter zero-diff parity artifact producer summary missing"
+}
 if ($reviewerPacketExporterSource -notlike "*export_launch_packet.py*") {
     throw "No-GUI reviewer packet exporter launch packet bridge missing"
 }
@@ -7672,6 +7696,9 @@ if ($reviewerPacketContract.runtime_gate_status_summary_field -ne "runtime_gate_
 }
 if ($reviewerPacketContract.zero_diff_parity_evidence_summary_field -ne "zero_diff_parity_evidence_summary") {
     throw "No-GUI reviewer packet exporter zero-diff parity evidence summary field missing"
+}
+if ($reviewerPacketContract.zero_diff_parity_artifact_producer_summary_field -ne "zero_diff_parity_artifact_producer_summary") {
+    throw "No-GUI reviewer packet exporter zero-diff parity artifact producer summary field missing"
 }
 if ($reviewerPacketContract.decoupling_readiness_field -ne "decoupling_readiness") {
     throw "No-GUI reviewer packet exporter decoupling readiness field missing"

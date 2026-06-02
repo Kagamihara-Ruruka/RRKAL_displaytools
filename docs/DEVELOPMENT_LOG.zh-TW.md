@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add parity artifact producer summary to reviewer exports
+
+- Added `zero_diff_parity_artifact_producer_summary` to Qt and no-GUI reviewer packet exports.
+- Added handoff and capability summary coverage for the parity artifact producer command, manifests, diff status and precommit gate fields.
+- Added smoke gates across launch packet, Qt reviewer packet, handoff inspection, capability summary and no-GUI exporter contracts.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add parity artifact producer review contract
 
 - Added parity artifact producer script/command, runner manifest, artifact diff manifest and diff/precommit gate fields to `inspect_render_plan_review_packet.ps1`.

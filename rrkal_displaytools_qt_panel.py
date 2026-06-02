@@ -424,7 +424,7 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
                 {"id": "ocean_guard", "fields": ["ocean_material_control_port.qt_control_panel.performance_guard_summary_contract"]},
                 {"id": "visual_review", "fields": ["visual_review_summary", "visual_feature_closure_matrix"]},
                 {"id": "goal_closure", "fields": ["goal_closure_scorecard", "goal_closure_scorecard.copy_summary_contract"]},
-                {"id": "compose_performance", "fields": ["compose_performance_summary", "runtime_gate_status_summary", "zero_diff_parity_evidence_summary", "layer_render_plan_performance.compose_pass_budget"]},
+                {"id": "compose_performance", "fields": ["compose_performance_summary", "runtime_gate_status_summary", "zero_diff_parity_evidence_summary", "zero_diff_parity_artifact_producer_summary", "layer_render_plan_performance.compose_pass_budget"]},
                 {"id": "decoupling", "fields": ["decoupling_readiness_summary", "decoupling_readiness.first_extraction_order"]},
                 {"id": "controlled_interception", "fields": ["controlled_interception_summary", "controlled_interception_policy.blocked_patterns"]},
                 {"id": "config_gateway", "fields": ["renderer_config_gateway_summary", "renderer_config_gateway.changed_defaults"]},
@@ -440,6 +440,7 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
             "performance_smoke_telemetry.output_paths",
             "runtime_gate_status_summary",
             "zero_diff_parity_evidence_summary",
+            "zero_diff_parity_artifact_producer_summary",
             "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract",
             "layer_selection_affordance.active_quick_actions",
             "layer_render_plan_performance.compose_pass_budget",
@@ -464,6 +465,7 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
             "compose_performance_summary",
             "runtime_gate_status_summary",
             "zero_diff_parity_evidence_summary",
+            "zero_diff_parity_artifact_producer_summary",
         ],
         "included_packet_fields": [
             "launch_packet_snapshot",
@@ -5808,6 +5810,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "compose_performance_summary": self.compose_performance_reviewer_summary_text(),
             "runtime_gate_status_summary": self.runtime_gate_status_text(),
             "zero_diff_parity_evidence_summary": self.zero_diff_parity_evidence_summary_text(),
+            "zero_diff_parity_artifact_producer_summary": self.zero_diff_parity_artifact_producer_summary_text(),
             "goal_closure_scorecard": self.collect_goal_closure_scorecard(),
             "cross_machine_clone_readiness": self.collect_cross_machine_clone_readiness(),
             "profile_launch_readiness": self.collect_profile_launch_readiness(),
@@ -10275,6 +10278,17 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "tolerance=max_abs_diff=0,changed_pixel_count=0; "
             "source=scripts\\render_compose_parity_smoke.ps1; "
             "manifest=state/render_compose_parity_smoke_manifest.json; "
+            "runtime_path=disabled_until_pass"
+        )
+
+    def zero_diff_parity_artifact_producer_summary_text(self) -> str:
+        return (
+            "Parity artifact producer: "
+            "command=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\render_compose_parity_artifacts.ps1 -SkipDiff; "
+            "runner_manifest=state/compose_parity/compose_parity_artifact_runner.json; "
+            "diff_manifest=state/compose_parity/render_compose_parity_smoke_manifest.json; "
+            "diff_status_field=render_compose_parity_smoke.diff_status; "
+            "precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; "
             "runtime_path=disabled_until_pass"
         )
 
