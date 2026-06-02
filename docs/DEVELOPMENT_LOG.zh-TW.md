@@ -1,3 +1,9 @@
+## 2026-06-02 - Extract repeated quick smoke summary helper
+
+- Added script-local repeated quick smoke summary helpers so frame execution and evidence summary payload construction are separated.
+- Kept `rrkal_displaytools.repeated_quick_smoke.v1`, renderer metadata schema, artifact paths, runtime merge state and generated `state/` behavior unchanged.
+- Validation: PASS (`scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-02 - Extract renderer metadata payload builder
 
 - Added `render_core/metadata.py` to own the pure renderer output metadata payload shape.

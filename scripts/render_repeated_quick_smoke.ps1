@@ -35,6 +35,52 @@ function Get-JsonProperty {
     return $property.Value
 }
 
+function Get-RepeatedQuickSmokeMetricValues {
+    param(
+        [object[]]$Results,
+        [string]$Name
+    )
+    return @($Results | ForEach-Object { [double]$_[$Name] })
+}
+
+function New-RepeatedQuickSmokeSummary {
+    param(
+        [object[]]$Results,
+        [int]$FrameCount,
+        [string]$ArtifactDir
+    )
+
+    $renderMsValues = Get-RepeatedQuickSmokeMetricValues -Results $Results -Name "render_ms"
+    $prepareValues = Get-RepeatedQuickSmokeMetricValues -Results $Results -Name "prepare_batches_ms"
+    $composeValues = Get-RepeatedQuickSmokeMetricValues -Results $Results -Name "compose_overlays_ms"
+
+    return [ordered]@{
+        schema = "rrkal_displaytools.repeated_quick_smoke.v1"
+        generated_at_utc = [DateTimeOffset]::UtcNow.ToString("o")
+        source = "scripts/render_repeated_quick_smoke.ps1"
+        quick_smoke_script = "scripts/render_quick_smoke.ps1"
+        frame_count = $FrameCount
+        output_dir = $ArtifactDir
+        metadata_schema = "rrkal_displaytools.renderer_output_metadata.v1"
+        render_ms_avg = ($renderMsValues | Measure-Object -Average).Average
+        render_ms_min = ($renderMsValues | Measure-Object -Minimum).Minimum
+        render_ms_max = ($renderMsValues | Measure-Object -Maximum).Maximum
+        prepare_batches_ms_avg = ($prepareValues | Measure-Object -Average).Average
+        prepare_batches_ms_min = ($prepareValues | Measure-Object -Minimum).Minimum
+        prepare_batches_ms_max = ($prepareValues | Measure-Object -Maximum).Maximum
+        compose_overlays_ms_avg = ($composeValues | Measure-Object -Average).Average
+        compose_overlays_ms_min = ($composeValues | Measure-Object -Minimum).Minimum
+        compose_overlays_ms_max = ($composeValues | Measure-Object -Maximum).Maximum
+        slowest_phase_ids = @($Results | ForEach-Object { $_["slowest_phase_id"] } | Sort-Object -Unique)
+        bottleneck_recommendations = @($Results | ForEach-Object { $_["bottleneck_recommendation"] } | Sort-Object -Unique)
+        preview_artifacts_emitted = -not @($Results | Where-Object { [int64]$_["preview_bytes"] -le 0 })
+        runtime_merge_enabled = $false
+        metadata_schema_changed = $false
+        results = $Results
+        boundary = "Evidence-only wrapper around render_quick_smoke.ps1; does not change renderer runtime, metadata schema, runtime merge, or cross-repo work."
+    }
+}
+
 $results = @()
 for ($index = 1; $index -le $Frames; $index += 1) {
     $frameId = "{0:D2}" -f $index
@@ -97,34 +143,7 @@ for ($index = 1; $index -le $Frames; $index += 1) {
     }
 }
 
-$renderMsValues = @($results | ForEach-Object { [double]$_["render_ms"] })
-$prepareValues = @($results | ForEach-Object { [double]$_["prepare_batches_ms"] })
-$composeValues = @($results | ForEach-Object { [double]$_["compose_overlays_ms"] })
-$summary = [ordered]@{
-    schema = "rrkal_displaytools.repeated_quick_smoke.v1"
-    generated_at_utc = [DateTimeOffset]::UtcNow.ToString("o")
-    source = "scripts/render_repeated_quick_smoke.ps1"
-    quick_smoke_script = "scripts/render_quick_smoke.ps1"
-    frame_count = $Frames
-    output_dir = $artifactDir
-    metadata_schema = "rrkal_displaytools.renderer_output_metadata.v1"
-    render_ms_avg = ($renderMsValues | Measure-Object -Average).Average
-    render_ms_min = ($renderMsValues | Measure-Object -Minimum).Minimum
-    render_ms_max = ($renderMsValues | Measure-Object -Maximum).Maximum
-    prepare_batches_ms_avg = ($prepareValues | Measure-Object -Average).Average
-    prepare_batches_ms_min = ($prepareValues | Measure-Object -Minimum).Minimum
-    prepare_batches_ms_max = ($prepareValues | Measure-Object -Maximum).Maximum
-    compose_overlays_ms_avg = ($composeValues | Measure-Object -Average).Average
-    compose_overlays_ms_min = ($composeValues | Measure-Object -Minimum).Minimum
-    compose_overlays_ms_max = ($composeValues | Measure-Object -Maximum).Maximum
-    slowest_phase_ids = @($results | ForEach-Object { $_["slowest_phase_id"] } | Sort-Object -Unique)
-    bottleneck_recommendations = @($results | ForEach-Object { $_["bottleneck_recommendation"] } | Sort-Object -Unique)
-    preview_artifacts_emitted = -not @($results | Where-Object { [int64]$_["preview_bytes"] -le 0 })
-    runtime_merge_enabled = $false
-    metadata_schema_changed = $false
-    results = $results
-    boundary = "Evidence-only wrapper around render_quick_smoke.ps1; does not change renderer runtime, metadata schema, runtime merge, or cross-repo integration."
-}
+$summary = New-RepeatedQuickSmokeSummary -Results $results -FrameCount $Frames -ArtifactDir $artifactDir
 
 $summaryPath = Join-Path $artifactDir "summary.json"
 $summary | ConvertTo-Json -Depth 16 | Set-Content -LiteralPath $summaryPath -Encoding UTF8
