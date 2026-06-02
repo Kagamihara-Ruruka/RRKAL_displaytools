@@ -20,6 +20,13 @@ if ($ContractOnly) {
         )
         included_summary_fields = @("runtime_gate_status_summary")
         zero_diff_parity_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly"
+        zero_diff_parity_evidence_checklist = @(
+            "state/compose_parity/baseline_sequential_frame_rgba.png",
+            "state/compose_parity/merged_candidate_frame_rgba.png",
+            "render_compose_parity_smoke.visual_parity_passed",
+            "max_abs_diff=0",
+            "changed_pixel_count=0"
+        )
         boundary = "Reviewer packet only; it does not launch Qt, Taichi, render frames, write metadata, or enable runtime single-pass composition."
         portable = $true
     } | ConvertTo-Json -Depth 8
@@ -49,6 +56,13 @@ $runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runti
     runtime_gate_status_summary_field = "runtime_gate_status_summary"
     zero_diff_parity_required = $true
     zero_diff_parity_contract_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly"
+    zero_diff_parity_evidence_checklist = @(
+        "state/compose_parity/baseline_sequential_frame_rgba.png",
+        "state/compose_parity/merged_candidate_frame_rgba.png",
+        "render_compose_parity_smoke.visual_parity_passed",
+        "max_abs_diff=0",
+        "changed_pixel_count=0"
+    )
     next_runtime_gate_action = "run_zero_diff_parity_contract_before_enabling_single_pass_submission"
     clone_first_review_commands = @(
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1",

@@ -7346,6 +7346,12 @@ if ($renderPlanReviewPacketContract.included_summary_fields -notcontains "runtim
 if ($renderPlanReviewPacketContract.zero_diff_parity_contract_command -notlike "*render_compose_parity_smoke.ps1 -ContractOnly*") {
     throw "Renderer render plan review packet contract zero-diff parity command missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_checklist -notcontains "state/compose_parity/baseline_sequential_frame_rgba.png") {
+    throw "Renderer render plan review packet contract parity baseline artifact missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_checklist -notcontains "changed_pixel_count=0") {
+    throw "Renderer render plan review packet contract changed-pixel evidence missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7367,6 +7373,15 @@ if ($renderPlanReviewPacket.zero_diff_parity_required -ne $true) {
 }
 if ($renderPlanReviewPacket.zero_diff_parity_contract_command -notlike "*render_compose_parity_smoke.ps1 -ContractOnly*") {
     throw "Renderer render plan review packet zero-diff parity contract command missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_evidence_checklist -notcontains "state/compose_parity/merged_candidate_frame_rgba.png") {
+    throw "Renderer render plan review packet parity candidate artifact missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_evidence_checklist -notcontains "render_compose_parity_smoke.visual_parity_passed") {
+    throw "Renderer render plan review packet visual parity evidence missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_evidence_checklist -notcontains "max_abs_diff=0") {
+    throw "Renderer render plan review packet max-abs-diff evidence missing"
 }
 if ($renderPlanReviewPacket.next_runtime_gate_action -ne "run_zero_diff_parity_contract_before_enabling_single_pass_submission") {
     throw "Renderer render plan review packet next runtime gate action missing"
