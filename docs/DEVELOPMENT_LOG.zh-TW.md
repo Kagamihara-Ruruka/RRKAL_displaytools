@@ -1,3 +1,10 @@
+## 2026-06-03 - Add static batch prepare source map
+
+- Added `docs/STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md` to map `prepare_batches`, vector overlay cache/defer evidence and the safe first helper boundary before cache behavior work.
+- Added the source-map document to `docs/DOCS_INDEX.zh-TW.md`.
+- Kept this checkpoint docs-only: no renderer runtime behavior, cache behavior, metadata schema, runtime merge state or generated `state/` behavior changed.
+- Validation: PASS (`scripts/smoke.ps1` with extended timeout and `git diff --check`).
+
 ## 2026-06-03 - Extract render plan compile input helper
 
 - Added `render_core.render_plan.build_layer_render_plan_compile_input()` to package controller-collected compile inputs before cache key and adapter payload construction.

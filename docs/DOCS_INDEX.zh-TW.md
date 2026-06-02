@@ -20,6 +20,7 @@
 - `RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md`: renderer backend mapping, render flow, monolith responsibility audit, and staged decomposition candidates for demo-readiness review.
 - `LAYER_STATE_SOURCE_MAP.zh-TW.md`: layer visibility/opacity/blend/selected-target/dirty-flag source map before layer-state helper extraction.
 - `RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md`: compile-layer-render-plan source map before compile facade / payload helper extraction.
+- `STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md`: `prepare_batches` / vector overlay cache source map before static batch cache work.
 
 ## Positioning
 
