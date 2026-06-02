@@ -1,5 +1,12 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add runtime gate summary to reviewer packet
+
+- Added `runtime_gate_status_summary` to the Qt reviewer packet and no-GUI reviewer packet exporter.
+- Added the field to reviewer packet recommended fields, included summaries and compose performance group guidance.
+- Updated capability summary text and smoke gates for reviewer/no-GUI/runtime gate consistency.
+- Stabilized the smoke call to inspect_render_plan_review_packet.ps1 by resolving it through $RepoRoot.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add copyable runtime gate action
 
 - Added a `Copy runtime gate` action under Renderer diagnostics.

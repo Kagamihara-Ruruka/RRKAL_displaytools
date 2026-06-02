@@ -1318,6 +1318,9 @@ if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains 
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "performance_smoke_telemetry.output_paths") {
     throw "Launch packet reviewer recommended performance smoke field missing"
 }
+if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "runtime_gate_status_summary") {
+    throw "Launch packet reviewer recommended runtime gate summary field missing"
+}
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Launch packet reviewer packet layer quick actions recommended field missing"
 }
@@ -1356,6 +1359,9 @@ if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "p
 }
 if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "compose_performance_summary") {
     throw "Launch packet reviewer packet compose performance summary field missing"
+}
+if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "runtime_gate_status_summary") {
+    throw "Launch packet reviewer packet runtime gate summary field missing"
 }
 if ($launchPacket.reviewer_packet_export.included_packet_fields -notcontains "launch_packet_snapshot") {
     throw "Launch packet reviewer packet snapshot field missing"
@@ -5781,6 +5787,9 @@ if ($qtPanelSource -notlike '*"module_boundary_summary": self.module_boundary_su
 if ($qtPanelSource -notlike '*"compose_performance_summary": self.compose_performance_reviewer_summary_text()*') {
     throw "Qt reviewer packet compose performance summary output is missing"
 }
+if ($qtPanelSource -notlike '*"runtime_gate_status_summary": self.runtime_gate_status_text()*') {
+    throw "Qt reviewer packet runtime gate status summary output is missing"
+}
 if ($qtPanelSource -notlike "*def compose_performance_reviewer_summary_text*") {
     throw "Qt compose performance reviewer summary helper is missing"
 }
@@ -6032,6 +6041,9 @@ if ($qtPanelSource -notlike "*Replay/contracts: inspect researcher first-run rou
 }
 if ($qtPanelSource -notlike "*Replay/contracts: inspect current and planned capability summary JSON*") {
     throw "Qt capability summary tooltip is missing"
+}
+if ($qtPanelSource -notlike "*runtime gate status strip/copy/reviewer summary*") {
+    throw "Qt capability summary missing runtime gate status capability"
 }
 if ($qtPanelSource -notlike "*Renderer ports: inspect scalar ocean material and sea-state handoff JSON*") {
     throw "Qt Renderer ports inspector tooltip is missing"
@@ -7314,7 +7326,8 @@ if ($renderPlanMetadataSummaryInspector.adapter_payload_status_field -ne "adapte
 if ($renderPlanMetadataSummaryInspector.adapter_payload_contract_status_field -ne "adapter_payload_contract_status") {
     throw "Renderer render plan metadata summary inspector adapter payload contract status field missing"
 }
-$renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1 | ConvertFrom-Json
+$renderPlanReviewPacketInspectorPath = Join-Path $RepoRoot "scripts\inspect_render_plan_review_packet.ps1"
+$renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
 }
@@ -7510,6 +7523,9 @@ if ($reviewerPacketExporterSource -notlike "*compose_performance_summary*") {
 if ($reviewerPacketExporterSource -notlike "*runtime_optimization_review_summary*") {
     throw "No-GUI reviewer packet exporter runtime optimization summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*runtime_gate_status_summary*") {
+    throw "No-GUI reviewer packet exporter runtime gate status summary missing"
+}
 if ($reviewerPacketExporterSource -notlike "*export_launch_packet.py*") {
     throw "No-GUI reviewer packet exporter launch packet bridge missing"
 }
@@ -7523,6 +7539,9 @@ if ($reviewerPacketContract.schema -ne "rrkal_displaytools.no_gui_reviewer_packe
 }
 if ($reviewerPacketContract.compose_performance_summary_field -ne "compose_performance_summary") {
     throw "No-GUI reviewer packet exporter compose performance field missing"
+}
+if ($reviewerPacketContract.runtime_gate_status_summary_field -ne "runtime_gate_status_summary") {
+    throw "No-GUI reviewer packet exporter runtime gate status summary field missing"
 }
 if ($reviewerPacketContract.decoupling_readiness_field -ne "decoupling_readiness") {
     throw "No-GUI reviewer packet exporter decoupling readiness field missing"
