@@ -219,6 +219,7 @@ $summary = [ordered]@{
         no_gui_contract_command = $launchPacket.reviewer_packet_export.no_gui_contract_command
         no_gui_export_schema = $launchPacket.reviewer_packet_export.no_gui_export_schema
         no_gui_primary_summary_field = $launchPacket.reviewer_packet_export.no_gui_primary_summary_field
+        runtime_gate_status_summary_field = "runtime_gate_status_summary"
         field_guide = $launchPacket.reviewer_packet_export.field_guide
         recommended_review_fields = $launchPacket.reviewer_packet_export.recommended_review_fields
         included_summary_fields = $launchPacket.reviewer_packet_export.included_summary_fields

@@ -5251,6 +5251,9 @@ if ($handoff.reviewer_packet_export.field_guide.qt_copy_action -ne "copy_reviewe
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "compose_performance_summary") {
     throw "Handoff inspection reviewer recommended compose summary field missing"
 }
+if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "runtime_gate_status_summary") {
+    throw "Handoff inspection reviewer recommended runtime gate summary field missing"
+}
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Handoff inspection reviewer packet layer quick actions recommended field missing"
 }
@@ -5274,6 +5277,12 @@ if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "module
 }
 if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "compose_performance_summary") {
     throw "Handoff inspection reviewer packet compose performance summary field missing"
+}
+if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "runtime_gate_status_summary") {
+    throw "Handoff inspection reviewer packet runtime gate summary field missing"
+}
+if ($handoff.reviewer_packet_export.runtime_gate_status_summary_field -ne "runtime_gate_status_summary") {
+    throw "Handoff inspection reviewer runtime gate summary field marker missing"
 }
 if ($handoff.reviewer_packet_export.included_packet_fields -notcontains "hydrology_lod_readiness") {
     throw "Handoff inspection reviewer packet hydrology readiness packet field missing"

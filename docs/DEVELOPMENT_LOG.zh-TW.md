@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add runtime gate summary to handoff inspection
+
+- Added a `runtime_gate_status_summary_field` marker to `scripts/inspect_handoff.ps1` reviewer packet export output.
+- Added smoke gates so handoff inspection preserves runtime gate recommended and included summary fields.
+- Kept this as cross-machine handoff metadata only; renderer behavior remains unchanged.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add runtime gate summary to render-plan review packet
 
 - Added `runtime_gate_status_summary` to `scripts/inspect_render_plan_review_packet.ps1`.
