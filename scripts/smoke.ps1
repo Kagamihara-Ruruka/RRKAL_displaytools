@@ -6054,6 +6054,21 @@ if ($qtPanelSource -notlike "*runtimeOptimizationReviewSummaryStrip*") {
 if ($qtPanelSource -notlike "*runtime_optimization_review_summary_text*") {
     throw "Qt runtime optimization review summary formatter is missing"
 }
+if ($qtPanelSource -notlike "*runtimeGateStatusStrip*") {
+    throw "Qt runtime gate status strip is missing"
+}
+if ($qtPanelSource -notlike "*runtime_gate_status_text*") {
+    throw "Qt runtime gate status formatter is missing"
+}
+if ($qtPanelSource -notlike "*Runtime gate status:*") {
+    throw "Qt runtime gate status text is missing"
+}
+if ($qtPanelSource -notlike "*single_pass_submission=*") {
+    throw "Qt runtime gate status single-pass submission text is missing"
+}
+if ($qtPanelSource -notlike "*zero_diff_parity_required=*") {
+    throw "Qt runtime gate status zero-diff parity text is missing"
+}
 if ($qtPanelSource -notlike "*precompute_decision=*") {
     throw "Qt runtime optimization summary missing precompute decision text"
 }

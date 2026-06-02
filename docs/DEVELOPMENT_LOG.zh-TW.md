@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add Qt runtime gate status strip
+
+- Added a dedicated Qt runtime gate status strip for compose bridge metadata availability, runtime merge, single-pass submission and zero-diff parity state.
+- Wired the strip into both render-plan diagnostics refresh paths.
+- Added smoke gates for the strip object name, formatter and gate text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add compose bridge gates to render-plan work order
 
 - Added compose bridge single-pass submission and zero-diff parity gate values to the copyable render-plan work order summary.

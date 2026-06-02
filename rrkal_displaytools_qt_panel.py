@@ -3896,6 +3896,14 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "border:1px solid #71b989; border-radius:8px; padding:6px 8px; font-weight:600; }"
         )
         layers_layout.addWidget(self.runtime_optimization_review_label)
+        self.runtime_gate_status_label = QtWidgets.QLabel("Runtime gate status: metadata=unknown; runtime_merge=false; single_pass_submission=false")
+        self.runtime_gate_status_label.setObjectName("runtimeGateStatusStrip")
+        self.runtime_gate_status_label.setWordWrap(True)
+        self.runtime_gate_status_label.setStyleSheet(
+            "QLabel#runtimeGateStatusStrip { color:#2f253a; background:#f3ecff; "
+            "border:1px solid #9b83c6; border-radius:8px; padding:6px 8px; font-weight:600; }"
+        )
+        layers_layout.addWidget(self.runtime_gate_status_label)
         render_plan_cache_button = QtWidgets.QPushButton("Render plan diagnostics")
         render_plan_cache_button.setObjectName("renderPlanCacheDiagnosticsButton")
         render_plan_cache_button.setToolTip(
@@ -5670,6 +5678,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text())
         if hasattr(self, "runtime_optimization_review_label"):
             self.runtime_optimization_review_label.setText(self.runtime_optimization_review_summary_text())
+        if hasattr(self, "runtime_gate_status_label"):
+            self.runtime_gate_status_label.setText(self.runtime_gate_status_text())
 
     def collect_layer_render_plan_performance(self) -> dict[str, object]:
         packet = layer_render_plan_performance_packet(
@@ -10192,6 +10202,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text(performance))
         if hasattr(self, "runtime_optimization_review_label"):
             self.runtime_optimization_review_label.setText(self.runtime_optimization_review_summary_text(performance))
+        if hasattr(self, "runtime_gate_status_label"):
+            self.runtime_gate_status_label.setText(self.runtime_gate_status_text(performance))
         self.command_text.setPlainText(
             json.dumps(
                 {
@@ -10225,6 +10237,19 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"lod={packet.get('lod_counter_packet_schema', '-')}; "
             f"overlay={packet.get('heavy_overlay_defer_cache_snapshot_schema', '-')}; "
             "runtime_mutation=false"
+        )
+
+    def runtime_gate_status_text(self, packet: dict[str, object] | None = None) -> str:
+        packet = packet if isinstance(packet, dict) else self.collect_layer_render_plan_performance()
+        bridge_schema = packet.get("layer_state_precompute_compose_bridge_schema", "-")
+        metadata_available = bridge_schema == "rrkal_displaytools.layer_state_precompute_compose_bridge.v1"
+        return (
+            "Runtime gate status: "
+            f"metadata_available={metadata_available}; "
+            f"runtime_merge={packet.get('layer_state_precompute_compose_bridge_runtime_merge_enabled', False)}; "
+            f"single_pass_submission={packet.get('layer_state_precompute_compose_bridge_single_pass_submission_enabled', False)}; "
+            f"zero_diff_parity_required={packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', True)}; "
+            "runtime_path=disabled_until_parity"
         )
 
     def compose_pass_budget_summary_text(self, packet: dict[str, object] | None = None) -> str:
