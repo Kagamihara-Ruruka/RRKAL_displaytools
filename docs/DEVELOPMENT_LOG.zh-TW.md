@@ -1,3 +1,11 @@
+## 2026-06-02 - Extract renderer metadata payload builder
+
+- Added `render_core/metadata.py` to own the pure renderer output metadata payload shape.
+- Updated `HybridRenderController.write_output_metadata()` to call the helper while keeping file write behavior and `rrkal_displaytools.renderer_output_metadata.v1` unchanged.
+- Updated smoke and render-plan metadata summary inspector source checks so metadata sidecar fields may live in the new helper.
+- Kept the slice output-neutral: no render pixel path, runtime merge, cross-repo work or generated state artifacts changed.
+- Validation: PASS (`scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1`, and `git diff --check`).
+
 ## 2026-06-02 - Renderer backend mapping audit
 
 - Added `docs/RENDERER_BACKEND_MAPPING_AUDIT.zh-TW.md` as a docs-only mapping of quick/repeated render evidence, backend entrypoints, render plan dependencies, metadata fields, profiler timing, preview artifacts and decomposition candidates.

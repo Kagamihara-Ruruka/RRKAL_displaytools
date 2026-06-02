@@ -60,6 +60,7 @@ from render_core.render_plan import (
     build_layer_render_plan_step_runtime_state,
     select_layer_render_plan_composition_input,
 )
+from render_core.metadata import build_renderer_output_metadata_payload
 from pin_projection import pin_projection_contract_packet, project_pins_to_screen
 try:
     import xarray as xr
@@ -14405,37 +14406,29 @@ class HybridRenderController:
         layer_render_plan = getattr(self, "compiled_layer_render_plan", None)
         if not isinstance(layer_render_plan, dict):
             layer_render_plan = self.compile_layer_render_plan()
-        payload = {
-            "schema": "rrkal_displaytools.renderer_output_metadata.v1",
-            "created_at_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "output_file": str(self.output_path),
-            "renderer": "taichi_global_bathymetry",
-            "frame_index": self.frame_index,
-            "width": self.width,
-            "height": self.height,
-            "style_profile": getattr(self.args, "style_profile", "scientific"),
-            "topography_source": getattr(self.args, "topo_source", None),
-            "data_mode": getattr(self.args, "data_mode", None),
-            "ui_backend": getattr(self.args, "ui", None),
-            "basemap_lod": self.basemap_lod,
-            "render_ms": self.last_render_ms,
-            "visible_layers": visible_layers,
-            "layer_visible": {layer_id: bool(visible) for layer_id, visible in self.layer_visible.items()},
-            "layer_opacity": layer_opacity,
-            "layer_blend_mode": layer_blend_mode,
-            "selected_layer_semantic_target": self.selected_layer_semantic_target,
-            "last_layer_pick_result": self.last_layer_pick_result,
-            "boundary_highlight": getattr(self, "boundary_highlight_state", {}),
-            "layer_render_plan": layer_render_plan,
-            "layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan),
-            "closed_loop_status": renderer_closed_loop_status_packet(),
-            "rrkal_data_manifest_ref": getattr(self.args, "rrkal_data_manifest_ref", ""),
-            "rrkal_data_manifest_ref_boundary": "Reference-only; displaytools records the RRKAL manifest reference but does not discover, download, validate, import, or govern it.",
-            "rrkal_boundary": {
-                "displaytools_owns": ["renderer output artifact", "visual layer state", "render metadata sidecar"],
-                "rrkal_owns": ["dataset discovery", "download/import/install registry", "manifest/cache governance"],
-            },
-        }
+        payload = build_renderer_output_metadata_payload(
+            output_file=str(self.output_path),
+            frame_index=self.frame_index,
+            width=self.width,
+            height=self.height,
+            style_profile=getattr(self.args, "style_profile", "scientific"),
+            topography_source=getattr(self.args, "topo_source", None),
+            data_mode=getattr(self.args, "data_mode", None),
+            ui_backend=getattr(self.args, "ui", None),
+            basemap_lod=self.basemap_lod,
+            render_ms=self.last_render_ms,
+            visible_layers=visible_layers,
+            layer_visible={layer_id: bool(visible) for layer_id, visible in self.layer_visible.items()},
+            layer_opacity=layer_opacity,
+            layer_blend_mode=layer_blend_mode,
+            selected_layer_semantic_target=self.selected_layer_semantic_target,
+            last_layer_pick_result=self.last_layer_pick_result,
+            boundary_highlight=getattr(self, "boundary_highlight_state", {}),
+            layer_render_plan=layer_render_plan,
+            layer_render_plan_summary=build_layer_render_plan_metadata_summary(layer_render_plan),
+            closed_loop_status=renderer_closed_loop_status_packet(),
+            rrkal_data_manifest_ref=getattr(self.args, "rrkal_data_manifest_ref", ""),
+        )
         try:
             metadata_path.parent.mkdir(parents=True, exist_ok=True)
             metadata_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")

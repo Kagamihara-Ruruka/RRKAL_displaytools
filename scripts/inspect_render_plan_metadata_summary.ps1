@@ -32,11 +32,20 @@ if ($ContractOnly) {
 
 $renderPlanSource = Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\render_plan.py") -Raw -Encoding UTF8
 $rendererSource = Get-Content -LiteralPath (Join-Path $RepoRoot "taichi_global_bathymetry.py") -Raw -Encoding UTF8
+$metadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py")) {
+    Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py") -Raw -Encoding UTF8
+} else {
+    ""
+}
+$rendererMetadataSource = "$rendererSource`n$metadataSource"
 $markers = [ordered]@{
     summary_schema = $renderPlanSource -like "*$summarySchema*"
     summary_builder = $renderPlanSource -like "*build_layer_render_plan_metadata_summary*"
-    full_plan_field = $rendererSource -like '*"layer_render_plan": layer_render_plan*'
-    summary_sidecar_field = $rendererSource -like '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*'
+    full_plan_field = $rendererMetadataSource -like '*"layer_render_plan": layer_render_plan*'
+    summary_sidecar_field = (
+        ($rendererMetadataSource -like '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*') -or
+        ($rendererMetadataSource -like '*"layer_render_plan_summary": layer_render_plan_summary*')
+    )
     adapter_payload_schema = $renderPlanSource -like "*$adapterPayloadSchema*"
     adapter_payload_status_field = $renderPlanSource -like "*adapter_payload_status*"
     adapter_payload_contract_schema = $renderPlanSource -like "*$adapterPayloadContractSchema*"

@@ -6814,6 +6814,11 @@ if ($qtPanelSource -notlike "*qt_inspector_action_groups*") {
 }
 
 $rendererSource = Get-Content -Raw -Encoding UTF8 taichi_global_bathymetry.py
+$renderCoreMetadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py")) {
+    Get-Content -Raw -Encoding UTF8 (Join-Path $RepoRoot "render_core\metadata.py")
+} else {
+    ""
+}
 $renderPlanCoreSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\render_plan.py")) {
     Get-Content -Raw -Encoding UTF8 (Join-Path $RepoRoot "render_core\render_plan.py")
 } else {
@@ -6824,6 +6829,7 @@ $displayCoreSource = @(
     (Get-Content -Raw -Encoding UTF8 display_core\render_matrix.py)
 ) -join "`n"
 $renderPlanCombinedSource = "$rendererSource`n$renderPlanCoreSource`n$renderPlanPerformanceModuleSource`n$runtimeOptimizationReviewModuleSource"
+$rendererMetadataSource = "$rendererSource`n$renderCoreMetadataSource"
 if ($displayCoreSource -notlike "*rrkal_displaytools.display_shell_render_matrix.v1*") {
     throw "Display shell render matrix capability schema is missing"
 }
@@ -7348,15 +7354,17 @@ if ($renderPlanCombinedSource -notlike "*single_pass_blockers*") {
 if ($renderPlanCombinedSource -notlike "*replace per-step overlay helpers with a unified Taichi render/composite pass*") {
     throw "Renderer render plan next refactor target marker is missing"
 }
-if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "layer_render_plan_snapshot"*') {
-    if ($rendererSource -notlike '*"layer_render_plan": getattr(self, "compiled_layer_render_plan"*') {
-        if ($rendererSource -notlike '*"layer_render_plan": layer_render_plan*') {
+if ($rendererMetadataSource -notlike '*"layer_render_plan": getattr(self, "layer_render_plan_snapshot"*') {
+    if ($rendererMetadataSource -notlike '*"layer_render_plan": getattr(self, "compiled_layer_render_plan"*') {
+        if ($rendererMetadataSource -notlike '*"layer_render_plan": layer_render_plan*') {
             throw "Renderer metadata layer render plan sidecar field is missing"
         }
     }
 }
-if ($rendererSource -notlike '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*') {
-    throw "Renderer metadata layer render plan summary sidecar field is missing"
+if ($rendererMetadataSource -notlike '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*') {
+    if ($rendererMetadataSource -notlike '*"layer_render_plan_summary": layer_render_plan_summary*') {
+        throw "Renderer metadata layer render plan summary sidecar field is missing"
+    }
 }
 if ($renderPlanCombinedSource -notlike "*rrkal_displaytools.layer_render_plan_metadata_summary.v1*") {
     throw "Renderer render plan metadata summary schema marker is missing"
