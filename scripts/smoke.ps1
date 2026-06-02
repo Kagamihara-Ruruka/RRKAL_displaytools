@@ -7352,6 +7352,9 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_checklist -notcont
 if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_checklist -notcontains "changed_pixel_count=0") {
     throw "Renderer render plan review packet contract changed-pixel evidence missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_evidence_summary -notlike "*runtime_path=disabled_until_pass*") {
+    throw "Renderer render plan review packet contract parity evidence summary missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7382,6 +7385,12 @@ if ($renderPlanReviewPacket.zero_diff_parity_evidence_checklist -notcontains "re
 }
 if ($renderPlanReviewPacket.zero_diff_parity_evidence_checklist -notcontains "max_abs_diff=0") {
     throw "Renderer render plan review packet max-abs-diff evidence missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_evidence_summary -notlike "*visual_parity_passed=required*") {
+    throw "Renderer render plan review packet parity evidence summary missing visual parity requirement"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_evidence_summary -notlike "*changed_pixel_count=0*") {
+    throw "Renderer render plan review packet parity evidence summary missing changed-pixel tolerance"
 }
 if ($renderPlanReviewPacket.next_runtime_gate_action -ne "run_zero_diff_parity_contract_before_enabling_single_pass_submission") {
     throw "Renderer render plan review packet next runtime gate action missing"

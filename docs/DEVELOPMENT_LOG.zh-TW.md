@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add zero-diff parity evidence summary
+
+- Added `zero_diff_parity_evidence_summary` to `inspect_render_plan_review_packet.ps1`.
+- Summarized the required baseline/candidate artifacts, visual parity requirement and zero-diff tolerances in one reviewer-facing line.
+- Added smoke gates for the contract and runtime review packet summary text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add zero-diff parity evidence checklist
 
 - Added `zero_diff_parity_evidence_checklist` to `inspect_render_plan_review_packet.ps1`.
