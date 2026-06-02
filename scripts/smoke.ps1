@@ -6060,6 +6060,9 @@ if ($qtPanelSource -notlike "*runtimeGateStatusStrip*") {
 if ($qtPanelSource -notlike "*runtime_gate_status_text*") {
     throw "Qt runtime gate status formatter is missing"
 }
+if ($qtPanelSource -notlike "*runtime_gate_status_summary*") {
+    throw "Qt render-plan diagnostics JSON missing runtime gate status summary"
+}
 if ($qtPanelSource -notlike "*Runtime gate status:*") {
     throw "Qt runtime gate status text is missing"
 }

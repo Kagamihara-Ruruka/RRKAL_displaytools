@@ -10209,6 +10209,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
                 {
                     "layer_render_plan_performance": performance,
                     "layer_render_plan_cache_diagnostics": diagnostics,
+                    "runtime_gate_status_summary": self.runtime_gate_status_text(performance),
                 },
                 ensure_ascii=False,
                 indent=2,

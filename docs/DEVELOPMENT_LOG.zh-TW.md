@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add runtime gate summary to diagnostics JSON
+
+- Added `runtime_gate_status_summary` to the Qt render-plan diagnostics JSON output.
+- Kept the field as reviewer/handoff text only; renderer behavior remains unchanged.
+- Added smoke coverage for the diagnostics JSON summary key.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add Qt runtime gate status strip
 
 - Added a dedicated Qt runtime gate status strip for compose bridge metadata availability, runtime merge, single-pass submission and zero-diff parity state.
