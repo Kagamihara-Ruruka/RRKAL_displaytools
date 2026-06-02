@@ -6985,6 +6985,9 @@ if ($capabilityIds -notcontains "display_shell_render_matrix") {
 if ($capabilityIds -notcontains "display_runtime_handoff") {
     throw "Capability summary missing display_runtime_handoff"
 }
+if ($capabilityIds -notcontains "compose_parity_runner_manifest_status") {
+    throw "Capability summary missing compose parity runner manifest status"
+}
 if ($displayShellMatrix.has_canvas_registry -ne $true) {
     throw "Display shell render matrix inspector canvas registry evidence missing"
 }
@@ -7407,6 +7410,9 @@ $renderPlanReviewPacketContract = powershell -NoProfile -ExecutionPolicy Bypass 
 if ($renderPlanReviewPacketContract.included_summary_fields -notcontains "runtime_gate_status_summary") {
     throw "Renderer render plan review packet contract runtime gate summary field missing"
 }
+if ($renderPlanReviewPacketContract.included_summary_fields -notcontains "compose_parity_runner_manifest_status_summary") {
+    throw "Renderer render plan review packet contract runner manifest status summary field missing"
+}
 if ($renderPlanReviewPacketContract.zero_diff_parity_contract_command -notlike "*render_compose_parity_smoke.ps1 -ContractOnly*") {
     throw "Renderer render plan review packet contract zero-diff parity command missing"
 }
@@ -7434,6 +7440,18 @@ if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_producer_command -
 if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_manifest_path -ne "state/compose_parity/compose_parity_artifact_runner.json") {
     throw "Renderer render plan review packet contract parity artifact runner manifest missing"
 }
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_schema -ne "rrkal_displaytools.compose_run_parity_artifact_runner.v1") {
+    throw "Renderer render plan review packet contract parity artifact runner schema missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_status_field -ne "compose_parity_artifact_runner.status") {
+    throw "Renderer render plan review packet contract parity artifact runner status field missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_diff_status_field -ne "compose_parity_artifact_runner.diff_status") {
+    throw "Renderer render plan review packet contract parity artifact runner diff status field missing"
+}
+if ($renderPlanReviewPacketContract.zero_diff_parity_artifact_runner_skip_diff_status -ne "completed_diff_skipped") {
+    throw "Renderer render plan review packet contract parity artifact runner skip-diff status missing"
+}
 if ($renderPlanReviewPacketContract.zero_diff_parity_diff_status_field -ne "render_compose_parity_smoke.diff_status") {
     throw "Renderer render plan review packet contract parity diff status field missing"
 }
@@ -7452,6 +7470,12 @@ if ($renderPlanReviewPacket.runtime_gate_status_summary_field -ne "runtime_gate_
 }
 if ($renderPlanReviewPacket.runtime_gate_status_summary -notlike "*single_pass_submission=False*") {
     throw "Renderer render plan review packet runtime gate summary must keep single-pass disabled"
+}
+if ($renderPlanReviewPacket.compose_parity_runner_manifest_status_summary -notlike "*skip_diff_status=completed_diff_skipped*") {
+    throw "Renderer render plan review packet runner manifest status summary missing skip-diff status"
+}
+if ($renderPlanReviewPacket.compose_parity_runner_manifest_status_summary -notlike "*runtime_merge=false*") {
+    throw "Renderer render plan review packet runner manifest status summary must keep runtime merge disabled"
 }
 if ($renderPlanReviewPacket.zero_diff_parity_required -ne $true) {
     throw "Renderer render plan review packet zero-diff parity requirement missing"
@@ -7485,6 +7509,18 @@ if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_script -ne "scrip
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_producer_command -notlike "*render_compose_parity_artifacts.ps1 -SkipDiff*") {
     throw "Renderer render plan review packet parity artifact producer command missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_schema -ne "rrkal_displaytools.compose_run_parity_artifact_runner.v1") {
+    throw "Renderer render plan review packet parity artifact runner schema missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_status_field -ne "compose_parity_artifact_runner.status") {
+    throw "Renderer render plan review packet parity artifact runner status field missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_diff_status_field -ne "compose_parity_artifact_runner.diff_status") {
+    throw "Renderer render plan review packet parity artifact runner diff status field missing"
+}
+if ($renderPlanReviewPacket.zero_diff_parity_artifact_runner_skip_diff_status -ne "completed_diff_skipped") {
+    throw "Renderer render plan review packet parity artifact runner skip-diff status missing"
 }
 if ($renderPlanReviewPacket.zero_diff_parity_artifact_diff_manifest_path -ne "state/compose_parity/render_compose_parity_smoke_manifest.json") {
     throw "Renderer render plan review packet parity artifact diff manifest missing"
@@ -8433,6 +8469,9 @@ $runtimeOptimizationCurrentIds = @($runtimeOptimizationCapability.current_capabi
 $runtimeOptimizationPlannedIds = @($runtimeOptimizationCapability.planned_capabilities | ForEach-Object { $_.id })
 if ($runtimeOptimizationCurrentIds -notcontains "runtime_optimization_work_order") {
     throw "Capability summary missing runtime optimization work order current capability"
+}
+if ($runtimeOptimizationCurrentIds -notcontains "compose_parity_runner_manifest_status") {
+    throw "Capability summary missing compose parity runner manifest status current capability"
 }
 if ($runtimeOptimizationPlannedIds -notcontains "layer_render_plan_performance") {
     throw "Capability summary missing planned layer render-plan performance capability"

@@ -103,6 +103,12 @@ $summary = [ordered]@{
             review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1"
         },
         [ordered]@{
+            id = "compose_parity_runner_manifest_status"
+            status = "review_ready_no_runtime_mutation"
+            description = "Compose parity artifact runner manifest status summary exposes schema, manifest path, writer script, status, diff_status, skip-diff status and precommit gate handoff without running the renderer."
+            review_command = "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1"
+        },
+        [ordered]@{
             id = "display_shell_render_matrix"
             status = "contract_ready"
             description = "DisplayShell / Canvas / Layer / Render Matrix contracts expose EarthCanvas and TimeSeriesCanvas samples, renderer registry dispatch and no-GUI pass/fail gates."

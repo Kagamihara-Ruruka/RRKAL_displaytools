@@ -1,4 +1,10 @@
-﻿## 2026-06-02 - Add runner manifest status summary
+﻿## 2026-06-02 - Surface runner manifest status in capability review
+
+- Added `compose_parity_runner_manifest_status` to the capability summary current capabilities.
+- Added runner manifest schema/status/diff/skip-diff fields and a copyable status summary to the render-plan review packet contract and output.
+- Kept the change review-only: no renderer run, artifact diff, runtime merge, or single-pass path was enabled.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+## 2026-06-02 - Add runner manifest status summary
 
 - Added `compose_parity_runner_manifest_status_summary` to Qt and no-GUI reviewer packet handoff output.
 - Included runner manifest schema, path, writer script, status field, diff status field, precommit gate field, and skip-diff status in the summary.
