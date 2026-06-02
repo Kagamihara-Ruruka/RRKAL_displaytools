@@ -635,6 +635,24 @@ if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_b
 if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_field -ne "renderer_output_metadata.policies.layer_state_precompute_compose_bridge") {
     throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge field missing"
 }
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_runtime_merge_enabled -ne $false) {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge runtime merge gate must stay disabled"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_runtime_merge_field -ne "renderer_output_metadata.policies.layer_state_precompute_compose_bridge.runtime_merge_enabled") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge runtime merge field missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_single_pass_submission_enabled -ne $false) {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge single-pass submission gate must stay disabled"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_single_pass_submission_field -ne "renderer_output_metadata.policies.layer_state_precompute_compose_bridge.single_pass_submission_enabled") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge single-pass submission field missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_zero_diff_parity_required -ne $true) {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge zero-diff parity gate missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_zero_diff_parity_field -ne "renderer_output_metadata.policies.layer_state_precompute_compose_bridge.requires_zero_diff_parity") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge zero-diff parity field missing"
+}
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_schema -ne "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Launch packet layer_render_plan_performance LOD counter packet schema missing"
 }
@@ -6047,6 +6065,18 @@ if ($qtPanelSource -notlike "*compose_bridge=*") {
 }
 if ($qtPanelSource -notlike "*layer_state_precompute_compose_bridge_field*") {
     throw "Qt runtime optimization summary missing precompute compose bridge field"
+}
+if ($qtPanelSource -notlike "*bridge_submit=*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge single-pass gate text"
+}
+if ($qtPanelSource -notlike "*layer_state_precompute_compose_bridge_single_pass_submission_field*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge single-pass field"
+}
+if ($qtPanelSource -notlike "*zero_diff_parity=*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge parity gate text"
+}
+if ($qtPanelSource -notlike "*layer_state_precompute_compose_bridge_zero_diff_parity_field*") {
+    throw "Qt runtime optimization summary missing precompute compose bridge parity field"
 }
 $qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource + $runtimeOptimizationReviewModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {

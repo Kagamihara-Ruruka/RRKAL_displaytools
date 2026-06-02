@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Surface compose bridge runtime gates in Qt summary
+
+- Added compose bridge runtime merge, single-pass submission and zero-diff parity gate metadata to `layer_render_plan_performance`.
+- Surfaced the compose bridge gate values and field paths in the Qt runtime optimization summary strip.
+- Added smoke gates for the launch packet metadata and Qt summary text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Surface precompute compose bridge in Qt summary
 
 - Added `layer_state_precompute_compose_bridge` fields to the Qt runtime optimization summary strip.
