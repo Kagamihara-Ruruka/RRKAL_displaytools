@@ -18,6 +18,7 @@ if ($ContractOnly) {
             "scripts/inspect_render_plan_metadata_summary.ps1",
             "scripts/inspect_render_plan_single_pass_preflight.ps1"
         )
+        included_summary_fields = @("runtime_gate_status_summary")
         boundary = "Reviewer packet only; it does not launch Qt, Taichi, render frames, write metadata, or enable runtime single-pass composition."
         portable = $true
     } | ConvertTo-Json -Depth 8
@@ -27,6 +28,7 @@ if ($ContractOnly) {
 $metadataSummary = powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "scripts\inspect_render_plan_metadata_summary.ps1") | ConvertFrom-Json
 $singlePassPreflight = powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "scripts\inspect_render_plan_single_pass_preflight.ps1") | ConvertFrom-Json
 $ready = $metadataSummary.status -eq "ready" -and $singlePassPreflight.status -eq "ready"
+$runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runtime_merge=False; single_pass_submission=$($singlePassPreflight.runtime_single_pass_enabled); zero_diff_parity_required=True; runtime_path=disabled_until_parity"
 
 [ordered]@{
     schema = $schema
@@ -42,6 +44,8 @@ $ready = $metadataSummary.status -eq "ready" -and $singlePassPreflight.status -e
     single_pass_preflight_status = $singlePassPreflight.status
     single_pass_preflight_schema = $singlePassPreflight.verifies_schema
     runtime_single_pass_enabled = $singlePassPreflight.runtime_single_pass_enabled
+    runtime_gate_status_summary = $runtimeGateStatusSummary
+    runtime_gate_status_summary_field = "runtime_gate_status_summary"
     clone_first_review_commands = @(
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_review_packet.ps1",
         "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\inspect_render_plan_metadata_summary.ps1",

@@ -1,5 +1,11 @@
 ﻿# Development Log
 
+## 2026-06-02 - Add runtime gate summary to render-plan review packet
+
+- Added `runtime_gate_status_summary` to `scripts/inspect_render_plan_review_packet.ps1`.
+- Kept the packet source-only; it still does not launch Qt, Taichi, render frames or enable runtime single-pass composition.
+- Added smoke gates for the contract summary field and disabled single-pass handoff text.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Add runtime gate summary to reviewer packet
 
 - Added `runtime_gate_status_summary` to the Qt reviewer packet and no-GUI reviewer packet exporter.

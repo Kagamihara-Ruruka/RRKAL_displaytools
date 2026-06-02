@@ -7327,6 +7327,10 @@ if ($renderPlanMetadataSummaryInspector.adapter_payload_contract_status_field -n
     throw "Renderer render plan metadata summary inspector adapter payload contract status field missing"
 }
 $renderPlanReviewPacketInspectorPath = Join-Path $RepoRoot "scripts\inspect_render_plan_review_packet.ps1"
+$renderPlanReviewPacketContract = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath -ContractOnly | ConvertFrom-Json
+if ($renderPlanReviewPacketContract.included_summary_fields -notcontains "runtime_gate_status_summary") {
+    throw "Renderer render plan review packet contract runtime gate summary field missing"
+}
 $renderPlanReviewPacket = powershell -NoProfile -ExecutionPolicy Bypass -File $renderPlanReviewPacketInspectorPath | ConvertFrom-Json
 if ($renderPlanReviewPacket.schema -ne "rrkal_displaytools.render_plan_review_packet.v1") {
     throw "Renderer render plan review packet schema missing"
@@ -7336,6 +7340,12 @@ if ($renderPlanReviewPacket.status -ne "ready") {
 }
 if ($renderPlanReviewPacket.runtime_single_pass_enabled -ne $false) {
     throw "Renderer render plan review packet must keep runtime single-pass disabled"
+}
+if ($renderPlanReviewPacket.runtime_gate_status_summary_field -ne "runtime_gate_status_summary") {
+    throw "Renderer render plan review packet runtime gate summary field missing"
+}
+if ($renderPlanReviewPacket.runtime_gate_status_summary -notlike "*single_pass_submission=False*") {
+    throw "Renderer render plan review packet runtime gate summary must keep single-pass disabled"
 }
 if ($renderPlanReviewPacket.adapter_payload_status_field -ne "adapter_payload_status") {
     throw "Renderer render plan review packet adapter payload status field missing"
