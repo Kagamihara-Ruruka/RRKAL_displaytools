@@ -6021,6 +6021,12 @@ if ($qtPanelSource -notlike "*runtimeOptimizationReviewSummaryStrip*") {
 if ($qtPanelSource -notlike "*runtime_optimization_review_summary_text*") {
     throw "Qt runtime optimization review summary formatter is missing"
 }
+if ($qtPanelSource -notlike "*precompute_decision=*") {
+    throw "Qt runtime optimization summary missing precompute decision text"
+}
+if ($qtPanelSource -notlike "*layer_state_precompute_decision_field*") {
+    throw "Qt runtime optimization summary missing precompute decision field"
+}
 $qtPanelRenderPlanSource = $qtPanelSource + $renderPlanPerformanceModuleSource + $runtimeOptimizationReviewModuleSource
 if ($qtPanelRenderPlanSource -notlike "*submit_single_taichi_render_pass*") {
     throw "Qt render plan performance single-pass marker is missing"

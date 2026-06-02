@@ -5668,6 +5668,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             self.compose_pass_budget_label.setText(self.compose_pass_budget_summary_text())
         if hasattr(self, "compose_parity_runner_label"):
             self.compose_parity_runner_label.setText(self.compose_parity_runner_readiness_text())
+        if hasattr(self, "runtime_optimization_review_label"):
+            self.runtime_optimization_review_label.setText(self.runtime_optimization_review_summary_text())
 
     def collect_layer_render_plan_performance(self) -> dict[str, object]:
         packet = layer_render_plan_performance_packet(
@@ -10210,6 +10212,9 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"field={packet.get('runtime_optimization_review_summary_field', '-')}; "
             f"pressure={packet.get('runtime_pressure_snapshot_schema', '-')}; "
             f"layer_state={packet.get('layer_render_state_packet_schema', '-')}; "
+            f"precompute_plan={packet.get('layer_state_precompute_plan_schema', '-')}; "
+            f"precompute_decision={packet.get('layer_state_precompute_decision_schema', '-')}; "
+            f"decision_field={packet.get('layer_state_precompute_decision_field', '-')}; "
             f"lod={packet.get('lod_counter_packet_schema', '-')}; "
             f"overlay={packet.get('heavy_overlay_defer_cache_snapshot_schema', '-')}; "
             "runtime_mutation=false"

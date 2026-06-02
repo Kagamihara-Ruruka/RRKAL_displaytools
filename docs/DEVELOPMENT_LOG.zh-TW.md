@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-06-02 - Surface LayerRenderState precompute decision in Qt summary
+
+- Added `layer_state_precompute_plan` and `layer_state_precompute_decision` fields to the Qt runtime optimization summary strip.
+- Updated the render-plan diagnostics refresh path so the runtime optimization strip refreshes with the other performance strips.
+- Added smoke gates for the Qt precompute decision summary text and field path.
+- Smoke: PASS after transient file-access backoff retries (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-01 - Add LayerRenderState precompute decision metadata
 
 - Added `rrkal_displaytools.layer_state_precompute_decision.v1` as reviewer metadata for reuse/rebuild/defer decisions from the precompute plan.
