@@ -9,6 +9,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
         "build_layer_render_state_packet",
         "build_layer_state_precompute_plan_packet",
         "build_layer_state_precompute_decision_packet",
+        "build_layer_state_precompute_compose_bridge_packet",
         "build_lod_counter_packet",
         "build_heavy_overlay_defer_cache_packet",
         "build_runtime_optimization_review_summary_packet",
@@ -18,6 +19,7 @@ def build_runtime_optimization_module_boundary_packet(source: str) -> dict[str, 
         "renderer_output_metadata.policies.layer_render_state",
         "renderer_output_metadata.policies.layer_state_precompute_plan",
         "renderer_output_metadata.policies.layer_state_precompute_decision",
+        "renderer_output_metadata.policies.layer_state_precompute_compose_bridge",
         "renderer_output_metadata.policies.lod_counters",
         "renderer_output_metadata.policies.heavy_overlay_defer_cache",
         "renderer_output_metadata.policies.runtime_optimization_review_summary",
@@ -253,6 +255,54 @@ def build_layer_state_precompute_decision_packet(
     }
 
 
+def build_layer_state_precompute_compose_bridge_packet(
+    source: str,
+    layer_state_precompute_decision: dict[str, object] | None,
+    compose_pass_budget: dict[str, object] | None = None,
+) -> dict[str, object]:
+    decision = layer_state_precompute_decision if isinstance(layer_state_precompute_decision, dict) else {}
+    budget = compose_pass_budget if isinstance(compose_pass_budget, dict) else {}
+    required_evidence = budget.get("required_evidence")
+    evidence = [str(item) for item in required_evidence] if isinstance(required_evidence, list) else [
+        "render_compose_parity_smoke.visual_parity_passed",
+        "max_abs_diff=0",
+        "changed_pixel_count=0",
+    ]
+    should_defer = bool(decision.get("should_defer_layers", False))
+    should_rebuild = bool(decision.get("should_rebuild_dynamic_layers", False))
+    should_reuse = bool(decision.get("should_reuse_static_batches", False))
+    if should_defer:
+        bridge_status = "defer_before_compose_queue"
+        compose_action = "keep_deferred_layers_out_of_merge_candidate"
+    elif should_rebuild:
+        bridge_status = "rebuild_before_compose_queue"
+        compose_action = "rebuild_layer_state_then_keep_sequential_compose"
+    elif should_reuse:
+        bridge_status = "static_reuse_candidate_for_compose_queue"
+        compose_action = "candidate_for_collapsed_compose_after_zero_diff_parity"
+    else:
+        bridge_status = "await_runtime_evidence"
+        compose_action = "keep_existing_sequential_compose"
+    return {
+        "schema": "rrkal_displaytools.layer_state_precompute_compose_bridge.v1",
+        "source": source,
+        "status": bridge_status,
+        "decision_schema": str(decision.get("schema", "")),
+        "decision_status": str(decision.get("status", "")),
+        "compile_action": str(decision.get("compile_action", "")),
+        "submit_action": str(decision.get("submit_action", "")),
+        "compose_action": compose_action,
+        "compose_budget_schema": str(budget.get("schema", "rrkal_displaytools.layer_render_plan_compose_pass_budget.v1")),
+        "current_pass_model": str(budget.get("current_pass_model", "sequential_overlay_composition")),
+        "target_pass_model": str(budget.get("target_pass_model", "collapsed_overlay_runs_then_single_taichi_composite_pass")),
+        "required_evidence": evidence,
+        "runtime_merge_enabled": False,
+        "single_pass_submission_enabled": False,
+        "requires_zero_diff_parity": True,
+        "runtime_optimization_applied": False,
+        "next_runtime_slice": "map_precompute_decision_to_compose_queue_after_zero_diff_parity",
+        "boundary": "Compose bridge is reviewer metadata only; it does not merge compose runs, enable single-pass submission or change Taichi execution.",
+    }
 def build_lod_counter_packet(
     source: str,
     lod_bucket: str,

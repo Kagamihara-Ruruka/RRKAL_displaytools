@@ -6,6 +6,7 @@ from __future__ import annotations
 from render_core.runtime_optimization_review import (
     build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
+    build_layer_state_precompute_compose_bridge_packet,
     build_layer_state_precompute_decision_packet,
     build_layer_state_precompute_plan_packet,
     build_lod_counter_packet,
@@ -51,6 +52,9 @@ def layer_render_plan_performance_packet(
         "layer_state_precompute_decision_schema": "rrkal_displaytools.layer_state_precompute_decision.v1",
         "layer_state_precompute_decision_helper": "render_core.runtime_optimization_review.build_layer_state_precompute_decision_packet",
         "layer_state_precompute_decision_field": "renderer_output_metadata.policies.layer_state_precompute_decision",
+        "layer_state_precompute_compose_bridge_schema": "rrkal_displaytools.layer_state_precompute_compose_bridge.v1",
+        "layer_state_precompute_compose_bridge_helper": "render_core.runtime_optimization_review.build_layer_state_precompute_compose_bridge_packet",
+        "layer_state_precompute_compose_bridge_field": "renderer_output_metadata.policies.layer_state_precompute_compose_bridge",
         "lod_counter_packet_schema": "rrkal_displaytools.lod_counter_packet.v1",
         "lod_counter_packet_helper": "render_core.runtime_optimization_review.build_lod_counter_packet",
         "lod_counter_packet_field": "renderer_output_metadata.policies.lod_counters",

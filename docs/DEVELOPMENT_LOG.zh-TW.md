@@ -1,5 +1,11 @@
 # Development Log
 
+## 2026-06-02 - Add LayerRenderState precompute compose bridge metadata
+
+- Added `rrkal_displaytools.layer_state_precompute_compose_bridge.v1` to connect precompute decisions to compose/run review metadata.
+- Wired renderer handoff metadata to emit `policies.layer_state_precompute_compose_bridge` while keeping runtime merge and single-pass submission disabled.
+- Exposed the bridge schema/helper/field through the render-plan performance contract and inspector.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
 ## 2026-06-02 - Surface LayerRenderState precompute decision in Qt summary
 
 - Added `layer_state_precompute_plan` and `layer_state_precompute_decision` fields to the Qt runtime optimization summary strip.

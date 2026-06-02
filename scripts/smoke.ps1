@@ -626,6 +626,15 @@ if ($launchPacket.layer_render_plan_performance.layer_state_precompute_decision_
 if ($launchPacket.layer_render_plan_performance.layer_state_precompute_decision_field -ne "renderer_output_metadata.policies.layer_state_precompute_decision") {
     throw "Launch packet layer_render_plan_performance LayerRenderState precompute decision field missing"
 }
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_schema -ne "rrkal_displaytools.layer_state_precompute_compose_bridge.v1") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge schema missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_helper -ne "render_core.runtime_optimization_review.build_layer_state_precompute_compose_bridge_packet") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge helper missing"
+}
+if ($launchPacket.layer_render_plan_performance.layer_state_precompute_compose_bridge_field -ne "renderer_output_metadata.policies.layer_state_precompute_compose_bridge") {
+    throw "Launch packet layer_render_plan_performance LayerRenderState precompute compose bridge field missing"
+}
 if ($launchPacket.layer_render_plan_performance.lod_counter_packet_schema -ne "rrkal_displaytools.lod_counter_packet.v1") {
     throw "Launch packet layer_render_plan_performance LOD counter packet schema missing"
 }
@@ -763,6 +772,12 @@ if ($runtimeOptimizationReviewModuleSource -notlike "*def build_layer_state_prec
 }
 if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.layer_state_precompute_decision.v1*") {
     throw "LayerRenderState precompute decision schema marker is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*def build_layer_state_precompute_compose_bridge_packet*") {
+    throw "LayerRenderState precompute compose bridge builder is missing"
+}
+if ($runtimeOptimizationReviewModuleSource -notlike "*rrkal_displaytools.layer_state_precompute_compose_bridge.v1*") {
+    throw "LayerRenderState precompute compose bridge schema marker is missing"
 }
 if ($runtimeOptimizationReviewModuleSource -notlike "*def build_lod_counter_packet*") {
     throw "LOD counter packet builder is missing"

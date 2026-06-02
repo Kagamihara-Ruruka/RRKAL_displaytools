@@ -23,6 +23,7 @@ from render_core.render_plan_performance import layer_render_plan_performance_pa
 from render_core.runtime_optimization_review import (
     build_heavy_overlay_defer_cache_packet,
     build_layer_render_state_packet,
+    build_layer_state_precompute_compose_bridge_packet,
     build_layer_state_precompute_decision_packet,
     build_layer_state_precompute_plan_packet,
     build_lod_counter_packet,
@@ -15863,6 +15864,11 @@ class HybridRenderController:
             layer_state_precompute_plan,
             runtime_pressure_snapshot,
         )
+        layer_state_precompute_compose_bridge = build_layer_state_precompute_compose_bridge_packet(
+            "HybridRenderController.project_handoff_snapshot",
+            layer_state_precompute_decision,
+            None,
+        )
         runtime_optimization_review_summary = build_runtime_optimization_review_summary_packet(
             "HybridRenderController.project_handoff_snapshot",
             runtime_pressure_snapshot,
@@ -15961,6 +15967,7 @@ class HybridRenderController:
                 "layer_render_state": layer_render_state,
                 "layer_state_precompute_plan": layer_state_precompute_plan,
                 "layer_state_precompute_decision": layer_state_precompute_decision,
+                "layer_state_precompute_compose_bridge": layer_state_precompute_compose_bridge,
                 "lod_counters": lod_counters,
                 "heavy_overlay_defer_cache": heavy_overlay_defer_cache,
                 "runtime_optimization_review_summary": runtime_optimization_review_summary,
