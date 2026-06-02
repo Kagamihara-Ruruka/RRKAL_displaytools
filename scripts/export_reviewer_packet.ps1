@@ -41,6 +41,7 @@ if ($ContractOnly) {
         zero_diff_parity_evidence_summary_field = "zero_diff_parity_evidence_summary"
         zero_diff_parity_artifact_producer_summary_field = "zero_diff_parity_artifact_producer_summary"
         compose_parity_runner_manifest_status_summary_field = "compose_parity_runner_manifest_status_summary"
+        compose_parity_precommit_gate_summary_field = "compose_parity_precommit_gate_summary"
         boundary = "Contract-only mode is for smoke checks; normal mode writes a local reviewer packet under state/."
     } | ConvertTo-Json -Depth 8
     exit 0
@@ -77,7 +78,7 @@ $workflow = $performance.compose_run_parity_artifact_workflow
 $adviceRules = $budget.bottleneck_advice_rules
 $composeAdvice = if ($adviceRules.unknown) { $adviceRules.unknown } else { "await_runtime_metadata" }
 
-$composePerformanceSummary = "Compose budget: status={0}; runs=-; merge=-; compose_ms=-; slowest=-; advice={1}; target={2}; runtime_merge=false | Compose parity runner: ready=True; script={3}; manifest={4}; runtime_merge=false | Compose parity runner manifest: schema={5}; path={4}; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false" -f @(
+$composePerformanceSummary = "Compose budget: status={0}; runs=-; merge=-; compose_ms=-; slowest=-; advice={1}; target={2}; runtime_merge=false | Compose parity runner: ready=True; script={3}; manifest={4}; runtime_merge=false | Compose parity runner manifest: schema={5}; path={4}; written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate=compose_parity_artifact_runner.precommit_gate; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false | Compose parity precommit gate: gate=compose_parity_artifact_runner.precommit_gate; required_before_runtime_merge=true; pass=visual_parity_passed=true,max_abs_diff=0,changed_pixel_count=0,precommit_gate_passed=true; contract=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly; runtime_merge=false" -f @(
     $budget.status,
     $composeAdvice,
     $budget.target_pass_model,
@@ -95,8 +96,9 @@ $performanceSmokeSummary = "Performance smoke telemetry: schema=$($launchPacket.
 $runtimeOptimizationReviewSummary = "Runtime optimization review: schema=$($performance.runtime_optimization_review_summary_schema); field=$($performance.runtime_optimization_review_summary_field); pressure=$($performance.runtime_pressure_snapshot_schema); layer_state=$($performance.layer_render_state_packet_schema); lod=$($performance.lod_counter_packet_schema); overlay=$($performance.heavy_overlay_defer_cache_snapshot_schema); runtime_mutation=false"
 $runtimeGateStatusSummary = "Runtime gate status: metadata_available=True; runtime_merge=$($performance.layer_state_precompute_compose_bridge_runtime_merge_enabled); single_pass_submission=$($performance.layer_state_precompute_compose_bridge_single_pass_submission_enabled); zero_diff_parity_required=$($performance.layer_state_precompute_compose_bridge_zero_diff_parity_required); runtime_path=disabled_until_parity"
 $zeroDiffParityEvidenceSummary = "Zero-diff parity evidence: artifacts=baseline_sequential_frame_rgba.png,merged_candidate_frame_rgba.png; visual_parity_passed=required; tolerance=max_abs_diff=0,changed_pixel_count=0; source=scripts\render_compose_parity_smoke.ps1; manifest=state/render_compose_parity_smoke_manifest.json; runtime_path=disabled_until_pass"
-$zeroDiffParityArtifactProducerSummary = "Parity artifact producer: command=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -SkipDiff; runner_manifest=state/compose_parity/compose_parity_artifact_runner.json; diff_manifest=state/compose_parity/render_compose_parity_smoke_manifest.json; diff_status_field=render_compose_parity_smoke.diff_status; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; runtime_path=disabled_until_pass"
-$composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: schema=$($performance.compose_run_parity_artifact_runner_schema); path=$($workflow.runner_manifest); written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
+$zeroDiffParityArtifactProducerSummary = "Parity artifact producer: command=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_artifacts.ps1 -SkipDiff; runner_manifest=state/compose_parity/compose_parity_artifact_runner.json; diff_manifest=state/compose_parity/render_compose_parity_smoke_manifest.json; diff_status_field=render_compose_parity_smoke.diff_status; precommit_gate=compose_parity_artifact_runner.precommit_gate; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; runtime_path=disabled_until_pass"
+$composeParityRunnerManifestStatusSummary = "Compose parity runner manifest: schema=$($performance.compose_run_parity_artifact_runner_schema); path=$($workflow.runner_manifest); written_by=scripts\render_compose_parity_artifacts.ps1; status_field=status; diff_status_field=diff_status; precommit_gate=compose_parity_artifact_runner.precommit_gate; precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; skip_diff_status=completed_diff_skipped; runtime_merge=false"
+$composeParityPrecommitGateSummary = "Compose parity precommit gate: gate=compose_parity_artifact_runner.precommit_gate; required_before_runtime_merge=true; pass=visual_parity_passed=true,max_abs_diff=0,changed_pixel_count=0,precommit_gate_passed=true; contract=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parity_smoke.ps1 -ContractOnly; runtime_merge=false"
 
 $reviewerPacket = [ordered]@{
     schema = "rrkal_displaytools.reviewer_packet.v1"
@@ -120,6 +122,7 @@ $reviewerPacket = [ordered]@{
     zero_diff_parity_evidence_summary = $zeroDiffParityEvidenceSummary
     zero_diff_parity_artifact_producer_summary = $zeroDiffParityArtifactProducerSummary
     compose_parity_runner_manifest_status_summary = $composeParityRunnerManifestStatusSummary
+    compose_parity_precommit_gate_summary = $composeParityPrecommitGateSummary
     runtime_optimization_review_summary = $runtimeOptimizationReviewSummary
     cross_machine_clone_readiness = $launchPacket.cross_machine_clone_readiness
     profile_launch_readiness = $launchPacket.profile_launch_readiness

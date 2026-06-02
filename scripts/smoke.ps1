@@ -1327,6 +1327,9 @@ if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains 
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
     throw "Launch packet reviewer recommended zero-diff parity artifact producer summary field missing"
 }
+if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Launch packet reviewer recommended compose parity precommit gate summary field missing"
+}
 if ($launchPacket.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Launch packet reviewer packet layer quick actions recommended field missing"
 }
@@ -1374,6 +1377,12 @@ if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "z
 }
 if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
     throw "Launch packet reviewer packet zero-diff parity artifact producer summary field missing"
+}
+if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_runner_manifest_status_summary") {
+    throw "Launch packet reviewer packet compose parity runner manifest status summary field missing"
+}
+if ($launchPacket.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Launch packet reviewer packet compose parity precommit gate summary field missing"
 }
 if ($launchPacket.reviewer_packet_export.included_packet_fields -notcontains "launch_packet_snapshot") {
     throw "Launch packet reviewer packet snapshot field missing"
@@ -3927,6 +3936,9 @@ if ($capabilities.reviewer_packet_export.field_guide.ordered_review_groups.id -n
 if ($capabilities.reviewer_packet_export.recommended_review_fields -notcontains "layer_render_plan_performance.compose_run_parity_artifact_workflow") {
     throw "Renderer reviewer recommended parity workflow field missing"
 }
+if ($capabilities.reviewer_packet_export.recommended_review_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Renderer reviewer recommended compose parity precommit gate summary field missing"
+}
 if ($capabilities.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Renderer reviewer packet layer quick actions recommended field missing"
 }
@@ -3950,6 +3962,12 @@ if ($capabilities.reviewer_packet_export.included_summary_fields -notcontains "m
 }
 if ($capabilities.reviewer_packet_export.included_summary_fields -notcontains "compose_performance_summary") {
     throw "Renderer reviewer packet compose performance summary field missing"
+}
+if ($capabilities.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_runner_manifest_status_summary") {
+    throw "Renderer reviewer packet compose parity runner manifest status summary field missing"
+}
+if ($capabilities.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Renderer reviewer packet compose parity precommit gate summary field missing"
 }
 if ($capabilities.reviewer_packet_export.included_packet_fields -notcontains "hydrology_lod_readiness") {
     throw "Renderer reviewer packet hydrology readiness packet field missing"
@@ -5278,6 +5296,9 @@ if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "zero
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "zero_diff_parity_artifact_producer_summary") {
     throw "Handoff inspection reviewer recommended zero-diff parity artifact producer summary field missing"
 }
+if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Handoff inspection reviewer recommended compose parity precommit gate summary field missing"
+}
 if ($handoff.reviewer_packet_export.recommended_review_fields -notcontains "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract") {
     throw "Handoff inspection reviewer packet layer quick actions recommended field missing"
 }
@@ -5319,6 +5340,18 @@ if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "zero_d
 }
 if ($handoff.reviewer_packet_export.zero_diff_parity_artifact_producer_summary_field -ne "zero_diff_parity_artifact_producer_summary") {
     throw "Handoff inspection reviewer zero-diff parity artifact producer summary field marker missing"
+}
+if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_runner_manifest_status_summary") {
+    throw "Handoff inspection reviewer packet compose parity runner manifest status summary field missing"
+}
+if ($handoff.reviewer_packet_export.compose_parity_runner_manifest_status_summary_field -ne "compose_parity_runner_manifest_status_summary") {
+    throw "Handoff inspection reviewer compose parity runner manifest status summary field marker missing"
+}
+if ($handoff.reviewer_packet_export.included_summary_fields -notcontains "compose_parity_precommit_gate_summary") {
+    throw "Handoff inspection reviewer packet compose parity precommit gate summary field missing"
+}
+if ($handoff.reviewer_packet_export.compose_parity_precommit_gate_summary_field -ne "compose_parity_precommit_gate_summary") {
+    throw "Handoff inspection reviewer compose parity precommit gate summary field marker missing"
 }
 if ($handoff.reviewer_packet_export.included_packet_fields -notcontains "hydrology_lod_readiness") {
     throw "Handoff inspection reviewer packet hydrology readiness packet field missing"
@@ -5844,6 +5877,9 @@ if ($qtPanelSource -notlike '*"zero_diff_parity_artifact_producer_summary": self
 if ($qtPanelSource -notlike '*"compose_parity_runner_manifest_status_summary": self.compose_parity_runner_manifest_status_summary_text()*') {
     throw "Qt reviewer packet compose parity runner manifest status summary output is missing"
 }
+if ($qtPanelSource -notlike '*"compose_parity_precommit_gate_summary": self.compose_parity_precommit_gate_summary_text()*') {
+    throw "Qt reviewer packet compose parity precommit gate summary output is missing"
+}
 if ($qtPanelSource -notlike "*def zero_diff_parity_evidence_summary_text*") {
     throw "Qt zero-diff parity evidence summary helper is missing"
 }
@@ -5853,11 +5889,17 @@ if ($qtPanelSource -notlike "*def zero_diff_parity_artifact_producer_summary_tex
 if ($qtPanelSource -notlike "*def compose_parity_runner_manifest_status_summary_text*") {
     throw "Qt compose parity runner manifest status summary helper is missing"
 }
+if ($qtPanelSource -notlike "*def compose_parity_precommit_gate_summary_text*") {
+    throw "Qt compose parity precommit gate summary helper is missing"
+}
 if ($qtPanelSource -notlike "*def compose_performance_reviewer_summary_text*") {
     throw "Qt compose performance reviewer summary helper is missing"
 }
 if ($qtPanelSource -notlike "*compose_parity_runner_manifest_status_summary_text(packet)*") {
     throw "Qt compose performance reviewer summary must include runner manifest status"
+}
+if ($qtPanelSource -notlike "*compose_parity_precommit_gate_summary_text(packet)*") {
+    throw "Qt compose performance reviewer summary must include precommit gate summary"
 }
 if ($qtPanelSource -notlike '*"hydrology_lod_readiness": self.collect_hydrology_lod_readiness()*') {
     throw "Qt reviewer packet hydrology readiness output is missing"
@@ -6147,8 +6189,8 @@ if ($qtPanelSource -notlike "*Copy runtime gate*") {
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_summary*") {
     throw "Qt runtime gate copy handler is missing"
 }
-if ($qtPanelSource -notlike '*self.runtime_gate_status_text()*self.zero_diff_parity_evidence_summary_text()*self.zero_diff_parity_artifact_producer_summary_text()*') {
-    throw "Qt runtime gate copy handler must include zero-diff parity evidence and artifact producer summaries"
+if ($qtPanelSource -notlike '*self.runtime_gate_status_text()*self.zero_diff_parity_evidence_summary_text()*self.zero_diff_parity_artifact_producer_summary_text()*self.compose_parity_precommit_gate_summary_text()*') {
+    throw "Qt runtime gate copy handler must include zero-diff parity evidence, artifact producer and precommit gate summaries"
 }
 if ($qtPanelSource -notlike "*copy_runtime_gate_status_button.clicked.connect*") {
     throw "Qt runtime gate copy action is not wired"
@@ -7768,6 +7810,15 @@ if ($reviewerPacketExporterSource -notlike "*zero_diff_parity_artifact_producer_
 if ($reviewerPacketExporterSource -notlike "*compose_parity_runner_manifest_status_summary*") {
     throw "No-GUI reviewer packet exporter runner manifest status summary missing"
 }
+if ($reviewerPacketExporterSource -notlike "*compose_parity_precommit_gate_summary*") {
+    throw "No-GUI reviewer packet exporter precommit gate summary missing"
+}
+if ($reviewerPacketExporterSource -notlike "*gate=compose_parity_artifact_runner.precommit_gate*") {
+    throw "No-GUI reviewer packet exporter precommit gate path missing"
+}
+if ($reviewerPacketExporterSource -notlike "*required_before_runtime_merge=true*") {
+    throw "No-GUI reviewer packet exporter precommit gate runtime merge requirement missing"
+}
 if ($reviewerPacketExporterSource -notlike "*skip_diff_status=completed_diff_skipped*") {
     throw "No-GUI reviewer packet exporter runner manifest skip-diff status missing"
 }
@@ -7796,6 +7847,9 @@ if ($reviewerPacketContract.zero_diff_parity_artifact_producer_summary_field -ne
 }
 if ($reviewerPacketContract.compose_parity_runner_manifest_status_summary_field -ne "compose_parity_runner_manifest_status_summary") {
     throw "No-GUI reviewer packet exporter runner manifest status summary field missing"
+}
+if ($reviewerPacketContract.compose_parity_precommit_gate_summary_field -ne "compose_parity_precommit_gate_summary") {
+    throw "No-GUI reviewer packet exporter precommit gate summary field missing"
 }
 if ($reviewerPacketContract.decoupling_readiness_field -ne "decoupling_readiness") {
     throw "No-GUI reviewer packet exporter decoupling readiness field missing"

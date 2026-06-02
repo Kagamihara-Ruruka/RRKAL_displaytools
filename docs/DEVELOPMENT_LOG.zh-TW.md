@@ -1,4 +1,10 @@
-﻿## 2026-06-02 - Add runner manifest precommit gate contract
+﻿## 2026-06-02 - Add copyable precommit gate summary
+
+- Added `compose_parity_precommit_gate_summary` to Qt reviewer packets, runtime gate copy text and no-GUI reviewer packet output.
+- Included the runner gate path, runtime-merge requirement, zero-diff pass condition and contract command in the short handoff text. Synced launch packet, renderer capabilities and handoff reviewer contracts to prevent reviewer-field drift.
+- Kept the change summary-only: no renderer run, artifact diff, runtime merge, or single-pass path was enabled.
+- Smoke: PASS (`powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\smoke.ps1`).
+## 2026-06-02 - Add runner manifest precommit gate contract
 
 - Added a `precommit_gate` contract object to `render_compose_parity_artifacts.ps1` runner manifests.
 - Surfaced the runner precommit gate schema, field path and runtime-merge requirement in the render-plan review packet.

@@ -424,7 +424,7 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
                 {"id": "ocean_guard", "fields": ["ocean_material_control_port.qt_control_panel.performance_guard_summary_contract"]},
                 {"id": "visual_review", "fields": ["visual_review_summary", "visual_feature_closure_matrix"]},
                 {"id": "goal_closure", "fields": ["goal_closure_scorecard", "goal_closure_scorecard.copy_summary_contract"]},
-                {"id": "compose_performance", "fields": ["compose_performance_summary", "runtime_gate_status_summary", "zero_diff_parity_evidence_summary", "zero_diff_parity_artifact_producer_summary", "layer_render_plan_performance.compose_pass_budget"]},
+                {"id": "compose_performance", "fields": ["compose_performance_summary", "runtime_gate_status_summary", "zero_diff_parity_evidence_summary", "zero_diff_parity_artifact_producer_summary", "compose_parity_runner_manifest_status_summary", "compose_parity_precommit_gate_summary", "layer_render_plan_performance.compose_pass_budget"]},
                 {"id": "decoupling", "fields": ["decoupling_readiness_summary", "decoupling_readiness.first_extraction_order"]},
                 {"id": "controlled_interception", "fields": ["controlled_interception_summary", "controlled_interception_policy.blocked_patterns"]},
                 {"id": "config_gateway", "fields": ["renderer_config_gateway_summary", "renderer_config_gateway.changed_defaults"]},
@@ -441,6 +441,8 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
             "runtime_gate_status_summary",
             "zero_diff_parity_evidence_summary",
             "zero_diff_parity_artifact_producer_summary",
+            "compose_parity_runner_manifest_status_summary",
+            "compose_parity_precommit_gate_summary",
             "layer_selection_tool.selection_summary_contract.quick_actions_summary_contract",
             "layer_selection_affordance.active_quick_actions",
             "layer_render_plan_performance.compose_pass_budget",
@@ -466,6 +468,8 @@ def reviewer_packet_export_packet(source: str) -> dict[str, object]:
             "runtime_gate_status_summary",
             "zero_diff_parity_evidence_summary",
             "zero_diff_parity_artifact_producer_summary",
+            "compose_parity_runner_manifest_status_summary",
+            "compose_parity_precommit_gate_summary",
         ],
         "included_packet_fields": [
             "launch_packet_snapshot",
@@ -5812,6 +5816,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "zero_diff_parity_evidence_summary": self.zero_diff_parity_evidence_summary_text(),
             "zero_diff_parity_artifact_producer_summary": self.zero_diff_parity_artifact_producer_summary_text(),
             "compose_parity_runner_manifest_status_summary": self.compose_parity_runner_manifest_status_summary_text(),
+            "compose_parity_precommit_gate_summary": self.compose_parity_precommit_gate_summary_text(),
             "goal_closure_scorecard": self.collect_goal_closure_scorecard(),
             "cross_machine_clone_readiness": self.collect_cross_machine_clone_readiness(),
             "profile_launch_readiness": self.collect_profile_launch_readiness(),
@@ -10273,6 +10278,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             + self.zero_diff_parity_evidence_summary_text()
             + "\n"
             + self.zero_diff_parity_artifact_producer_summary_text()
+            + "\n"
+            + self.compose_parity_precommit_gate_summary_text()
         )
         QtWidgets.QApplication.clipboard().setText(summary)
         self.status.setText("Copied runtime gate status summary")
@@ -10295,6 +10302,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "runner_manifest=state/compose_parity/compose_parity_artifact_runner.json; "
             "diff_manifest=state/compose_parity/render_compose_parity_smoke_manifest.json; "
             "diff_status_field=render_compose_parity_smoke.diff_status; "
+            "precommit_gate=compose_parity_artifact_runner.precommit_gate; "
             "precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; "
             "runtime_path=disabled_until_pass"
         )
@@ -10326,6 +10334,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             f"parity_evidence={self.zero_diff_parity_evidence_summary_text()}; "
             f"artifact_producer={self.zero_diff_parity_artifact_producer_summary_text()}; "
+            f"precommit_gate={self.compose_parity_precommit_gate_summary_text(packet)}; "
             "evidence=compose_parity_runner; "
             "runtime_merge=false"
         )
@@ -10355,6 +10364,7 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             f"parity_gate=zero_diff_required:{packet.get('layer_state_precompute_compose_bridge_zero_diff_parity_required', '-')}; "
             f"parity_evidence={self.zero_diff_parity_evidence_summary_text()}; "
             f"artifact_producer={self.zero_diff_parity_artifact_producer_summary_text()}; "
+            f"precommit_gate={self.compose_parity_precommit_gate_summary_text(packet)}; "
             f"final={final_stage}; "
             "runtime_merge=false; "
             "next=post_07_render_plan_compose_extraction"
@@ -10373,6 +10383,8 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             + self.compose_parity_runner_readiness_text(packet)
             + " | "
             + self.compose_parity_runner_manifest_status_summary_text(packet)
+            + " | "
+            + self.compose_parity_precommit_gate_summary_text(packet)
         )
 
     def compose_parity_runner_readiness_text(self, packet: dict[str, object] | None = None) -> str:
@@ -10410,8 +10422,19 @@ class DisplayToolsQtPanel(QtWidgets.QMainWindow):
             "written_by=scripts\\render_compose_parity_artifacts.ps1; "
             "status_field=status; "
             "diff_status_field=diff_status; "
+            "precommit_gate=compose_parity_artifact_runner.precommit_gate; "
             "precommit_gate_field=render_compose_parity_smoke.precommit_gate_passed; "
             "skip_diff_status=completed_diff_skipped; "
+            "runtime_merge=false"
+        )
+
+    def compose_parity_precommit_gate_summary_text(self, packet: dict[str, object] | None = None) -> str:
+        return (
+            "Compose parity precommit gate: "
+            "gate=compose_parity_artifact_runner.precommit_gate; "
+            "required_before_runtime_merge=true; "
+            "pass=visual_parity_passed=true,max_abs_diff=0,changed_pixel_count=0,precommit_gate_passed=true; "
+            "contract=powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\render_compose_parity_smoke.ps1 -ContractOnly; "
             "runtime_merge=false"
         )
 
