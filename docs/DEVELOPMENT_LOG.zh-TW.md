@@ -1,3 +1,10 @@
+## 2026-06-03 - Extract layer runtime snapshot input helper
+
+- Added `render_core/layer_state.py` with `build_layer_runtime_snapshot_input()` as a pure packet helper for renderer layer-state snapshot inputs.
+- Updated `HybridRenderController.layer_render_plan_runtime_snapshot()` to delegate input packaging while keeping setter behavior, dirty flags, runtime state file ack, metadata schema and render output behavior unchanged.
+- Updated `docs/LAYER_STATE_SOURCE_MAP.zh-TW.md` to mark the helper as implemented.
+- Validation: PASS (`py -3 -m py_compile render_core\layer_state.py taichi_global_bathymetry.py`, `scripts/render_quick_smoke.ps1`, `scripts/render_repeated_quick_smoke.ps1 -Frames 3`, `scripts/smoke.ps1` with extended timeout, and `git diff --check`).
+
 ## 2026-06-03 - Add layer state source map
 
 - Added `docs/LAYER_STATE_SOURCE_MAP.zh-TW.md` to map layer visibility, opacity, blend, selected semantic target, dirty flags and runtime snapshot inputs before implementation.

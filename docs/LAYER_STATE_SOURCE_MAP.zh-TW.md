@@ -53,11 +53,11 @@ The next helper should not move setter behavior. A safe first implementation can
 }
 ```
 
-Recommended helper name:
+Implemented helper name:
 
 - `render_core.layer_state.build_layer_runtime_snapshot_input()`
 
-Allowed first use:
+Current first use:
 
 - `layer_render_plan_runtime_snapshot()` may call the helper after controller-local values are collected.
 - The helper should only normalize and package values.

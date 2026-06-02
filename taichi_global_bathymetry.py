@@ -62,6 +62,7 @@ from render_core.render_plan import (
 )
 from render_core.metadata import build_renderer_output_metadata_payload
 from render_core.preview import write_preview_frame_png
+from render_core.layer_state import build_layer_runtime_snapshot_input
 from pin_projection import pin_projection_contract_packet, project_pins_to_screen
 try:
     import xarray as xr
@@ -14045,14 +14046,23 @@ class HybridRenderController:
             "boundary_hover_dirty": bool(getattr(self, "boundary_hover_dirty", False)),
         }
         plan_steps = composition_steps if isinstance(composition_steps, list) else self.layer_render_plan_composition_steps()
-        return build_layer_render_plan_runtime_snapshot(
-            int(getattr(self, "frame_index", 0)),
-            visible_layers,
-            getattr(self, "selected_layer_semantic_target", None),
-            dirty_flags,
-            defer_vector_overlays,
-            plan_steps,
+        snapshot_input = build_layer_runtime_snapshot_input(
+            frame_index=int(getattr(self, "frame_index", 0)),
+            visible_layers=visible_layers,
+            selected_layer_semantic_target=getattr(self, "selected_layer_semantic_target", None),
+            dirty_flags=dirty_flags,
+            defer_vector_overlays=defer_vector_overlays,
+            composition_steps=plan_steps,
             source="HybridRenderController.layer_render_plan_runtime_snapshot",
+        )
+        return build_layer_render_plan_runtime_snapshot(
+            snapshot_input["frame_index"],
+            snapshot_input["visible_layers"],
+            snapshot_input["selected_layer_semantic_target"],
+            snapshot_input["dirty_flags"],
+            snapshot_input["defer_vector_overlays"],
+            snapshot_input["composition_steps"],
+            source=str(snapshot_input["source"]),
         )
 
     def layer_render_plan_composition_steps(self) -> list[dict[str, object]]:
