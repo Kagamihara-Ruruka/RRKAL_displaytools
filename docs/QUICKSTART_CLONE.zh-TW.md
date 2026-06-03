@@ -74,6 +74,13 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\render_compose_parit
 ```
 
 這會產生 `state/compose_parity/baseline_sequential_frame_rgba.png`、`state/compose_parity/merged_candidate_frame_rgba.png`、`state/compose_parity/renderer_output_metadata.json`、`state/compose_parity/render_compose_parity_smoke_manifest.json` 與 `state/compose_parity/compose_parity_artifact_runner.json`。Runner 會優先使用 `.venv\Scripts\python.exe`，找不到才 fallback 到 `py -3`。這些都是本機 runtime artifacts，不提交 Git。若只要產生 artifacts、暫不跑 RGBA diff，可加 `-SkipDiff`。
+可選的 runtime_blend timing evidence runner（較重，會啟動 renderer 兩次並產生本機 artifacts）：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\runtime_blend_timing_review_smoke.ps1 -Frames 3
+```
+
+這會產生 `state/showcase/runtime_blend_timing_review/summary.json`、`state/showcase/runtime_blend_timing_review/summary.md`、`state/showcase/runtime_blend_data_ready_gate/gate.json` 與 `state/showcase/runtime_blend_data_ready_gate/gate.md`。這些都是本機 evidence artifacts，不提交 Git。若只要檢查入口 contract、不要啟動 renderer，可先跑 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\runtime_blend_timing_review_smoke.ps1 -ContractOnly`。
 
 ## 5. 啟動 Qt 控制面板
 

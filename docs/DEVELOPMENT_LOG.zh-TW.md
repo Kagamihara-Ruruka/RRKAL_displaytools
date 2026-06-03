@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 clone quickstart runtime blend evidence runner
+
+- Scope: added runtime_blend timing evidence runner guidance to `docs/QUICKSTART_CLONE.zh-TW.md`.
+- Guidance: clone users can run `runtime_blend_timing_review_smoke.ps1 -Frames 3` for local evidence or `-ContractOnly` for no-render review.
+- Safety: documents that generated evidence artifacts remain local-only and must not be committed.
 ## 2026-06-03 - c_3 runtime blend GTD alignment
 
 - Scope: updated `docs/PROJECT_GTD.md` with the current runtime_blend evidence runner, data-ready gate contract, and next-step boundary.
