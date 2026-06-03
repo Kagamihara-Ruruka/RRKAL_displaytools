@@ -3,6 +3,7 @@ param(
     [string]$DefaultAnalysisPath,
     [string]$HighDensitySummaryPath,
     [string]$HighDensityAnalysisPath,
+    [string]$OutputPath,
     [switch]$ContractOnly,
     [switch]$Json
 )
@@ -33,6 +34,7 @@ if ($ContractOnly) {
         default_analysis_path = $DefaultAnalysisPath
         high_density_summary_path = $HighDensitySummaryPath
         high_density_analysis_path = $HighDensityAnalysisPath
+        optional_output_path_parameter = "OutputPath"
         required_summary_schema = "rrkal_displaytools.warm_frame_benchmark.v1"
         output_schema = "rrkal_displaytools.runtime_blend_timing_evidence_review.v1"
         next_instrumentation_gate = "data_ready_boundary_timing_gate"
@@ -156,6 +158,14 @@ $review = [pscustomobject]@{
     output_behavior_changed = $false
     metadata_schema_changed = $false
     runtime_merge_enabled = $false
+}
+
+if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
+    $outputDirectory = Split-Path -Parent $OutputPath
+    if (-not [string]::IsNullOrWhiteSpace($outputDirectory)) {
+        New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+    }
+    $review | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
 }
 
 if ($Json) {

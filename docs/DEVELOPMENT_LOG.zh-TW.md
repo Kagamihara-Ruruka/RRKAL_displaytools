@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend review summary artifact
+
+- Scope: added optional `-OutputPath` support to `review_runtime_blend_timing_evidence.ps1` and wired the runner to write an ignored review summary at `state/showcase/runtime_blend_timing_review/summary.json`.
+- Behavior: stdout review remains available; runner now leaves a persistent local evidence summary for demo-readiness review.
+- Safety: generated summary is ignored and must not be staged or committed.
 ## 2026-06-03 - c_3 smoke covers runtime blend review contracts
 
 - Scope: added fast contract-only checks for runtime_blend timing review scripts to `scripts/smoke.ps1`.
