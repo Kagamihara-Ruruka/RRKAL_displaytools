@@ -1,3 +1,9 @@
+## 2026-06-03 - c_3 demo readiness baseline doc
+
+- Scope: added `docs/DEMO_READINESS_BASELINE.zh-TW.md` and indexed it in `docs/DOCS_INDEX.zh-TW.md`.
+- Evidence: records the 2026-06-03 16:08 quick/repeated/warm/runtime_blend/smoke PASS baseline, including timing tables and current limits.
+- Boundary: document-only checkpoint; generated `state/` artifacts stay local; no runtime optimization, metadata schema change, runtime merge, or output behavior change.
+
 ## 2026-06-03 - c_3 fresh runtime blend baseline rerun
 
 - Scope: reran the existing renderer evidence baseline after `c474987` without changing renderer runtime behavior.
