@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend timing evidence review script
+
+- Scope: added `scripts/review_runtime_blend_timing_evidence.ps1` to read ignored default and high-density runtime_blend timing artifacts and summarize scaling, first-step timing, confidence, sync-risk attribution, and next gate.
+- Behavior: stdout-only by default with optional JSON stdout; no generated state artifacts are written by the review script.
+- Safety: review output keeps `optimization_authorized=false`, `metadata_schema_changed=false`, `runtime_merge_enabled=false`, and `output_behavior_changed=false`.
 ## 2026-06-03 - c_3 align runtime blend next gate label
 
 - Scope: aligned opt-in warm-frame analysis output so `runtime_blend_next_safe_target` points to `data_ready_boundary_timing_gate` after runtime_blend timing evidence is collected.
