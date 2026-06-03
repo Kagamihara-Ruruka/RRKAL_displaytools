@@ -1,3 +1,9 @@
+## 2026-06-03 - c_3 fresh runtime blend baseline rerun
+
+- Scope: reran the existing renderer evidence baseline after `c474987` without changing renderer runtime behavior.
+- Commands: `render_quick_smoke`, `render_repeated_quick_smoke -Frames 3`, `render_warm_frame_smoke`, high-density warm-frame, runtime_blend timing, high-density runtime_blend timing, and `smoke` all passed.
+- Evidence: default runtime_blend total stayed about 26 ms; high-density runtime_blend total stayed about 50 ms; first-step timing was roughly uniform with later steps in this run, so data-ready wait remains possible but not dominant.
+- Safety: generated evidence artifacts remained under ignored `state/`; metadata schema unchanged; runtime merge stayed disabled; no output behavior change was introduced.
 ## 2026-06-03 - c_3 clone quickstart runtime blend evidence runner
 
 - Scope: added runtime_blend timing evidence runner guidance to `docs/QUICKSTART_CLONE.zh-TW.md`.
