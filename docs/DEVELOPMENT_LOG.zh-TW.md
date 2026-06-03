@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend timing review smoke runner
+
+- Scope: added `scripts/runtime_blend_timing_review_smoke.ps1` to run default and high-density opt-in warm-frame evidence, then summarize both with `review_runtime_blend_timing_evidence.ps1`.
+- Behavior: orchestrates existing ignored evidence outputs only; no tracked PNG or JSON artifacts are written.
+- Safety: runner remains evidence-only and does not authorize runtime_blend optimization or interactive FPS readiness claims.
 ## 2026-06-03 - c_3 runtime blend timing evidence review script
 
 - Scope: added `scripts/review_runtime_blend_timing_evidence.ps1` to read ignored default and high-density runtime_blend timing artifacts and summarize scaling, first-step timing, confidence, sync-risk attribution, and next gate.
