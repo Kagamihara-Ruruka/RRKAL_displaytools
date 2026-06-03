@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend review contract-only mode
+
+- Scope: added `-ContractOnly` to `scripts/review_runtime_blend_timing_evidence.ps1` for clone/review contexts where ignored runtime_blend timing artifacts may not exist yet.
+- Behavior: contract-only mode prints expected artifact paths, schemas, next gate, and safety flags without reading or writing generated artifacts.
+- Safety: normal evidence review behavior remains unchanged.
 ## 2026-06-03 - c_3 runtime blend timing review smoke runner
 
 - Scope: added `scripts/runtime_blend_timing_review_smoke.ps1` to run default and high-density opt-in warm-frame evidence, then summarize both with `review_runtime_blend_timing_evidence.ps1`.

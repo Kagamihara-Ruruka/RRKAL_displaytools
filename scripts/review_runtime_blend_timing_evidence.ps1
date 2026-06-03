@@ -3,6 +3,7 @@ param(
     [string]$DefaultAnalysisPath,
     [string]$HighDensitySummaryPath,
     [string]$HighDensityAnalysisPath,
+    [switch]$ContractOnly,
     [switch]$Json
 )
 
@@ -20,6 +21,27 @@ if ([string]::IsNullOrWhiteSpace($HighDensitySummaryPath)) {
 }
 if ([string]::IsNullOrWhiteSpace($HighDensityAnalysisPath)) {
     $HighDensityAnalysisPath = Join-Path $repoRoot "state\showcase\warm_frame_smoke_runtime_blend_timing_high_density\analysis.json"
+}
+
+if ($ContractOnly) {
+    [pscustomobject]@{
+        schema = "rrkal_displaytools.runtime_blend_timing_evidence_review_contract.v1"
+        mode = "contract_only"
+        reads_generated_artifacts = $true
+        writes_generated_artifacts = $false
+        default_summary_path = $DefaultSummaryPath
+        default_analysis_path = $DefaultAnalysisPath
+        high_density_summary_path = $HighDensitySummaryPath
+        high_density_analysis_path = $HighDensityAnalysisPath
+        required_summary_schema = "rrkal_displaytools.warm_frame_benchmark.v1"
+        output_schema = "rrkal_displaytools.runtime_blend_timing_evidence_review.v1"
+        next_instrumentation_gate = "data_ready_boundary_timing_gate"
+        optimization_authorized = $false
+        metadata_schema_changed = $false
+        runtime_merge_enabled = $false
+        output_behavior_changed = $false
+    } | ConvertTo-Json -Depth 4
+    exit 0
 }
 
 function Read-JsonFile {
