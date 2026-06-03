@@ -14,6 +14,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $warmScript = Join-Path $PSScriptRoot "render_warm_frame_smoke.ps1"
 $reviewScript = Join-Path $PSScriptRoot "review_runtime_blend_timing_evidence.ps1"
 $reviewSummaryPath = Join-Path $repoRoot "state\showcase\runtime_blend_timing_review\summary.json"
+$reviewMarkdownPath = Join-Path $repoRoot "state\showcase\runtime_blend_timing_review\summary.md"
 
 if ($ContractOnly) {
     [pscustomobject]@{
@@ -22,8 +23,9 @@ if ($ContractOnly) {
         frames = $Frames
         default_command = "render_warm_frame_smoke.ps1 -Frames $Frames -RuntimeBlendTiming"
         high_density_command = "render_warm_frame_smoke.ps1 -Frames $Frames -HighDensityCompose -RuntimeBlendTiming"
-        review_command = "review_runtime_blend_timing_evidence.ps1 -OutputPath $reviewSummaryPath"
+        review_command = "review_runtime_blend_timing_evidence.ps1 -OutputPath $reviewSummaryPath -MarkdownPath $reviewMarkdownPath"
         review_summary_path = $reviewSummaryPath
+        review_markdown_path = $reviewMarkdownPath
         contract_only_reads_generated_artifacts = $false
         contract_only_writes_generated_artifacts = $false
         normal_mode_writes_ignored_artifacts = $true
@@ -50,7 +52,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "High-density runtime_blend timing warm-frame smoke failed"
 }
 
-$reviewArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $reviewScript, "-OutputPath", $reviewSummaryPath)
+$reviewArgs = @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", $reviewScript, "-OutputPath", $reviewSummaryPath, "-MarkdownPath", $reviewMarkdownPath)
 if ($Json) {
     $reviewArgs += "-Json"
 }

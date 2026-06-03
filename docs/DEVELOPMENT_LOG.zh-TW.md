@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend review Markdown summary
+
+- Scope: added optional Markdown summary output to `review_runtime_blend_timing_evidence.ps1` and wired `runtime_blend_timing_review_smoke.ps1` to emit `state/showcase/runtime_blend_timing_review/summary.md` next to the ignored JSON summary.
+- Behavior: Markdown is a human-readable mirror of the review result; JSON remains the machine-readable evidence summary.
+- Safety: generated Markdown remains ignored and must not be staged or committed.
 ## 2026-06-03 - c_3 runtime blend evidence command docs
 
 - Scope: documented runtime_blend evidence command entrypoints for contract-only review, artifact review, and full default plus high-density evidence loop.

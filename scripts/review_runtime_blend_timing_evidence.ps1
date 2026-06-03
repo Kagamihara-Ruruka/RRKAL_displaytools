@@ -4,6 +4,7 @@ param(
     [string]$HighDensitySummaryPath,
     [string]$HighDensityAnalysisPath,
     [string]$OutputPath,
+    [string]$MarkdownPath,
     [switch]$ContractOnly,
     [switch]$Json
 )
@@ -35,6 +36,7 @@ if ($ContractOnly) {
         high_density_summary_path = $HighDensitySummaryPath
         high_density_analysis_path = $HighDensityAnalysisPath
         optional_output_path_parameter = "OutputPath"
+        optional_markdown_path_parameter = "MarkdownPath"
         required_summary_schema = "rrkal_displaytools.warm_frame_benchmark.v1"
         output_schema = "rrkal_displaytools.runtime_blend_timing_evidence_review.v1"
         next_instrumentation_gate = "data_ready_boundary_timing_gate"
@@ -166,6 +168,42 @@ if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
         New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
     }
     $review | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
+}
+
+if (-not [string]::IsNullOrWhiteSpace($MarkdownPath)) {
+    $markdownDirectory = Split-Path -Parent $MarkdownPath
+    if (-not [string]::IsNullOrWhiteSpace($markdownDirectory)) {
+        New-Item -ItemType Directory -Force -Path $markdownDirectory | Out-Null
+    }
+    $markdown = @"
+# Runtime Blend Timing Evidence Review
+
+Schema: `$($review.schema)`
+
+## Summary
+
+- Step count ratio high-density/default: `$($review.step_count_ratio_high_density_over_default)`
+- Total timing ratio high-density/default: `$($review.total_timing_ratio_high_density_over_default)`
+- Roughly linear with step count: `$($review.roughly_linear_with_step_count)`
+- Sync-wait attribution: `$($review.sync_wait_attribution)`
+- Next instrumentation gate: `$($review.next_instrumentation_gate)`
+- Optimization authorized: `$($review.optimization_authorized)`
+- Metadata schema changed: `$($review.metadata_schema_changed)`
+- Runtime merge enabled: `$($review.runtime_merge_enabled)`
+- Output behavior changed: `$($review.output_behavior_changed)`
+
+## Modes
+
+| mode | runtime_blend_run_count | runtime_blend_total_ms_avg | first_runtime_blend_step_ms | non_first_runtime_blend_steps_avg_ms | timing_interpretation |
+| --- | ---: | ---: | ---: | ---: | --- |
+| default | $($defaultReview.runtime_blend_run_count) | $($defaultReview.runtime_blend_total_ms_avg) | $($defaultReview.first_runtime_blend_step_ms) | $($defaultReview.non_first_runtime_blend_steps_avg_ms) | $($defaultReview.timing_interpretation) |
+| high_density | $($highDensityReview.runtime_blend_run_count) | $($highDensityReview.runtime_blend_total_ms_avg) | $($highDensityReview.first_runtime_blend_step_ms) | $($highDensityReview.non_first_runtime_blend_steps_avg_ms) | $($highDensityReview.timing_interpretation) |
+
+## Boundary
+
+This report is evidence-only. It does not authorize runtime_blend optimization, alpha blending changes, layer ordering changes, output path changes, metadata sidecar schema changes, runtime merge, or interactive FPS readiness claims.
+"@
+    Set-Content -LiteralPath $MarkdownPath -Value $markdown -Encoding UTF8
 }
 
 if ($Json) {
