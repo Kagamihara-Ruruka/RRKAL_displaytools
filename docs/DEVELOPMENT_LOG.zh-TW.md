@@ -1,3 +1,13 @@
+## 2026-06-03 - c_3 preview interaction readiness boundary
+
+- Scope: added `docs/PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md` and indexed it in `docs/DOCS_INDEX.zh-TW.md`.
+- Evidence boundary: separated quick/repeated/warm/runtime_blend/demo-readiness renderer evidence from actual Qt/UI interactive loop readiness.
+- Demo baseline: clarified that `docs/DEMO_READINESS_BASELINE.zh-TW.md` is renderer/preview artifact evidence, not interactive FPS or full UI readiness.
+- Next gate: defined `Qt Preview Operation Evidence Gate` for future UI event-loop, preview refresh, and user-latency evidence.
+- Validation: reran quick, repeated 3-frame, repeated 5-frame, warm-frame, runtime_blend timing, and smoke; all passed.
+- Latest evidence: repeated 5-frame render avg `1017.780 ms`, warm-frame render avg `71.500 ms`, runtime_blend total avg `25.880 ms`.
+- Safety: docs-only; no UI implementation, runtime optimization, metadata schema change, runtime merge, or output behavior change.
+
 ## 2026-06-03 - c_3 data-ready gate baseline rerun
 
 - Scope: reran quick, repeated 3-frame, repeated 5-frame, warm-frame, high-density warm-frame, runtime_blend timing, high-density runtime_blend timing, and smoke for data-ready gate review.

@@ -64,6 +64,20 @@ Runtime-blend timing review:
 - First runtime_blend step timing is close to later steps in this run, so data-ready wait remains possible but was not dominant in this baseline.
 - This is not a UI interactive frame-rate claim. It is renderer preview and warm-frame evidence for demo-readiness judgment.
 
+## Preview interaction readiness boundary
+
+This baseline is renderer/preview artifact evidence only.
+
+It does not prove:
+
+- Qt event loop responsiveness.
+- preview refresh timing inside the running UI.
+- user interaction latency.
+- interactive FPS readiness.
+- full UI readiness.
+
+The next UI-facing evidence gate is documented in `docs/PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md`. Until that gate has UI-path evidence, demo-readiness wording must stay limited to renderer preview artifacts and warm-frame timing.
+
 ## Next safe action
 
 Use the data-ready boundary timing gate before any deeper runtime_blend instrumentation:
