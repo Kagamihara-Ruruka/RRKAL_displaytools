@@ -105,3 +105,30 @@ Decision classification: `requires_non_invasive_instrumentation_review`.
 - Compatibility: renderer output metadata sidecar remains `rrkal_displaytools.renderer_output_metadata.v1`; runtime merge remains disabled.
 - Rendering boundary: this is timing evidence only. It does not change alpha, blending, layer ordering, output paths, or expected output pixels.
 - Measurement limitation: runtime_blend step timing can include CPU/GPU synchronization or data-ready wait. The first runtime_blend step is especially likely to include non-blend wait time, so evidence must not be used as optimization proof without a follow-up parity gate.
+
+## Runtime Blend Timing Evidence Review
+
+Date: 2026-06-03
+
+Observed evidence:
+
+- Default runtime_blend timing used 3 runtime_blend steps and averaged about 26.3 ms total per frame.
+- High-density runtime_blend timing used 6 runtime_blend steps and averaged about 54.3 ms total per frame.
+- The total timing scales roughly with runtime_blend step count, so current evidence points to per-step runtime_blend cost rather than an alpha-compose collapse candidate.
+- Default first-step timing averaged about 8.7 ms and did not exceed non-first steps in this run.
+- High-density first-step timing averaged about 10.0 ms versus about 8.9 ms for non-first steps. This is slightly higher, but not enough to prove CPU/GPU sync or data-ready wait as the dominant cost.
+- Compose overlay timing remains larger than runtime_blend total by a small residual amount, consistent with alpha compose and style-profile postprocess work still running in the same compose phase.
+
+Ambiguity and attribution limits:
+
+- The current runtime_blend timing is step-level evidence only.
+- It cannot fully separate blend math from data-ready waits, CPU/GPU synchronization, command dispatch overhead, or Taichi backend scheduling.
+- The first runtime_blend step may include data-ready wait, but this run does not show a consistently dominant first-step inflation.
+- This evidence is not an optimization authorization and is not an interactive FPS readiness claim.
+
+Design classification:
+
+- Next step classification: `need_data_ready_boundary_timing_design`.
+- Recommended insertion point: immediately before and after the first runtime_blend dispatch inside `HybridRenderController.apply_layer_render_plan_composition()`.
+- Expected behavior: evidence-only timing around data-ready / dispatch boundary; output pixels, layer ordering, alpha blending, metadata sidecar schema, and runtime merge behavior should remain unchanged.
+- Validation requirement: smoke plus warm-frame timing evidence is necessary. Pixel parity should be required before any later optimization, merge, blend rewrite, array-copy rewrite, or layer-order change.

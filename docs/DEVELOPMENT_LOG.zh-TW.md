@@ -1,3 +1,10 @@
+## 2026-06-03 - c_3 runtime blend timing evidence review
+
+- Scope: reviewed opt-in runtime_blend timing evidence after `73ffb62` and added clearer interpretation fields to the warm-frame smoke analysis output.
+- Evidence: default mode averaged about 26.3 ms for 3 runtime_blend steps; high-density mode averaged about 54.3 ms for 6 runtime_blend steps.
+- Finding: timing scales roughly with runtime_blend step count; first-step timing is not conclusively inflated enough to separate blend math from CPU/GPU sync or data-ready wait.
+- Decision: next design classification is `need_data_ready_boundary_timing_design`; no runtime_blend optimization is authorized by this evidence.
+- Safety: metadata schema remains unchanged, runtime merge remains disabled, and expected output pixels remain unchanged.
 ## 2026-06-03 - c_3 opt-in runtime blend timing evidence
 
 - Scope: added opt-in runtime_blend step timing evidence for warm-frame smoke review.

@@ -363,6 +363,43 @@ $runtimeBlendStepTimingRows = @(
         }
     }
 )
+$firstRuntimeBlendStepRows = @(
+    $runtimeBlendStepTimingRows |
+        Where-Object { $_.first_runtime_blend_step_may_include_data_ready_wait -eq $true }
+)
+$nonFirstRuntimeBlendStepRows = @(
+    $runtimeBlendStepTimingRows |
+        Where-Object { $_.first_runtime_blend_step_may_include_data_ready_wait -ne $true }
+)
+$firstRuntimeBlendStepMs = $null
+if ($firstRuntimeBlendStepRows.Count -gt 0) {
+    $firstRuntimeBlendStepMs = [math]::Round(
+        [double](($firstRuntimeBlendStepRows | Measure-Object -Property runtime_blend_step_ms -Average).Average),
+        3
+    )
+}
+$nonFirstRuntimeBlendStepsAvgMs = $null
+if ($nonFirstRuntimeBlendStepRows.Count -gt 0) {
+    $nonFirstRuntimeBlendStepsAvgMs = [math]::Round(
+        [double](($nonFirstRuntimeBlendStepRows | Measure-Object -Property runtime_blend_step_ms -Average).Average),
+        3
+    )
+}
+$runtimeBlendTimingInterpretation = "not_collected"
+$runtimeBlendTimingConfidence = "not_collected"
+if ($runtimeBlendTimingEnabled) {
+    if ($null -ne $firstRuntimeBlendStepMs -and $null -ne $nonFirstRuntimeBlendStepsAvgMs) {
+        $runtimeBlendTimingConfidence = "limited_warm_frame_evidence"
+        if ($firstRuntimeBlendStepMs -gt ($nonFirstRuntimeBlendStepsAvgMs * 1.5)) {
+            $runtimeBlendTimingInterpretation = "first_step_higher_possible_sync_wait"
+        } else {
+            $runtimeBlendTimingInterpretation = "roughly_uniform_steps_sync_wait_not_dominant_in_current_run"
+        }
+    } else {
+        $runtimeBlendTimingConfidence = "insufficient_runtime_blend_rows"
+        $runtimeBlendTimingInterpretation = "insufficient_runtime_blend_rows"
+    }
+}
 $inputStepCount = if ($null -ne $composeQueuePacket.input_step_count) { [int]$composeQueuePacket.input_step_count } else { 0 }
 $executableStepCount = if ($null -ne $composeQueuePacket.executable_step_count) { [int]$composeQueuePacket.executable_step_count } else { $composeQueue.Count }
 $skippedStepCount = if ($null -ne $composeQueuePacket.skipped_step_count) { [int]$composeQueuePacket.skipped_step_count } else { $skippedSteps.Count }
@@ -409,6 +446,11 @@ $composeAssessment = [ordered]@{
     runtime_blend_step_timings = $runtimeBlendStepTimingRows
     runtime_blend_total_ms = $lastRuntimeBlendTimingPacket.runtime_blend_total_ms
     runtime_blend_total_ms_avg = $summary.runtime_blend_total_ms_avg
+    first_runtime_blend_step_ms = $firstRuntimeBlendStepMs
+    non_first_runtime_blend_steps_avg_ms = $nonFirstRuntimeBlendStepsAvgMs
+    first_step_may_include_data_ready_wait = if ($RuntimeBlendTiming) { $summary.first_runtime_blend_step_may_include_data_ready_wait } else { $false }
+    runtime_blend_timing_interpretation = $runtimeBlendTimingInterpretation
+    runtime_blend_timing_confidence = $runtimeBlendTimingConfidence
     runtime_blend_timing_limitations = $summary.runtime_blend_timing_limitations
     gpu_cpu_sync_misattribution_risk = $summary.gpu_cpu_sync_misattribution_risk
     timing_includes_possible_sync_wait = $summary.timing_includes_possible_sync_wait
@@ -469,6 +511,11 @@ $analysis = [ordered]@{
     runtime_blend_step_timings = $runtimeBlendStepTimingRows
     runtime_blend_total_ms = $lastRuntimeBlendTimingPacket.runtime_blend_total_ms
     runtime_blend_total_ms_avg = $summary.runtime_blend_total_ms_avg
+    first_runtime_blend_step_ms = $firstRuntimeBlendStepMs
+    non_first_runtime_blend_steps_avg_ms = $nonFirstRuntimeBlendStepsAvgMs
+    first_step_may_include_data_ready_wait = if ($RuntimeBlendTiming) { $summary.first_runtime_blend_step_may_include_data_ready_wait } else { $false }
+    runtime_blend_timing_interpretation = $runtimeBlendTimingInterpretation
+    runtime_blend_timing_confidence = $runtimeBlendTimingConfidence
     runtime_blend_timing_limitations = $summary.runtime_blend_timing_limitations
     gpu_cpu_sync_misattribution_risk = $summary.gpu_cpu_sync_misattribution_risk
     timing_includes_possible_sync_wait = $summary.timing_includes_possible_sync_wait
@@ -524,6 +571,11 @@ Write-Host "Compose overlay assessment:"
     runtime_blend_timing_enabled = $composeAssessment.runtime_blend_timing_enabled
     runtime_blend_total_ms = $composeAssessment.runtime_blend_total_ms
     runtime_blend_total_ms_avg = $composeAssessment.runtime_blend_total_ms_avg
+    first_runtime_blend_step_ms = $composeAssessment.first_runtime_blend_step_ms
+    non_first_runtime_blend_steps_avg_ms = $composeAssessment.non_first_runtime_blend_steps_avg_ms
+    first_step_may_include_data_ready_wait = $composeAssessment.first_step_may_include_data_ready_wait
+    runtime_blend_timing_interpretation = $composeAssessment.runtime_blend_timing_interpretation
+    runtime_blend_timing_confidence = $composeAssessment.runtime_blend_timing_confidence
     gpu_cpu_sync_misattribution_risk = $composeAssessment.gpu_cpu_sync_misattribution_risk
     runtime_blend_next_safe_target = $composeAssessment.runtime_blend_next_safe_target
     alpha_compose_run_count = $composeAssessment.alpha_compose_run_count
