@@ -147,6 +147,10 @@ Suggested future classification:
 
 `need_qt_preview_operation_evidence_gate_before_ui_readiness_claim`
 
+Gate draft:
+
+- See `docs/QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md` for the detailed measurement plan, future smoke concept, invariants, and stop conditions.
+
 ## 2026-06-03 audit baseline rerun
 
 The audit reran the safe renderer evidence subset after HEAD `5650f99`.

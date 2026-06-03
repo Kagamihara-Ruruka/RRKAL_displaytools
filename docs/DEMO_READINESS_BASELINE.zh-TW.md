@@ -76,7 +76,7 @@ It does not prove:
 - interactive FPS readiness.
 - full UI readiness.
 
-The next UI-facing evidence gate is documented in `docs/PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md`. Until that gate has UI-path evidence, demo-readiness wording must stay limited to renderer preview artifacts and warm-frame timing.
+The next UI-facing evidence gate is documented in `docs/PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md` and drafted in `docs/QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md`. Until that gate has UI-path evidence, demo-readiness wording must stay limited to renderer preview artifacts and warm-frame timing.
 
 ## Next safe action
 

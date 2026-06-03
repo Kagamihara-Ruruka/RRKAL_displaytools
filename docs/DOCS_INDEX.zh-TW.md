@@ -24,6 +24,7 @@
 - `RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md`: runtime-blend subphase timing feasibility, safe insertion points, and parity/safety gate before instrumentation.
 - `DEMO_READINESS_BASELINE.zh-TW.md`: latest renderer preview, repeated quick render, warm-frame, and runtime-blend timing evidence for demo-readiness judgment.
 - `PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md`: boundary between renderer preview evidence and future Qt/UI interactive readiness evidence.
+- `QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md`: proposed future Qt preview operation evidence gate for event-loop, preview-refresh, and user-latency measurement.
 
 ## Positioning
 

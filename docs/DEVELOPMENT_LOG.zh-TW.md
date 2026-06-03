@@ -1,3 +1,12 @@
+## 2026-06-03 - c_3 Qt preview operation evidence gate draft
+
+- Scope: added `docs/QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md` and linked it from the preview interaction boundary, demo baseline, and docs index.
+- Gate design: defines future evidence for UI event-loop non-blocking behavior, preview refresh timing, frame-to-frame interaction timing, layer/camera operation latency, artifact invariants, and conservative no-FPS-overclaim reporting.
+- Future smoke: proposes `qt_preview_operation_smoke` as opt-in-only, machine-readable evidence that fails conservatively if the UI path is unavailable.
+- Validation: reran quick, repeated 3-frame, repeated 5-frame, warm-frame, runtime_blend timing, and smoke; all passed.
+- Latest evidence: repeated 5-frame render avg `1054.000 ms`, warm-frame render avg `82.630 ms`, runtime_blend total avg `26.122 ms`; still renderer evidence only.
+- Boundary: docs/evidence-gate-design only; no UI implementation, Qt event-loop code, runtime optimization, metadata schema change, runtime merge, or output behavior change.
+
 ## 2026-06-03 - c_3 preview interaction readiness boundary
 
 - Scope: added `docs/PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md` and indexed it in `docs/DOCS_INDEX.zh-TW.md`.
