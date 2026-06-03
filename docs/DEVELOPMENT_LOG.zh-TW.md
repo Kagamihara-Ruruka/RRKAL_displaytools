@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend evidence command docs
+
+- Scope: documented runtime_blend evidence command entrypoints for contract-only review, artifact review, and full default plus high-density evidence loop.
+- Output: documented ignored summary path `state/showcase/runtime_blend_timing_review/summary.json`.
+- Safety: command docs explicitly keep runtime_blend optimization, runtime merge, metadata schema changes, and interactive FPS claims unauthorized.
 ## 2026-06-03 - c_3 runtime blend review summary artifact
 
 - Scope: added optional `-OutputPath` support to `review_runtime_blend_timing_evidence.ps1` and wired the runner to write an ignored review summary at `state/showcase/runtime_blend_timing_review/summary.json`.

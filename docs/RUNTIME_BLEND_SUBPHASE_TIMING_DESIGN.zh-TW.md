@@ -174,3 +174,37 @@ Stop conditions:
 Current classification:
 
 `need_data_ready_boundary_timing_design_complete_before_instrumentation`
+
+## Runtime Blend Evidence Command Entrypoints
+
+Date: 2026-06-03
+
+Fast contract-only checks:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\review_runtime_blend_timing_evidence.ps1 -ContractOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\runtime_blend_timing_review_smoke.ps1 -ContractOnly
+```
+
+Read existing ignored evidence artifacts and print a review:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\review_runtime_blend_timing_evidence.ps1
+```
+
+Run the full default plus high-density opt-in evidence loop and write the ignored review summary:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\runtime_blend_timing_review_smoke.ps1 -Frames 3
+```
+
+Ignored review summary output:
+
+```text
+state/showcase/runtime_blend_timing_review/summary.json
+```
+
+Interpretation boundary:
+
+- These commands collect and summarize evidence only.
+- They do not authorize runtime_blend optimization, alpha blending changes, layer ordering changes, output path changes, metadata sidecar schema changes, runtime merge, or interactive FPS readiness claims.
