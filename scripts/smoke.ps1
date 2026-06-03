@@ -8604,6 +8604,9 @@ if ($runtimeBlendTimingReviewContract.schema -ne "rrkal_displaytools.runtime_ble
 if ($runtimeBlendTimingReviewContract.writes_generated_artifacts -ne $false) {
     throw "Runtime blend timing evidence review contract must not write generated artifacts"
 }
+if ($runtimeBlendTimingReviewContract.optional_markdown_path_parameter -ne "MarkdownPath") {
+    throw "Runtime blend timing evidence review Markdown output parameter missing"
+}
 if ($runtimeBlendTimingReviewContract.next_instrumentation_gate -ne "data_ready_boundary_timing_gate") {
     throw "Runtime blend timing evidence review next gate mismatch"
 }
@@ -8620,6 +8623,9 @@ if ($runtimeBlendTimingReviewSmokeContract.contract_only_writes_generated_artifa
 }
 if ($runtimeBlendTimingReviewSmokeContract.normal_mode_writes_ignored_artifacts -ne $true) {
     throw "Runtime blend timing review smoke normal mode ignored artifact disclosure missing"
+}
+if ($runtimeBlendTimingReviewSmokeContract.review_markdown_path -notmatch "runtime_blend_timing_review.*summary.md") {
+    throw "Runtime blend timing review smoke Markdown summary path missing"
 }
 if ($runtimeBlendTimingReviewSmokeContract.optimization_authorized -ne $false) {
     throw "Runtime blend timing review smoke must not authorize optimization"

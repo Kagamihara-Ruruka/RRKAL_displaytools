@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 smoke covers runtime blend Markdown review contract
+
+- Scope: extended `scripts/smoke.ps1` to verify the runtime_blend review Markdown output contract.
+- Behavior: smoke checks that `review_runtime_blend_timing_evidence.ps1 -ContractOnly` exposes `MarkdownPath` and the runner contract exposes `summary.md` under the ignored review summary directory.
+- Safety: no renderer runtime behavior, metadata schema, output path, or expected pixel change.
 ## 2026-06-03 - c_3 runtime blend review Markdown summary
 
 - Scope: added optional Markdown summary output to `review_runtime_blend_timing_evidence.ps1` and wired `runtime_blend_timing_review_smoke.ps1` to emit `state/showcase/runtime_blend_timing_review/summary.md` next to the ignored JSON summary.
