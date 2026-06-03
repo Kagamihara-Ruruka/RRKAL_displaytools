@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 data-ready gate packet output
+
+- Scope: added optional `-OutputPath` and `-MarkdownPath` to `scripts/export_runtime_blend_data_ready_gate.ps1` for ignored JSON/Markdown review packet output.
+- Behavior: `-ContractOnly` remains no-write; normal mode can write gate packets for o_1 review bundles.
+- Safety: `scripts/smoke.ps1` now verifies the output-path contract without authorizing runtime_blend instrumentation or optimization.
 ## 2026-06-03 - c_3 data-ready gate contract docs
 
 - Scope: documented `scripts/export_runtime_blend_data_ready_gate.ps1 -ContractOnly` as the first artifact for any future runtime_blend data-ready boundary instrumentation review.

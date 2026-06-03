@@ -8641,6 +8641,12 @@ if ($runtimeBlendDataReadyGate.future_instrumentation_touches_renderer_core -ne 
 if ($runtimeBlendDataReadyGate.separate_review_required -ne $true) {
     throw "Runtime blend data-ready gate must require separate review"
 }
+if ($runtimeBlendDataReadyGate.optional_output_path_parameter -ne "OutputPath") {
+    throw "Runtime blend data-ready gate output path parameter missing"
+}
+if ($runtimeBlendDataReadyGate.optional_markdown_path_parameter -ne "MarkdownPath") {
+    throw "Runtime blend data-ready gate Markdown path parameter missing"
+}
 if (@($runtimeBlendDataReadyGate.candidate_boundaries.id) -notcontains "runtime_blend_call_ms") {
     throw "Runtime blend data-ready gate runtime_blend call boundary missing"
 }

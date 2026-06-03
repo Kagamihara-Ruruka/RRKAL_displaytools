@@ -1,4 +1,6 @@
 param(
+    [string]$OutputPath,
+    [string]$MarkdownPath,
     [switch]$ContractOnly
 )
 
@@ -72,8 +74,61 @@ $gate = [pscustomobject]@{
 }
 
 if ($ContractOnly) {
-    $gate | ConvertTo-Json -Depth 6
+    $contract = [ordered]@{}
+    foreach ($property in $gate.PSObject.Properties) {
+        $contract[$property.Name] = $property.Value
+    }
+    $contract["optional_output_path_parameter"] = "OutputPath"
+    $contract["optional_markdown_path_parameter"] = "MarkdownPath"
+    [pscustomobject]$contract | ConvertTo-Json -Depth 6
     exit 0
+}
+
+if (-not [string]::IsNullOrWhiteSpace($OutputPath)) {
+    $outputDirectory = Split-Path -Parent $OutputPath
+    if (-not [string]::IsNullOrWhiteSpace($outputDirectory)) {
+        New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+    }
+    $gate | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding UTF8
+}
+
+if (-not [string]::IsNullOrWhiteSpace($MarkdownPath)) {
+    $markdownDirectory = Split-Path -Parent $MarkdownPath
+    if (-not [string]::IsNullOrWhiteSpace($markdownDirectory)) {
+        New-Item -ItemType Directory -Force -Path $markdownDirectory | Out-Null
+    }
+    $candidateBoundaryList = @($gate.candidate_boundaries | ForEach-Object { "- `$($_.id)`: $($_.intent)" }) -join "`n"
+    $validationList = @($gate.validation_required | ForEach-Object { "- `$_" }) -join "`n"
+    $stopList = @($gate.stop_conditions | ForEach-Object { "- `$_" }) -join "`n"
+    $markdown = @"
+# Runtime Blend Data-Ready Boundary Gate
+
+Schema: `$($gate.schema)`
+
+## Boundary
+
+- Future instrumentation touches renderer core: `$($gate.future_instrumentation_touches_renderer_core)`
+- Separate review required: `$($gate.separate_review_required)`
+- Optimization authorized: `$($gate.optimization_authorized)`
+- Metadata schema changed: `$($gate.metadata_schema_changed)`
+- Runtime merge enabled: `$($gate.runtime_merge_enabled)`
+- Output behavior changed: `$($gate.output_behavior_changed)`
+
+## Candidate timing boundaries
+
+$candidateBoundaryList
+
+## Required validation
+
+$validationList
+
+## Stop conditions
+
+$stopList
+
+This gate is a review artifact only. It does not authorize runtime_blend optimization or interactive FPS readiness claims.
+"@
+    Set-Content -LiteralPath $MarkdownPath -Value $markdown -Encoding UTF8
 }
 
 $gate | ConvertTo-Json -Depth 6
