@@ -334,6 +334,9 @@ $runtimeBlendNextSafeTarget = switch ($decisionClassification) {
     default { "targeted_compose_evidence_review" }
 }
 $runtimeBlendTimingEnabled = $summary.runtime_blend_timing_enabled -eq $true
+if ($runtimeBlendTimingEnabled -and $runtimeBlendNextSafeTarget -eq "runtime_blend_subphase_timing_design") {
+    $runtimeBlendNextSafeTarget = "data_ready_boundary_timing_gate"
+}
 $runtimeBlendTimingPackets = @(
     $results | ForEach-Object {
         $packet = $_.runtime_blend_timing

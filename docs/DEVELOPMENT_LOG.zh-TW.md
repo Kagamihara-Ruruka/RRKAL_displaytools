@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 align runtime blend next gate label
+
+- Scope: aligned opt-in warm-frame analysis output so `runtime_blend_next_safe_target` points to `data_ready_boundary_timing_gate` after runtime_blend timing evidence is collected.
+- Behavior: default non-opt-in analysis remains unchanged; renderer runtime, metadata sidecar schema, output paths, and expected pixels remain unchanged.
+- Safety: this is evidence-script labeling only and does not authorize runtime_blend optimization.
 ## 2026-06-03 - c_3 data-ready boundary timing gate design
 
 - Scope: documented the next runtime_blend data-ready boundary timing gate before any deeper instrumentation.
