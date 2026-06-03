@@ -73,3 +73,42 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\export_runtime_blend
 ```
 
 Any deeper boundary timing should be reviewed as a separate renderer-core slice before commit. Do not use this baseline as approval for runtime_blend optimization, alpha/blending changes, layer ordering changes, metadata schema changes, runtime merge, or output pixel behavior changes.
+
+## Data-ready gate baseline rerun
+
+Rerun time: 2026-06-03 22:02 +08
+
+| command | result | elapsed |
+| --- | --- | ---: |
+| `scripts\render_quick_smoke.ps1` | PASS | 29.417 s |
+| `scripts\render_repeated_quick_smoke.ps1 -Frames 3` | PASS | 41.439 s |
+| `scripts\render_repeated_quick_smoke.ps1 -Frames 5` | PASS | 66.601 s |
+| `scripts\render_warm_frame_smoke.ps1` | PASS | 36.199 s |
+| `scripts\render_warm_frame_smoke.ps1 -HighDensityCompose` | PASS | 43.916 s |
+| `scripts\render_warm_frame_smoke.ps1 -RuntimeBlendTiming` | PASS | 34.737 s |
+| `scripts\render_warm_frame_smoke.ps1 -HighDensityCompose -RuntimeBlendTiming` | PASS | 38.574 s |
+| `scripts\smoke.ps1` | PASS | 266.525 s |
+
+Latest 5-frame repeated quick summary:
+
+| metric | value |
+| --- | ---: |
+| render avg | 966.313 ms |
+| prepare_batches avg | 927.076 ms |
+| compose_overlays avg | 34.454 ms |
+| slowest phase ids | `prepare_batches` |
+
+Latest runtime_blend timing summary:
+
+| mode | runtime_blend runs | total avg | first-step avg | non-first avg |
+| --- | ---: | ---: | ---: | ---: |
+| default | 3 | 27.228 ms | 8.979 ms | 9.125 ms |
+| high-density | 6 | 51.615 ms | 8.621 ms | 8.599 ms |
+
+Interpretation:
+
+- Preview artifacts and metadata were emitted during the repeated quick runs.
+- Process-per-frame evidence remains dominated by `prepare_batches`.
+- In-process warm-frame evidence still shifts the final warm target toward `compose_overlays`.
+- First runtime_blend step timing was roughly uniform with later steps in both default and high-density timing modes.
+- Data-ready wait remains possible but is not dominant in this rerun; the next safe classification remains `need_data_ready_boundary_timing_design`.

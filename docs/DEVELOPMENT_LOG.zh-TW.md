@@ -1,3 +1,10 @@
+## 2026-06-03 - c_3 data-ready gate baseline rerun
+
+- Scope: reran quick, repeated 3-frame, repeated 5-frame, warm-frame, high-density warm-frame, runtime_blend timing, high-density runtime_blend timing, and smoke for data-ready gate review.
+- Evidence: all commands passed; latest runtime_blend timing stayed roughly uniform between first and non-first steps, with default total avg `27.228 ms` and high-density total avg `51.615 ms`.
+- Docs: updated `docs/RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md` and `docs/DEMO_READINESS_BASELINE.zh-TW.md` with the latest gate interpretation.
+- Boundary: docs-only evidence design; no runtime optimization, metadata schema change, runtime merge, or output behavior change.
+
 ## 2026-06-03 - c_3 repeated quick five-frame evidence
 
 - Scope: reran `scripts/render_repeated_quick_smoke.ps1 -Frames 5` as read-only process-per-frame preview evidence.

@@ -175,6 +175,33 @@ Current classification:
 
 `need_data_ready_boundary_timing_design_complete_before_instrumentation`
 
+### 2026-06-03 baseline rerun check
+
+The latest data-ready gate baseline rerun kept the design classification unchanged.
+
+Observed runtime_blend timing:
+
+| mode | runtime_blend runs | total avg | first-step avg | non-first avg | interpretation |
+| --- | ---: | ---: | ---: | ---: | --- |
+| default | 3 | 27.228 ms | 8.979 ms | 9.125 ms | roughly uniform steps |
+| high-density | 6 | 51.615 ms | 8.621 ms | 8.599 ms | roughly uniform steps |
+
+Current attribution:
+
+- The high-density/default total timing ratio is about 1.90 for a 2.00 step-count ratio, so timing still scales mainly with runtime_blend step count.
+- The first runtime_blend step was not higher than later steps in this run. A data-ready or CPU/GPU wait remains possible, but it was not dominant in the current evidence.
+- `compose_overlays` remains explainable as runtime_blend timing plus alpha compose, style-profile postprocess, and residual dispatch/allocation work.
+- The evidence is still not enough to split blend math from data-ready wait. The next safe classification remains `need_data_ready_boundary_timing_design`, not optimization.
+
+Gate decision:
+
+- `data-ready boundary` means the execution point where the queued composition step has resolved its layer id, overlay object, dispatch branch, and is about to call the existing runtime_blend path.
+- A future timer should measure `dispatch_ready_ms`, `runtime_blend_call_ms`, and `post_blend_return_ms` around that boundary, not inside blend math.
+- This future hook would touch renderer execution code and requires separate review before commit.
+- Validation should include smoke and warm-frame evidence for measurement-only changes, plus parity protection before any later behavior change.
+- Timing uncertainty should be labeled as possible backend synchronization or data-ready wait unless boundary evidence proves otherwise.
+- This gate is evidence design only and does not authorize runtime_blend optimization.
+
 ## Runtime Blend Evidence Command Entrypoints
 
 Date: 2026-06-03
