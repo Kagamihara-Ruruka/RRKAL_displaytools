@@ -38,6 +38,16 @@ Repeated quick render remains process-per-frame evidence:
 | 2 | 973.795 ms | 932.861 ms | 36.131 ms | `prepare_batches` |
 | 3 | 1001.787 ms | 959.475 ms | 37.390 ms | `prepare_batches` |
 
+Additional 5-frame process-per-frame stability rerun at 2026-06-03 16:20 +08:
+
+| frame | render | prepare_batches | compose_overlays | slowest phase |
+| --- | ---: | ---: | ---: | --- |
+| 1 | 1202.949 ms | 1157.801 ms | 36.767 ms | `prepare_batches` |
+| 2 | 973.808 ms | 933.590 ms | 35.392 ms | `prepare_batches` |
+| 3 | 961.468 ms | 921.175 ms | 35.530 ms | `prepare_batches` |
+| 4 | 967.843 ms | 927.154 ms | 36.071 ms | `prepare_batches` |
+| 5 | 972.716 ms | 932.181 ms | 35.909 ms | `prepare_batches` |
+
 Runtime-blend timing review:
 
 | mode | runtime_blend runs | total avg | first-step avg | non-first avg | interpretation |
@@ -48,6 +58,7 @@ Runtime-blend timing review:
 ## Interpretation
 
 - The quick and repeated quick paths are still dominated by `prepare_batches` because each run starts a renderer process.
+- The 5-frame repeated quick rerun kept preview emission stable; frame 1 was slower than later runs, but all five runs remained in the same `prepare_batches` bottleneck class.
 - In-process warm-frame evidence shifts the final warm-frame target toward `compose_overlays`.
 - Runtime-blend cost scales roughly with step count in the current evidence.
 - First runtime_blend step timing is close to later steps in this run, so data-ready wait remains possible but was not dominant in this baseline.

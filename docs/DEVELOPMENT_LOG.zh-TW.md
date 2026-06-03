@@ -1,3 +1,9 @@
+## 2026-06-03 - c_3 repeated quick five-frame evidence
+
+- Scope: reran `scripts/render_repeated_quick_smoke.ps1 -Frames 5` as read-only process-per-frame preview evidence.
+- Evidence: all five frames emitted render PNG, preview PNG, and metadata sidecar; frame timing stayed `prepare_batches` dominated.
+- Docs: updated `docs/DEMO_READINESS_BASELINE.zh-TW.md` with the 5-frame table and interpretation.
+
 ## 2026-06-03 - c_3 demo readiness baseline doc
 
 - Scope: added `docs/DEMO_READINESS_BASELINE.zh-TW.md` and indexed it in `docs/DOCS_INDEX.zh-TW.md`.
