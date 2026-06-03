@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 smoke covers runtime blend review contracts
+
+- Scope: added fast contract-only checks for runtime_blend timing review scripts to `scripts/smoke.ps1`.
+- Behavior: smoke now verifies review schemas, generated-artifact write guards, next gate, and optimization guard without launching the runtime_blend review runner.
+- Safety: no renderer runtime behavior, metadata sidecar schema, output path, or expected pixel change.
 ## 2026-06-03 - c_3 runtime blend review runner contract-only mode
 
 - Scope: added `-ContractOnly` to `scripts/runtime_blend_timing_review_smoke.ps1` so clone/review flows can inspect the runtime_blend evidence runner without launching Taichi.

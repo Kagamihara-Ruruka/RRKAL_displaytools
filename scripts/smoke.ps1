@@ -8596,6 +8596,35 @@ if (@($renderPlanPerformanceInspectorContract.required_contracts) -notcontains "
     throw "Layer render-plan performance inspector contract must expose LayerRenderState contract"
 }
 
+$runtimeBlendTimingReviewContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\review_runtime_blend_timing_evidence.ps1"), "-ContractOnly")
+$runtimeBlendTimingReviewContract = ($runtimeBlendTimingReviewContractText -join "`n") | ConvertFrom-Json
+if ($runtimeBlendTimingReviewContract.schema -ne "rrkal_displaytools.runtime_blend_timing_evidence_review_contract.v1") {
+    throw "Runtime blend timing evidence review contract schema missing"
+}
+if ($runtimeBlendTimingReviewContract.writes_generated_artifacts -ne $false) {
+    throw "Runtime blend timing evidence review contract must not write generated artifacts"
+}
+if ($runtimeBlendTimingReviewContract.next_instrumentation_gate -ne "data_ready_boundary_timing_gate") {
+    throw "Runtime blend timing evidence review next gate mismatch"
+}
+if ($runtimeBlendTimingReviewContract.optimization_authorized -ne $false) {
+    throw "Runtime blend timing evidence review must not authorize optimization"
+}
+$runtimeBlendTimingReviewSmokeContractText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\runtime_blend_timing_review_smoke.ps1"), "-ContractOnly")
+$runtimeBlendTimingReviewSmokeContract = ($runtimeBlendTimingReviewSmokeContractText -join "`n") | ConvertFrom-Json
+if ($runtimeBlendTimingReviewSmokeContract.schema -ne "rrkal_displaytools.runtime_blend_timing_review_smoke_contract.v1") {
+    throw "Runtime blend timing review smoke contract schema missing"
+}
+if ($runtimeBlendTimingReviewSmokeContract.contract_only_writes_generated_artifacts -ne $false) {
+    throw "Runtime blend timing review smoke contract-only mode must not write generated artifacts"
+}
+if ($runtimeBlendTimingReviewSmokeContract.normal_mode_writes_ignored_artifacts -ne $true) {
+    throw "Runtime blend timing review smoke normal mode ignored artifact disclosure missing"
+}
+if ($runtimeBlendTimingReviewSmokeContract.optimization_authorized -ne $false) {
+    throw "Runtime blend timing review smoke must not authorize optimization"
+}
+
 $runtimeOptimizationCapabilityText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\export_capability_summary.ps1"))
 $runtimeOptimizationCapability = ($runtimeOptimizationCapabilityText -join "`n") | ConvertFrom-Json
 $runtimeOptimizationCurrentIds = @($runtimeOptimizationCapability.current_capabilities | ForEach-Object { $_.id })
