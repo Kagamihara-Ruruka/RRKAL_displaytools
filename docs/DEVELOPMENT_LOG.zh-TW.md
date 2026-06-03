@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend GTD alignment
+
+- Scope: updated `docs/PROJECT_GTD.md` with the current runtime_blend evidence runner, data-ready gate contract, and next-step boundary.
+- Boundary: GTD now explicitly says not to optimize runtime_blend until Owner / o_1 approves renderer-core instrumentation through the data-ready gate.
+- Safety: docs-only change; no renderer runtime behavior changed.
 ## 2026-06-03 - c_3 runtime blend evidence handoff
 
 - Scope: updated `docs/AGENT_HANDOFF.zh-TW.md` with current runtime_blend evidence commands, ignored outputs, interpretation, and next data-ready gate boundary.

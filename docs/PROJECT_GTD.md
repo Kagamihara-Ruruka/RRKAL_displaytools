@@ -8,7 +8,7 @@
 - `L:\AGENT_EXCHANGE` 不進 GitHub；只把驗證後的決策或工程結果消化進本 repo 的 GTD / handoff / docs / OpenSpec / code。
 - 若 displaytools 發現需求或風險屬於其他專案，只寫交換區信件，不直接改對方 repo。
 
-Last updated: 2026-05-30
+Last updated: 2026-06-03
 
 ## Current focus
 
@@ -35,8 +35,19 @@ Last updated: 2026-05-30
 | Spatial compression roadmap | Planned | `spatial_compression_roadmap.py` records DWT, spherical harmonics and neural-field options as contract-only strategy, with Qt Replay/contracts inspect/copy actions. | After render-plan decoupling, prototype spherical-harmonics LOD and DWT residual contracts with `rrkal-visual-compressor`; keep neural fields research-only until parity evidence exists. |
 | Cloud/local workflow | MVP | `docs/WORKFLOW.zh-TW.md` and `docs/CODEX_CLOUD_HANDOFF.zh-TW.md` define GitHub as sync truth, `L:\\RRKAL_displaytools` as the local cloud-drive working copy, Codex Cloud as the long-running code/docs/CI surface, and local Windows as Qt/Taichi visual validation authority. | Convert the conversation backup step into a reusable skill after the private transcript repo policy is confirmed. |
 
-## Working rules
 
+## 2026-06-03 - Runtime blend evidence and data-ready gate
+
+Done:
+- Added opt-in runtime_blend timing review scripts, one-command evidence runner, ignored JSON/Markdown summaries, and smoke-covered contract checks.
+- Added `rrkal_displaytools.runtime_blend_data_ready_boundary_gate.v1` as the next review gate before renderer-core data-ready timing instrumentation.
+- Updated handoff and runtime_blend design docs so cloned machines can run contract-only checks or the full local evidence loop.
+
+Next:
+- Do not optimize runtime_blend yet.
+- If Owner / o_1 approves renderer-core instrumentation, start with the data-ready boundary gate and keep it evidence-only before any parity-sensitive change.
+
+## Working rules
 - Visualization-first: renderer, material, style, LOD, diagnostics, display contracts.
 - Qt/PyQt6-first for displaytools control UI; do not introduce Tk as the main UI path.
 - RRKAL-first data governance: dataset discovery, download, import, install registry, manifest, cache lifecycle, and asset repair belong to `APIkeys_collection`.
