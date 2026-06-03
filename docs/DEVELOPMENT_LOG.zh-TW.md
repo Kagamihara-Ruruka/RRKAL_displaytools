@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend data-ready gate contract
+
+- Scope: added `scripts/export_runtime_blend_data_ready_gate.ps1` as a contract-only exporter for the next runtime_blend data-ready boundary timing gate.
+- Contract: discloses the future renderer-core insertion point, candidate timing boundaries, required validation, parity requirements, stop conditions, and forbidden scope.
+- Safety: `scripts/smoke.ps1` now verifies the gate contract without authorizing runtime_blend optimization or metadata schema changes.
 ## 2026-06-03 - c_3 smoke covers runtime blend Markdown review contract
 
 - Scope: extended `scripts/smoke.ps1` to verify the runtime_blend review Markdown output contract.

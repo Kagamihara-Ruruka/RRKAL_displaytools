@@ -8630,6 +8630,26 @@ if ($runtimeBlendTimingReviewSmokeContract.review_markdown_path -notmatch "runti
 if ($runtimeBlendTimingReviewSmokeContract.optimization_authorized -ne $false) {
     throw "Runtime blend timing review smoke must not authorize optimization"
 }
+$runtimeBlendDataReadyGateText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\export_runtime_blend_data_ready_gate.ps1"), "-ContractOnly")
+$runtimeBlendDataReadyGate = ($runtimeBlendDataReadyGateText -join "`n") | ConvertFrom-Json
+if ($runtimeBlendDataReadyGate.schema -ne "rrkal_displaytools.runtime_blend_data_ready_boundary_gate.v1") {
+    throw "Runtime blend data-ready boundary gate schema missing"
+}
+if ($runtimeBlendDataReadyGate.future_instrumentation_touches_renderer_core -ne $true) {
+    throw "Runtime blend data-ready gate must disclose renderer core touch"
+}
+if ($runtimeBlendDataReadyGate.separate_review_required -ne $true) {
+    throw "Runtime blend data-ready gate must require separate review"
+}
+if (@($runtimeBlendDataReadyGate.candidate_boundaries.id) -notcontains "runtime_blend_call_ms") {
+    throw "Runtime blend data-ready gate runtime_blend call boundary missing"
+}
+if ($runtimeBlendDataReadyGate.optimization_authorized -ne $false) {
+    throw "Runtime blend data-ready gate must not authorize optimization"
+}
+if ($runtimeBlendDataReadyGate.metadata_schema_changed -ne $false) {
+    throw "Runtime blend data-ready gate must keep metadata schema unchanged"
+}
 
 $runtimeOptimizationCapabilityText = Invoke-CapturedNative powershell @("-NoProfile", "-ExecutionPolicy", "Bypass", "-File", (Join-Path $RepoRoot "scripts\export_capability_summary.ps1"))
 $runtimeOptimizationCapability = ($runtimeOptimizationCapabilityText -join "`n") | ConvertFrom-Json
