@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend evidence handoff
+
+- Scope: updated `docs/AGENT_HANDOFF.zh-TW.md` with current runtime_blend evidence commands, ignored outputs, interpretation, and next data-ready gate boundary.
+- Boundary: handoff states that future data-ready timing touches renderer core and requires separate review before commit.
+- Safety: no renderer runtime behavior, metadata schema, runtime merge, or expected output behavior changed.
 ## 2026-06-03 - c_3 runtime blend runner emits data-ready gate packet
 
 - Scope: wired `runtime_blend_timing_review_smoke.ps1` to emit the ignored data-ready gate JSON/Markdown packet after runtime_blend evidence review.

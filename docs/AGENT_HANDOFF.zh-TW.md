@@ -76,3 +76,20 @@
 - Do not import Qt, Taichi, Matplotlib, Plotly, VisPy, PyVista or VTK into `display_core/` or current `display_runtime/` skeletons before explicit adapter parity work.
 - Do not move RRKAL crawler/download/import/cache performance smoke into this repo; displaytools owns renderer/config/UI telemetry only.
 - Codex Cloud can work from GitHub and handoff docs, but local Qt/Taichi/GPU visual validation remains a local responsibility.
+
+## Current runtime_blend evidence handoff
+
+- Latest runtime_blend evidence path is evidence-only; it does not authorize runtime_blend optimization, runtime merge, metadata schema changes, output pixel changes, or interactive FPS readiness claims.
+- Fast contract checks:
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\review_runtime_blend_timing_evidence.ps1 -ContractOnly`
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\runtime_blend_timing_review_smoke.ps1 -ContractOnly`
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\export_runtime_blend_data_ready_gate.ps1 -ContractOnly`
+- Full local evidence runner:
+  - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\runtime_blend_timing_review_smoke.ps1 -Frames 3`
+- Ignored local outputs:
+  - `state/showcase/runtime_blend_timing_review/summary.json`
+  - `state/showcase/runtime_blend_timing_review/summary.md`
+  - `state/showcase/runtime_blend_data_ready_gate/gate.json`
+  - `state/showcase/runtime_blend_data_ready_gate/gate.md`
+- Current interpretation: runtime_blend timing scales roughly with step count; current evidence labels CPU/GPU sync or data-ready wait as possible but not dominant in the latest runs.
+- Next safe gate: inspect `rrkal_displaytools.runtime_blend_data_ready_boundary_gate.v1` before any renderer-core instrumentation. Future data-ready boundary timing touches renderer core and requires separate review before commit.
