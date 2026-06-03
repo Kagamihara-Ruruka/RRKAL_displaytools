@@ -1,5 +1,6 @@
 param(
     [int]$Frames = 3,
+    [switch]$ContractOnly,
     [switch]$Json
 )
 
@@ -12,6 +13,26 @@ if ($Frames -lt 2) {
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $warmScript = Join-Path $PSScriptRoot "render_warm_frame_smoke.ps1"
 $reviewScript = Join-Path $PSScriptRoot "review_runtime_blend_timing_evidence.ps1"
+
+if ($ContractOnly) {
+    [pscustomobject]@{
+        schema = "rrkal_displaytools.runtime_blend_timing_review_smoke_contract.v1"
+        mode = "contract_only"
+        frames = $Frames
+        default_command = "render_warm_frame_smoke.ps1 -Frames $Frames -RuntimeBlendTiming"
+        high_density_command = "render_warm_frame_smoke.ps1 -Frames $Frames -HighDensityCompose -RuntimeBlendTiming"
+        review_command = "review_runtime_blend_timing_evidence.ps1"
+        contract_only_reads_generated_artifacts = $false
+        contract_only_writes_generated_artifacts = $false
+        normal_mode_writes_ignored_artifacts = $true
+        next_instrumentation_gate = "data_ready_boundary_timing_gate"
+        optimization_authorized = $false
+        metadata_schema_changed = $false
+        runtime_merge_enabled = $false
+        output_behavior_changed = $false
+    } | ConvertTo-Json -Depth 4
+    exit 0
+}
 
 Write-Host "Runtime blend timing review smoke"
 Write-Host "Repo: $repoRoot"

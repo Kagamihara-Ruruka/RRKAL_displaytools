@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend review runner contract-only mode
+
+- Scope: added `-ContractOnly` to `scripts/runtime_blend_timing_review_smoke.ps1` so clone/review flows can inspect the runtime_blend evidence runner without launching Taichi.
+- Behavior: contract-only mode prints planned commands and safety flags; normal mode remains the same evidence runner over ignored warm-frame artifacts.
+- Safety: no runtime behavior, metadata sidecar schema, output path, or expected pixel change.
 ## 2026-06-03 - c_3 runtime blend review contract-only mode
 
 - Scope: added `-ContractOnly` to `scripts/review_runtime_blend_timing_evidence.ps1` for clone/review contexts where ignored runtime_blend timing artifacts may not exist yet.
