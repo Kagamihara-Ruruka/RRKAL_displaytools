@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 data-ready gate contract docs
+
+- Scope: documented `scripts/export_runtime_blend_data_ready_gate.ps1 -ContractOnly` as the first artifact for any future runtime_blend data-ready boundary instrumentation review.
+- Boundary: the contract states that future instrumentation touches renderer core and requires separate review before commit.
+- Safety: docs continue to keep optimization authorization false and metadata/runtime/output behavior unchanged.
 ## 2026-06-03 - c_3 runtime blend data-ready gate contract
 
 - Scope: added `scripts/export_runtime_blend_data_ready_gate.ps1` as a contract-only exporter for the next runtime_blend data-ready boundary timing gate.

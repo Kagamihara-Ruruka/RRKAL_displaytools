@@ -208,3 +208,17 @@ Interpretation boundary:
 
 - These commands collect and summarize evidence only.
 - They do not authorize runtime_blend optimization, alpha blending changes, layer ordering changes, output path changes, metadata sidecar schema changes, runtime merge, or interactive FPS readiness claims.
+
+## Data-Ready Gate Contract Entrypoint
+
+Date: 2026-06-03
+
+Before proposing or implementing runtime_blend data-ready boundary instrumentation, inspect the gate contract:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File L:\RRKAL_displaytools\scripts\export_runtime_blend_data_ready_gate.ps1 -ContractOnly
+```
+
+The contract is the review-facing checklist for the next instrumentation slice. It explicitly states that future instrumentation touches renderer core and therefore requires separate review before commit. It also keeps optimization authorization false and keeps metadata schema, runtime merge, and expected output behavior unchanged.
+
+Use this contract as the first artifact in any next review packet. Do not treat it as approval to modify runtime_blend behavior.
