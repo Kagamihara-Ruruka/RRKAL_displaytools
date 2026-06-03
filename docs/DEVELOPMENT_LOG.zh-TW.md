@@ -1,3 +1,9 @@
+## 2026-06-03 - c_3 data-ready boundary timing gate design
+
+- Scope: documented the next runtime_blend data-ready boundary timing gate before any deeper instrumentation.
+- Decision: future timing should remain opt-in and evidence-only, with explicit dispatch-ready, runtime-blend-call, and post-blend-return boundaries.
+- Safety: default render behavior, output paths, metadata schema, runtime merge state, alpha blending, layer ordering, and expected pixels must remain unchanged.
+- Gate: pixel parity or a documented equivalent is required before any optimization, merge, blend rewrite, array-copy rewrite, or layer-order change.
 ## 2026-06-03 - c_3 runtime blend timing evidence review
 
 - Scope: reviewed opt-in runtime_blend timing evidence after `73ffb62` and added clearer interpretation fields to the warm-frame smoke analysis output.

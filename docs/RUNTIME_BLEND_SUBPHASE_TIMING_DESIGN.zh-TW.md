@@ -132,3 +132,45 @@ Design classification:
 - Recommended insertion point: immediately before and after the first runtime_blend dispatch inside `HybridRenderController.apply_layer_render_plan_composition()`.
 - Expected behavior: evidence-only timing around data-ready / dispatch boundary; output pixels, layer ordering, alpha blending, metadata sidecar schema, and runtime merge behavior should remain unchanged.
 - Validation requirement: smoke plus warm-frame timing evidence is necessary. Pixel parity should be required before any later optimization, merge, blend rewrite, array-copy rewrite, or layer-order change.
+
+## Data-Ready Boundary Timing Gate
+
+Date: 2026-06-03
+
+Purpose:
+
+- Define the next review gate before adding any deeper runtime_blend timing instrumentation.
+- Keep the next step evidence-only. No optimization, alpha blending change, layer ordering change, output path change, or expected pixel change is authorized by this gate.
+
+Candidate timing boundaries:
+
+1. `dispatch_ready_ms`: immediately after the composition step action, layer id, overlay object, dispatch packet, and dispatch type have been resolved.
+2. `runtime_blend_call_ms`: immediately around the existing `compose_runtime_blend(frame, layer_id, overlay)` call.
+3. `post_blend_return_ms`: immediately after the runtime_blend call returns, before aggregate phase timing is updated.
+4. Optional later review only: internal `compose_runtime_blend` subphase timing. This should require separate review because it may expose backend synchronization behavior and could make attribution harder.
+
+Expected interpretation:
+
+- If `dispatch_ready_ms` is small and `runtime_blend_call_ms` is stable, current step timing mostly reflects runtime_blend work plus backend dispatch overhead.
+- If the first `runtime_blend_call_ms` is much higher than later calls, data-ready wait or CPU/GPU synchronization remains a likely attribution risk.
+- If high-density total timing scales linearly with runtime_blend step count, the evidence should remain classified as per-step runtime_blend pressure, not alpha-compose collapse pressure.
+
+Required validation before any future instrumentation commit:
+
+- Default quick render behavior remains unchanged without the opt-in flag.
+- Renderer output metadata sidecar schema remains `rrkal_displaytools.renderer_output_metadata.v1`.
+- Runtime merge remains disabled.
+- Output paths remain unchanged.
+- Generated state artifacts remain ignored and unstaged.
+- Run quick, repeated quick, warm-frame, opt-in warm-frame, high-density opt-in warm-frame, smoke, diff check, and generated-artifact ignore audit.
+- Pixel parity or a documented equivalent should be required before any optimization, merge, blend rewrite, array-copy rewrite, or layer-order change.
+
+Stop conditions:
+
+- Stop if the timing change would alter output pixels, layer ordering, alpha blending, metadata schema, runtime merge behavior, or default non-opt-in behavior.
+- Stop if first-step attribution cannot be labeled clearly as limited evidence.
+- Stop if the implementation would require internal renderer rewrite rather than a bounded evidence hook.
+
+Current classification:
+
+`need_data_ready_boundary_timing_design_complete_before_instrumentation`
