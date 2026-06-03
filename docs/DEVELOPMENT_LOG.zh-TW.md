@@ -1,3 +1,8 @@
+## 2026-06-03 - c_3 runtime blend runner emits data-ready gate packet
+
+- Scope: wired `runtime_blend_timing_review_smoke.ps1` to emit the ignored data-ready gate JSON/Markdown packet after runtime_blend evidence review.
+- Output: runner now leaves both `state/showcase/runtime_blend_timing_review/summary.*` and `state/showcase/runtime_blend_data_ready_gate/gate.*` for local review.
+- Safety: smoke verifies the runner contract paths; generated packets remain ignored and are not committed.
 ## 2026-06-03 - c_3 data-ready gate packet output
 
 - Scope: added optional `-OutputPath` and `-MarkdownPath` to `scripts/export_runtime_blend_data_ready_gate.ps1` for ignored JSON/Markdown review packet output.

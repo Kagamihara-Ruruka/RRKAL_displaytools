@@ -13,8 +13,11 @@ if ($Frames -lt 2) {
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $warmScript = Join-Path $PSScriptRoot "render_warm_frame_smoke.ps1"
 $reviewScript = Join-Path $PSScriptRoot "review_runtime_blend_timing_evidence.ps1"
+$gateScript = Join-Path $PSScriptRoot "export_runtime_blend_data_ready_gate.ps1"
 $reviewSummaryPath = Join-Path $repoRoot "state\showcase\runtime_blend_timing_review\summary.json"
 $reviewMarkdownPath = Join-Path $repoRoot "state\showcase\runtime_blend_timing_review\summary.md"
+$gateSummaryPath = Join-Path $repoRoot "state\showcase\runtime_blend_data_ready_gate\gate.json"
+$gateMarkdownPath = Join-Path $repoRoot "state\showcase\runtime_blend_data_ready_gate\gate.md"
 
 if ($ContractOnly) {
     [pscustomobject]@{
@@ -24,8 +27,11 @@ if ($ContractOnly) {
         default_command = "render_warm_frame_smoke.ps1 -Frames $Frames -RuntimeBlendTiming"
         high_density_command = "render_warm_frame_smoke.ps1 -Frames $Frames -HighDensityCompose -RuntimeBlendTiming"
         review_command = "review_runtime_blend_timing_evidence.ps1 -OutputPath $reviewSummaryPath -MarkdownPath $reviewMarkdownPath"
+        gate_packet_command = "export_runtime_blend_data_ready_gate.ps1 -OutputPath $gateSummaryPath -MarkdownPath $gateMarkdownPath"
         review_summary_path = $reviewSummaryPath
         review_markdown_path = $reviewMarkdownPath
+        gate_summary_path = $gateSummaryPath
+        gate_markdown_path = $gateMarkdownPath
         contract_only_reads_generated_artifacts = $false
         contract_only_writes_generated_artifacts = $false
         normal_mode_writes_ignored_artifacts = $true
@@ -60,6 +66,11 @@ if ($Json) {
 & powershell @reviewArgs
 if ($LASTEXITCODE -ne 0) {
     throw "Runtime blend timing evidence review failed"
+}
+
+& powershell -NoProfile -ExecutionPolicy Bypass -File $gateScript -OutputPath $gateSummaryPath -MarkdownPath $gateMarkdownPath | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Runtime blend data-ready gate packet export failed"
 }
 
 Write-Host "Runtime blend timing review smoke passed."

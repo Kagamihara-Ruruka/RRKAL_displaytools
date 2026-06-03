@@ -8627,6 +8627,12 @@ if ($runtimeBlendTimingReviewSmokeContract.normal_mode_writes_ignored_artifacts 
 if ($runtimeBlendTimingReviewSmokeContract.review_markdown_path -notmatch "runtime_blend_timing_review.*summary.md") {
     throw "Runtime blend timing review smoke Markdown summary path missing"
 }
+if ($runtimeBlendTimingReviewSmokeContract.gate_summary_path -notmatch "runtime_blend_data_ready_gate.*gate.json") {
+    throw "Runtime blend timing review smoke data-ready gate JSON path missing"
+}
+if ($runtimeBlendTimingReviewSmokeContract.gate_markdown_path -notmatch "runtime_blend_data_ready_gate.*gate.md") {
+    throw "Runtime blend timing review smoke data-ready gate Markdown path missing"
+}
 if ($runtimeBlendTimingReviewSmokeContract.optimization_authorized -ne $false) {
     throw "Runtime blend timing review smoke must not authorize optimization"
 }
