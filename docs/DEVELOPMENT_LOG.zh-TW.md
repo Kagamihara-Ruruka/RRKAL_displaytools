@@ -1,3 +1,10 @@
+## 2026-06-05 - c_3 Display ViewCard consumer mapping
+
+- Scope: added `docs/DISPLAY_VIEWCARD_CONSUMER_MAPPING.zh-TW.md` and indexed it in `docs/DOCS_INDEX.zh-TW.md`.
+- Mapping: documented minimal DisplayViewCard, LayerViewCard, PreviewViewCard, and optional EvidenceViewCard fields from the displaytools downstream-consumer perspective.
+- Geo layer add: identified the minimum LayerViewCard fields c_3 needs for geo vector/raster add without direct upstream DB, manifest, or raw data consumption.
+- Boundary: docs-only display-consumer mapping; no renderer, Qt implementation, metadata schema change, output behavior change, Odoriba integration, or CanvasStrategy framework.
+
 ## 2026-06-03 - c_3 Qt preview operation evidence gate draft
 
 - Scope: added `docs/QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md` and linked it from the preview interaction boundary, demo baseline, and docs index.

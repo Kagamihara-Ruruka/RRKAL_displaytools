@@ -25,6 +25,7 @@
 - `DEMO_READINESS_BASELINE.zh-TW.md`: latest renderer preview, repeated quick render, warm-frame, and runtime-blend timing evidence for demo-readiness judgment.
 - `PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md`: boundary between renderer preview evidence and future Qt/UI interactive readiness evidence.
 - `QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md`: proposed future Qt preview operation evidence gate for event-loop, preview-refresh, and user-latency measurement.
+- `DISPLAY_VIEWCARD_CONSUMER_MAPPING.zh-TW.md`: c_3 downstream consumer mapping for minimal DisplayViewCard, LayerViewCard, PreviewViewCard, and optional EvidenceViewCard fields.
 
 ## Positioning
 
