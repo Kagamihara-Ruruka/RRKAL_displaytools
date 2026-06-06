@@ -31,6 +31,7 @@
 - `COMPOSE_PARITY_CONTRACT_ONLY_EVIDENCE_PACKET.zh-TW.md`: contract-only evidence packet showing what current compose parity scripts prove and what remains missing before visual parity.
 - `COMPOSE_PARITY_PAIRWISE_COMPARISON_PLAN.zh-TW.md`: baseline-vs-candidate pairwise comparison plan for future queue, skip, dispatch, timing, metadata, and artifact diff parity evidence.
 - `COMPOSE_PARITY_PAIRWISE_GAP_PACKET.zh-TW.md`: contract-only tooling document for the machine-readable compose parity gap packet emitted by `scripts\compare_compose_pairwise_packet.ps1 -ContractOnly`, validated by `scripts\validate_compose_pairwise_gap_packet.ps1 -ContractOnly`, bundled by `scripts\compose_parity_contract_checkpoint.ps1`, and checkpoint-validated by `scripts\validate_compose_parity_contract_checkpoint.ps1`.
+- `C3_FIRST_HELPER_EXTRACTION_PREIMPLEMENTATION_GATE.zh-TW.md`: docs/evidence-only gate that selects generated artifact audit/report packaging as the first safe future helper candidate before any renderer helper extraction.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
