@@ -62,6 +62,11 @@ If this gate is accepted, the next low-risk step is one of:
 1. Add a policy import-boundary checker for a future policy helper module.
 2. Add a docs-only preimplementation gate for `PointOverlayBudgetPolicy` helper movement.
 
+Current follow-up evidence:
+
+- `scripts\validate_policy_import_boundary.py` defines the standalone AST import-boundary checker.
+- `docs\POINT_OVERLAY_BUDGET_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md` records the movement preimplementation gate.
+
 Do not extract the policy in the same checkpoint as this fixture gate.
 
 ## Boundary statement
