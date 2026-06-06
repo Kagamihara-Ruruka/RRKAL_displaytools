@@ -45,6 +45,24 @@ class PointOverlayBudgetPolicyFixtureTests(unittest.TestCase):
         self.assertEqual(decision["sample_ratio_cap"], 0.18)
         self.assertEqual(decision["reason"], "drag-over-budget")
 
+    def test_sparse_record_count_drag_over_budget_caps_sample_ratio(self):
+        decision = self.policy.decision(
+            layer="ais",
+            point_count=12_000,
+            width=1280,
+            height=720,
+            render_ms=40.0,
+            lod="regional",
+            target_fps=30.0,
+            interaction_active=True,
+        )
+
+        self.assertTrue(decision["over_budget"])
+        self.assertFalse(decision["dense"])
+        self.assertFalse(decision["very_dense"])
+        self.assertEqual(decision["sample_ratio_cap"], 0.35)
+        self.assertEqual(decision["reason"], "drag-over-budget")
+
     def test_high_record_count_drag_over_budget_caps_more_aggressively(self):
         decision = self.policy.decision(
             layer="aircraft",
@@ -162,17 +180,28 @@ class PointOverlayBudgetPolicyFixtureTests(unittest.TestCase):
             ),
         }
 
-        text = self.policy.text(decisions)
-
-        self.assertIn("Point overlay budget policy", text)
-        self.assertIn("Rule: AIS/ADS-B stay screen-space correct", text)
-        self.assertIn("[ais]", text)
-        self.assertIn("- points: 75,000", text)
-        self.assertIn("- reason: drag-over-budget", text)
-        self.assertIn("- pressure: 1.20x", text)
-        self.assertIn("- sample ratio cap: 0.18", text)
-        self.assertIn("- interaction active: True", text)
-        self.assertIn("[aircraft]", text)
+        self.assertEqual(
+            self.policy.text(decisions).splitlines(),
+            [
+                "Point overlay budget policy",
+                "",
+                "Rule: AIS/ADS-B stay screen-space correct while interaction lowers sample ratio under pressure.",
+                "",
+                "[ais]",
+                "- points: 75,000",
+                "- reason: drag-over-budget",
+                "- pressure: 1.20x",
+                "- sample ratio cap: 0.18",
+                "- interaction active: True",
+                "",
+                "[aircraft]",
+                "- points: 12,000",
+                "- reason: full-quality",
+                "- pressure: 0.60x",
+                "- sample ratio cap: 1.00",
+                "- interaction active: False",
+            ],
+        )
 
 
 if __name__ == "__main__":

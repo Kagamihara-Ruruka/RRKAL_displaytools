@@ -28,6 +28,7 @@ Observed dependencies:
 | fixture | expected branch / behavior |
 | --- | --- |
 | low record count under budget | `full-quality`, `sample_ratio_cap=1.0`, not dense |
+| sparse record count drag over budget | `drag-over-budget`, sparse, `sample_ratio_cap=0.35` |
 | medium record count drag over budget | `drag-over-budget`, dense, `sample_ratio_cap=0.18` |
 | high record count drag over budget | very dense, `sample_ratio_cap=0.10` |
 | steady over-budget dense | `steady-over-budget-dense`, `sample_ratio_cap=0.35` |
@@ -39,7 +40,7 @@ Observed dependencies:
 | `render_ms=None` and negative point count | coerces current ms to `0.0`, point count to `0`, keeps full quality |
 | deterministic repeat call | same input returns the same output dict |
 | decision output keys | exact key set is pinned |
-| text output | heading, rule wording, layer sections, point formatting, pressure and sample cap fields are pinned |
+| text output | exact split-line order is pinned, including heading, blank lines, rule line, layer section order, point formatting, pressure formatting, sample cap formatting, and interaction flag |
 
 ## Current fixture evidence
 
