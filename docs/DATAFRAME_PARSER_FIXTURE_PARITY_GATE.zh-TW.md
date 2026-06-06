@@ -87,3 +87,17 @@ Recommended next c_3 action:
 - Do not write runtime artifacts.
 
 Stop if future tests need renderer setup, Qt, Taichi, cache files, PNG/JSON runtime artifacts, metadata schema changes, or provider normalization changes.
+
+## First fixture evidence
+
+First focused parser fixture tests now exist in `tests/test_dataframe_parsers.py`.
+
+Current evidence covers parser input/output behavior only:
+
+- GeoJSON Point and non-Point behavior.
+- JSON FeatureCollection, OpenSky `states`, known list-key, and direct list behavior.
+- JSONL blank-line handling and invalid-line failure.
+- NMEA missing-decoder behavior with a mock import failure.
+- `dataframe_from_text` dispatch for GeoJSON, JSONL, NMEA-looking text, CSV text, and malformed JSON/JSONL fallback to CSV.
+
+This evidence does not approve parser extraction. It only proves that the parser zone has import-level fixture observability without renderer, Qt, Taichi runtime initialization, output artifact generation, or metadata behavior changes.
