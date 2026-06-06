@@ -1,3 +1,5 @@
+import sys
+import types
 import unittest
 from unittest import mock
 
@@ -7,6 +9,11 @@ import taichi_global_bathymetry as tgb
 
 
 class DataFrameParserFixtureParityTests(unittest.TestCase):
+    def _install_fake_pyais(self, decode_func):
+        fake_pyais = types.ModuleType("pyais")
+        fake_pyais.decode = decode_func
+        return mock.patch.dict(sys.modules, {"pyais": fake_pyais})
+
     def test_geojson_point_feature_adds_lon_lat(self):
         frame = tgb.dataframe_from_geojson(
             {
@@ -93,6 +100,58 @@ class DataFrameParserFixtureParityTests(unittest.TestCase):
         self.assertIsInstance(frame, pd.DataFrame)
         self.assertTrue(frame.empty)
 
+    def test_nmea_success_decode_path_returns_lat_lon_rows(self):
+        class FakeDecoded:
+            def asdict(self):
+                return {"lat": 25.0, "lon": 121.0, "mmsi": 123456789}
+
+        with self._install_fake_pyais(lambda line: FakeDecoded()):
+            frame = tgb.dataframe_from_nmea("!AIVDM,valid")
+
+        self.assertFalse(frame.empty)
+        self.assertEqual(float(frame.loc[0, "lat"]), 25.0)
+        self.assertEqual(float(frame.loc[0, "lon"]), 121.0)
+        self.assertEqual(int(frame.loc[0, "mmsi"]), 123456789)
+
+    def test_nmea_filters_non_ais_and_rows_without_lat_lon(self):
+        class FakeDecoded:
+            def __init__(self, row):
+                self._row = row
+
+            def asdict(self):
+                return self._row
+
+        def fake_decode(line):
+            if "missing" in line:
+                return FakeDecoded({"mmsi": 1})
+            return FakeDecoded({"lat": 24.5, "lon": 120.5, "mmsi": 2})
+
+        text = "not ais\n!AIVDM,missing\n$AIVDM,valid\n"
+        with self._install_fake_pyais(fake_decode):
+            frame = tgb.dataframe_from_nmea(text)
+
+        self.assertEqual(len(frame), 1)
+        self.assertEqual(float(frame.loc[0, "lat"]), 24.5)
+        self.assertEqual(float(frame.loc[0, "lon"]), 120.5)
+        self.assertEqual(int(frame.loc[0, "mmsi"]), 2)
+
+    def test_nmea_decoder_exception_is_skipped(self):
+        class FakeDecoded:
+            def asdict(self):
+                return {"lat": 23.5, "lon": 119.5}
+
+        def fake_decode(line):
+            if "bad" in line:
+                raise ValueError("decode fixture failure")
+            return FakeDecoded()
+
+        with self._install_fake_pyais(fake_decode):
+            frame = tgb.dataframe_from_nmea("!AIVDM,bad\n!AIVDM,valid\n")
+
+        self.assertEqual(len(frame), 1)
+        self.assertEqual(float(frame.loc[0, "lat"]), 23.5)
+        self.assertEqual(float(frame.loc[0, "lon"]), 119.5)
+
     def test_dataframe_from_text_dispatches_geojson(self):
         frame = tgb.dataframe_from_text(
             '{"type":"FeatureCollection","features":[{"properties":{"id":1},"geometry":{"type":"Point","coordinates":[1,2]}}]}',
@@ -134,6 +193,29 @@ class DataFrameParserFixtureParityTests(unittest.TestCase):
 
         self.assertEqual(list(frame.columns), ["lon", "lat"])
         self.assertEqual(float(frame.loc[0, "lon"]), 121.0)
+
+    def test_dataframe_from_text_csv_failure_falls_back_to_non_empty_nmea(self):
+        expected = pd.DataFrame([{"lat": 22.0, "lon": 120.0}])
+        csv_error = ValueError("csv fixture failure")
+
+        with mock.patch.object(tgb.pd, "read_csv", side_effect=csv_error), mock.patch.object(
+            tgb, "dataframe_from_nmea", return_value=expected
+        ) as parser:
+            frame = tgb.dataframe_from_text("not,csv", "sample.csv")
+
+        parser.assert_called()
+        self.assertIs(frame, expected)
+
+    def test_dataframe_from_text_csv_failure_empty_nmea_reraises_csv_error(self):
+        csv_error = ValueError("csv fixture failure")
+
+        with mock.patch.object(tgb.pd, "read_csv", side_effect=csv_error), mock.patch.object(
+            tgb, "dataframe_from_nmea", return_value=pd.DataFrame()
+        ):
+            with self.assertRaises(ValueError) as ctx:
+                tgb.dataframe_from_text("not,csv", "sample.csv")
+
+        self.assertIs(ctx.exception, csv_error)
 
 
 if __name__ == "__main__":
