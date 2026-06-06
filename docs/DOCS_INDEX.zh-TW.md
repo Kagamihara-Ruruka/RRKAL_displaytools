@@ -36,6 +36,7 @@
 - `DATAFRAME_PARSER_FIXTURE_PARITY_GATE.zh-TW.md`: docs/evidence-only preimplementation gate for `taichi_global_bathymetry.py` DataFrame parser fixture parity around parser input/output behavior.
 - `NORMALIZER_FIXTURE_PARITY_GATE.zh-TW.md`: docs/evidence-only preimplementation gate for AIS and aircraft DataFrame normalizer fixture parity.
 - `NORMALIZER_HELPER_EXTRACTION_PREIMPLEMENTATION_GATE.zh-TW.md`: docs/evidence-only gate defining future normalizer helper extraction boundaries, import restrictions, before/after parity requirements, risks, and the standalone import-boundary checker.
+- `POLICY_STATIC_PACKET_BUILDER_CANDIDATE_MAP.zh-TW.md`: docs/evidence-only map of policy object and static packet builder candidates after the normalizer extraction slice.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
