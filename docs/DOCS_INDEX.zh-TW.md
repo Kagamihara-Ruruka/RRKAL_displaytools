@@ -34,6 +34,7 @@
 - `C3_FIRST_HELPER_EXTRACTION_PREIMPLEMENTATION_GATE.zh-TW.md`: docs/evidence-only gate that selects generated artifact audit/report packaging as the first safe future helper candidate and records its focused validator.
 - `GENERATED_ARTIFACT_AUDIT_HELPER_INTEGRATION_MAP.zh-TW.md`: docs/evidence-only map for the next safe connection shape of `GeneratedArtifactAuditPacket`, keeping checkpoint/validator/meta-test boundaries separate.
 - `DATAFRAME_PARSER_FIXTURE_PARITY_GATE.zh-TW.md`: docs/evidence-only preimplementation gate for `taichi_global_bathymetry.py` DataFrame parser fixture parity around parser input/output behavior.
+- `NORMALIZER_FIXTURE_PARITY_GATE.zh-TW.md`: docs/evidence-only preimplementation gate for AIS and aircraft DataFrame normalizer fixture parity.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
