@@ -62,6 +62,14 @@ For o_1 / n_1 summary use, the checkpoint JSON also repeats `missing_evidence`, 
 
 The bundle is still contract-only. It does not run renderer, launch Qt, read baseline/candidate artifacts, write `state/` outputs, generate PNG/JSON artifacts, change metadata schema, change output behavior, enable runtime merge, or claim visual parity / precommit / interactive FPS readiness.
 
+Checkpoint validator:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\validate_compose_parity_contract_checkpoint.ps1
+```
+
+The checkpoint validator confirms the checkpoint JSON keeps conservative contract-only fields, keeps `missing_evidence` non-empty, and keeps artifact / visual readiness flags false. Its optional `-SelfTestNegative` mode mutates an in-memory checkpoint copy and verifies false readiness flags are detected.
+
 ## Required output fields
 
 The packet includes:
