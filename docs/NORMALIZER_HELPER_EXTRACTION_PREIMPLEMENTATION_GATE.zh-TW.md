@@ -83,6 +83,8 @@ py -3 -B scripts\generated_artifact_audit_leaf_provider.py
 Additional required evidence:
 
 - Import scan proving the candidate helper module does not import renderer, Qt, VisPy, Taichi runtime, provider/source loader, parser dispatcher, metadata sidecar writer, or artifact writer modules.
+- Standalone static checker: `scripts\validate_normalizer_import_boundary.py render_core\dataframe_normalizers.py`.
+- Negative self-test: `scripts\validate_normalizer_import_boundary.py --self-test-negative`.
 - `git diff` proving any future `taichi_global_bathymetry.py` change is limited to import and delegation wiring.
 - Artifact audit proving no `state/`, PNG, or runtime JSON artifacts are produced or staged.
 - Explicit confirmation that metadata behavior and output behavior are unchanged.
