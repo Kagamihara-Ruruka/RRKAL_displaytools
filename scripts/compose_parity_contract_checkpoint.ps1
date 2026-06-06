@@ -59,6 +59,7 @@ Test-Null $errors "packet.visual_parity_passed" $packet.visual_parity_passed
 Test-Null $errors "packet.precommit_gate_passed" $packet.precommit_gate_passed
 Test-Equal $errors "packet.precommit_gate_evaluated" $packet.precommit_gate_evaluated $false
 Test-Equal $errors "packet.precommit_gate_status" $packet.precommit_gate_status "not_evaluated_contract_only"
+Test-Equal $errors "packet.artifact_parity.evidence_ready" $packet.artifact_parity.evidence_ready $false
 Test-Equal $errors "validation.status" $validation.status "pass"
 Test-Equal $errors "negative_validation.status" $negativeValidation.status "pass"
 
@@ -92,6 +93,9 @@ $checkpoint = [ordered]@{
     precommit_gate_passed = $packet.precommit_gate_passed
     precommit_gate_evaluated = $packet.precommit_gate_evaluated
     precommit_gate_status = $packet.precommit_gate_status
+    visual_parity_ready = $false
+    artifact_parity_ready = $false
+    missing_evidence = @($packet.missing_evidence)
     gap_packet_status = $packet.status
     validator_status = $validation.status
     negative_self_test_status = $negativeValidation.status

@@ -58,6 +58,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\compose_parity_contr
 
 This checkpoint bundle runs the contract-only gap packet, the normal validator, and the negative self-test validator together. Its checkpoint JSON must preserve `contract_only=true`, `runtime_merge_enabled=false`, `visual_parity_passed=null`, `precommit_gate_passed=null`, and `precommit_gate_evaluated=false`.
 
+For o_1 / n_1 summary use, the checkpoint JSON also repeats `missing_evidence`, `artifact_parity_ready=false`, `visual_parity_ready=false`, and `negative_self_test_detected_all_false_readiness_mutations=true`.
+
 The bundle is still contract-only. It does not run renderer, launch Qt, read baseline/candidate artifacts, write `state/` outputs, generate PNG/JSON artifacts, change metadata schema, change output behavior, enable runtime merge, or claim visual parity / precommit / interactive FPS readiness.
 
 ## Required output fields
