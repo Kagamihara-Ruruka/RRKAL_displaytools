@@ -51,12 +51,16 @@ Observed packet summary:
 | `visual_parity_passed` | `null` |
 | `max_abs_diff` | `null` |
 | `changed_pixel_count` | `null` |
+| `precommit_gate_passed` | `null` |
+| `precommit_gate_evaluated` | `false` |
+| `precommit_gate_status` | `not_evaluated_contract_only` |
 | `notification_reason` | `contract_only_no_render_side_effect` |
 
 What this proves:
 
 - The parity smoke contract is callable without rendering.
 - The contract-only path does not claim artifact parity.
+- The contract-only path does not claim precommit readiness.
 - Runtime merge remains disabled.
 
 What this does not prove:
@@ -64,6 +68,7 @@ What this does not prove:
 - No baseline/candidate PNG diff was executed.
 - No visual parity was measured.
 - No pixel or metadata output equivalence was established.
+- The precommit gate was not evaluated.
 
 ### `render_compose_parity_artifacts.ps1 -ContractOnly`
 
@@ -129,6 +134,7 @@ What this does not prove:
 | Alpha/layer ordering parity | Artifact diff contract exists. | `contract_exists_missing_artifacts` |
 | Generated artifact audit | Contract-only commands left the working tree clean. | `pass_for_this_packet` |
 | Runtime merge state | Contract-only packets report `runtime_merge_enabled=false`. | `pass_contract_only` |
+| Precommit readiness | Contract-only packet reports `precommit_gate_passed=null`, `precommit_gate_evaluated=false`, and `precommit_gate_status=not_evaluated_contract_only`. | `not_evaluated_contract_only` |
 
 ## Missing evidence before compose execution movement
 

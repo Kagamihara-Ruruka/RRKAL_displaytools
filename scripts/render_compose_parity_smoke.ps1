@@ -43,7 +43,9 @@ $changedPixelCount = $null
 $imageSize = $null
 $diffError = $null
 $visualParityPassed = $null
-$precommitGatePassed = $true
+$precommitGatePassed = $null
+$precommitGateEvaluated = $false
+$precommitGateStatus = "not_evaluated_missing_artifacts"
 $notificationLevel = "info"
 $notificationSuppressed = $true
 $notificationReason = "pending_artifacts_not_a_precommit_failure"
@@ -53,7 +55,9 @@ $exitCode = 0
 if ($ContractOnly) {
     $diffStatus = "contract_only_forced"
     $notificationReason = "contract_only_no_render_side_effect"
+    $precommitGateStatus = "not_evaluated_contract_only"
 } elseif ($runDiff) {
+    $precommitGateEvaluated = $true
     $notificationSuppressed = $false
     $notificationReason = "artifact_diff_completed"
     try {
@@ -70,6 +74,7 @@ if ($ContractOnly) {
                 $changedPixelCount = -1
                 $visualParityPassed = $false
                 $precommitGatePassed = $false
+                $precommitGateStatus = "failed_dimension_mismatch"
                 $notificationLevel = "error"
                 $notificationReason = "artifact_dimensions_mismatch"
                 $passed = $false
@@ -97,6 +102,7 @@ if ($ContractOnly) {
                 }
                 $visualParityPassed = [bool](($maxAbsDiff -le $ToleranceMaxAbsDiff) -and ($changedPixelCount -le $ToleranceChangedPixelCount))
                 $precommitGatePassed = $visualParityPassed
+                $precommitGateStatus = if ($visualParityPassed) { "passed_zero_diff_artifact_parity" } else { "failed_artifact_visual_parity" }
                 $passed = $visualParityPassed
                 $diffStatus = if ($visualParityPassed) { "visual_parity_passed" } else { "visual_parity_failed" }
                 $notificationLevel = if ($visualParityPassed) { "ok" } else { "error" }
@@ -118,6 +124,7 @@ if ($ContractOnly) {
         $diffError = $_.Exception.Message
         $visualParityPassed = $false
         $precommitGatePassed = $false
+        $precommitGateStatus = "failed_artifact_diff_error"
         $notificationLevel = "error"
         $notificationReason = "artifact_diff_error"
         $passed = $false
@@ -152,6 +159,8 @@ $packet = [ordered]@{
     diff_status = $diffStatus
     passed = $passed
     precommit_gate_passed = $precommitGatePassed
+    precommit_gate_evaluated = $precommitGateEvaluated
+    precommit_gate_status = $precommitGateStatus
     visual_parity_passed = $visualParityPassed
     max_abs_diff = $maxAbsDiff
     changed_pixel_count = $changedPixelCount

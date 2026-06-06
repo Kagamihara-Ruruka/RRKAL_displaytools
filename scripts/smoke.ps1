@@ -7739,8 +7739,14 @@ if ($composeParitySmoke.schema -ne "rrkal_displaytools.render_compose_parity_smo
 if ($composeParitySmoke.status -ne "contract_only_forced") {
     throw "Compose parity smoke forced contract mode status mismatch"
 }
-if ($composeParitySmoke.precommit_gate_passed -ne $true) {
-    throw "Compose parity smoke contract mode precommit gate should pass"
+if ($null -ne $composeParitySmoke.precommit_gate_passed) {
+    throw "Compose parity smoke contract mode precommit gate should be unevaluated"
+}
+if ($composeParitySmoke.precommit_gate_evaluated -ne $false) {
+    throw "Compose parity smoke contract mode precommit gate evaluation flag should be false"
+}
+if ($composeParitySmoke.precommit_gate_status -ne "not_evaluated_contract_only") {
+    throw "Compose parity smoke contract mode precommit gate status mismatch"
 }
 if ($null -ne $composeParitySmoke.visual_parity_passed) {
     throw "Compose parity smoke contract mode visual parity should be pending"

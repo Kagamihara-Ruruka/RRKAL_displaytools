@@ -53,6 +53,9 @@ Proposed top-level packet:
   "metadata_schema_changed": false,
   "output_behavior_changed": false,
   "generated_artifacts_staged": false,
+  "precommit_gate_passed": null,
+  "precommit_gate_evaluated": false,
+  "precommit_gate_status": "not_evaluated_contract_only",
   "visual_parity_ready": false,
   "interactive_fps_claimed": false
 }
@@ -314,6 +317,8 @@ Pass condition:
 - `visual_parity_passed=true`
 - `max_abs_diff=0`
 - `changed_pixel_count=0`
+- `precommit_gate_evaluated=true`
+- `precommit_gate_passed=true`
 - `runtime_merge_enabled=false` until separate approval
 
 Important:
