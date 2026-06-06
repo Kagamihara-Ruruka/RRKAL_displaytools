@@ -50,6 +50,7 @@ Implementation status:
 - Validator: `scripts/validate_generated_artifact_audit_packet.py`.
 - Validator test: `tests/test_generated_artifact_audit_validator.py`.
 - Integration map: `docs/GENERATED_ARTIFACT_AUDIT_HELPER_INTEGRATION_MAP.zh-TW.md`.
+- Leaf provider: `scripts/generated_artifact_audit_leaf_provider.py`.
 - Boundary: this helper does not call Git, run renderer, launch Qt, read baseline/candidate artifacts, write files, or infer visual parity.
 
 Candidate boundaries:

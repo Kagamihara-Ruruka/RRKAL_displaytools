@@ -46,6 +46,14 @@ Recommended next slice:
 
 `generated artifact audit leaf evidence provider`
 
+Implementation status:
+
+- Leaf provider: `scripts/generated_artifact_audit_leaf_provider.py`.
+- Focused test: `tests/test_generated_artifact_audit_leaf_provider.py`.
+- The provider queries only staged and untracked path lists, then passes them to `build_generated_artifact_audit_packet`.
+- The provider does not call checkpoint scripts, validator scripts, tests, renderer, Qt, or runtime artifact generators.
+- It prints one packet to stdout and does not write runtime artifact files.
+
 Proposed shape:
 
 - Script or helper returns path lists only:
