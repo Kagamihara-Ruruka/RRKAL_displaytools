@@ -26,7 +26,10 @@
 - `PREVIEW_INTERACTION_READINESS_BOUNDARY.zh-TW.md`: boundary between renderer preview evidence and future Qt/UI interactive readiness evidence.
 - `QT_PREVIEW_OPERATION_EVIDENCE_GATE.zh-TW.md`: proposed future Qt preview operation evidence gate for event-loop, preview-refresh, and user-latency measurement.
 - `DISPLAY_VIEWCARD_CONSUMER_MAPPING.zh-TW.md`: c_3 downstream consumer mapping for minimal DisplayViewCard, LayerViewCard, PreviewViewCard, and optional EvidenceViewCard fields.
-
+- `COMPOSE_EXECUTION_SOURCE_MAP.zh-TW.md`: docs-only map of queue building, skip reasons, dispatch path, timing packet, metadata summary, and parity requirements around compose execution.
+- `COMPOSE_EXECUTION_PARITY_GATE.zh-TW.md`: future parity gate design before any compose execution movement, including queue, skip, dispatch, timing, metadata, visual diff, and artifact audit branches.
+- `COMPOSE_PARITY_CONTRACT_ONLY_EVIDENCE_PACKET.zh-TW.md`: contract-only evidence packet showing what current compose parity scripts prove and what remains missing before visual parity.
+- `COMPOSE_PARITY_PAIRWISE_COMPARISON_PLAN.zh-TW.md`: baseline-vs-candidate pairwise comparison plan for future queue, skip, dispatch, timing, metadata, and artifact diff parity evidence.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.

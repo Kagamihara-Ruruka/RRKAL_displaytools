@@ -31,7 +31,9 @@
 - Work from `L:\RRKAL_displaytools` unless explicitly using a local temporary clone for GUI/renderer validation.
 - Do not scan or depend on K drive for routine displaytools work; K is outside the current workspace unless the user explicitly asks for a bounded read-only lookup.
 - Inspect Git state before edits.
-- Read `docs/WORKFLOW.zh-TW.md`, `docs/CODEX_CLOUD_HANDOFF.zh-TW.md`, `docs/DOCS_INDEX.zh-TW.md`, `docs/PROJECT_GTD.md`, and this handoff.
+- Read `docs/AGENT_START_HERE.zh-TW.md`, `docs/WORKFLOW.zh-TW.md`, `docs/CODEX_CLOUD_HANDOFF.zh-TW.md`, `docs/DOCS_INDEX.zh-TW.md`, `docs/PROJECT_GTD.md`, and this handoff.
+- Use Notion Agents as the coordination dashboard for status/handoff/review requests/accepted decisions/operations notes. Do not use Notion as product evidence or renderer behavior authority.
+- Treat L:\AGENT_EXCHANGE as historical/archive reference only, not a coordination inbox/outbox.
 - Pick one small, reversible visualization slice.
 
 ## End-of-round checklist
@@ -80,6 +82,7 @@
 ## Current runtime_blend evidence handoff
 
 - Latest runtime_blend evidence path is evidence-only; it does not authorize runtime_blend optimization, runtime merge, metadata schema changes, output pixel changes, or interactive FPS readiness claims.
+- Compose parity contract-only evidence is not visual parity and is not precommit readiness. In -ContractOnly, precommit_gate_passed=null, precommit_gate_evaluated=false, and precommit_gate_status=not_evaluated_contract_only are expected.
 - Fast contract checks:
   - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\review_runtime_blend_timing_evidence.ps1 -ContractOnly`
   - `powershell -NoProfile -ExecutionPolicy Bypass -File scripts\runtime_blend_timing_review_smoke.ps1 -ContractOnly`

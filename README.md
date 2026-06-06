@@ -1,4 +1,4 @@
-﻿# RRKAL_displaytools
+# RRKAL_displaytools
 
 RRKAL display and visualization tools.
 
@@ -115,6 +115,7 @@ Core docs:
 - `docs/WORKSPACE_LAYOUT.zh-TW.md`
 - `docs/PROFILE_SCHEMA.zh-TW.md`
 - `docs/SETUP_WINDOWS.zh-TW.md`
+- `docs/AGENT_START_HERE.zh-TW.md`
 - `docs/RRKAL_HANDOFF_CONTRACT.zh-TW.md`
 - `docs/CAPABILITY_SUMMARY.zh-TW.md`
 - `docs/QUICKSTART_CLONE.zh-TW.md`
