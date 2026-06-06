@@ -41,6 +41,14 @@ Recommended candidate:
 
 `GeneratedArtifactAuditPacket` / generated artifact audit report helper.
 
+Implementation status:
+
+- First helper extraction candidate: `render_core/generated_artifact_audit.py`.
+- Helper entry: `build_generated_artifact_audit_packet(staged_paths, untracked_paths)`.
+- Scope: package generated artifact audit evidence from caller-provided path lists only.
+- Validation: `tests/test_generated_artifact_audit.py`.
+- Boundary: this helper does not call Git, run renderer, launch Qt, read baseline/candidate artifacts, write files, or infer visual parity.
+
 Candidate boundaries:
 
 - Input: repo root plus optional staged/untracked file lists.
