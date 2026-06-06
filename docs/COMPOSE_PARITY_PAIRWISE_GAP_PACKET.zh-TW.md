@@ -33,6 +33,21 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\validate_compose_pai
 
 The validator checks the contract-only JSON for false readiness signals. It fails if contract-only output claims visual parity, precommit readiness, runtime merge, generated artifacts, metadata schema change, output behavior change, or an evaluated parity branch.
 
+Negative self-test:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\validate_compose_pairwise_gap_packet.ps1 -ContractOnly -SelfTestNegative
+```
+
+The negative self-test mutates an in-memory copy of the contract-only packet and verifies the validator detects these false readiness signals:
+
+- `visual_parity_passed=true`
+- `precommit_gate_passed=true`
+- `precommit_gate_evaluated=true`
+- `runtime_merge_enabled=true`
+
+It does not read baseline/candidate artifacts and does not write `state/` outputs.
+
 ## Required output fields
 
 The packet includes:
