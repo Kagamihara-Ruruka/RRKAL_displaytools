@@ -47,6 +47,8 @@ Implementation status:
 - Helper entry: `build_generated_artifact_audit_packet(staged_paths, untracked_paths)`.
 - Scope: package generated artifact audit evidence from caller-provided path lists only.
 - Validation: `tests/test_generated_artifact_audit.py`.
+- Validator: `scripts/validate_generated_artifact_audit_packet.py`.
+- Validator test: `tests/test_generated_artifact_audit_validator.py`.
 - Boundary: this helper does not call Git, run renderer, launch Qt, read baseline/candidate artifacts, write files, or infer visual parity.
 
 Candidate boundaries:
