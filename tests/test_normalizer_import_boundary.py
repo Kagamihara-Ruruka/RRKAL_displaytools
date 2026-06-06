@@ -14,7 +14,7 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_normalizer_import_boundary.py"
 
 class NormalizerImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_returns_not_applicable_pass(self):
-        packet = validate_target(REPO_ROOT / "render_core" / "dataframe_normalizers.py")
+        packet = validate_target(REPO_ROOT / "render_core" / "missing_dataframe_normalizers.py")
 
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
@@ -34,6 +34,13 @@ class NormalizerImportBoundaryTests(unittest.TestCase):
         self.assertFalse(packet["boundary_passed"])
         self.assertEqual(packet["violations"][0]["module"], "taichi")
 
+    def test_pyais_import_is_forbidden(self):
+        packet = validate_source("import pyais\n")
+
+        self.assertEqual(packet["status"], "fail")
+        self.assertFalse(packet["boundary_passed"])
+        self.assertEqual(packet["violations"][0]["module"], "pyais")
+
     def test_from_import_forbidden_name_fails(self):
         packet = validate_source("from taichi_global_bathymetry import HybridRenderController\n")
 
@@ -43,7 +50,7 @@ class NormalizerImportBoundaryTests(unittest.TestCase):
 
     def test_cli_missing_candidate_output_is_json(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "dataframe_normalizers.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_dataframe_normalizers.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
