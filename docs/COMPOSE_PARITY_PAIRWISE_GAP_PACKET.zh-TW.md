@@ -25,6 +25,14 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts\compare_compose_pair
 
 The script supports `-ContractOnly` only. Running it without `-ContractOnly` is intentionally rejected.
 
+Validator:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\validate_compose_pairwise_gap_packet.ps1 -ContractOnly
+```
+
+The validator checks the contract-only JSON for false readiness signals. It fails if contract-only output claims visual parity, precommit readiness, runtime merge, generated artifacts, metadata schema change, output behavior change, or an evaluated parity branch.
+
 ## Required output fields
 
 The packet includes:
@@ -98,6 +106,17 @@ This script implements the contract-only gap packet proposed by:
 - `docs\COMPOSE_PARITY_CONTRACT_ONLY_EVIDENCE_PACKET.zh-TW.md`
 
 It does not replace artifact diff parity. It only makes the missing branches machine-readable.
+
+The validator keeps that machine-readable packet honest by checking:
+
+- `contract_only=true`
+- `runtime_merge_enabled=false`
+- `visual_parity_passed=null`
+- `precommit_gate_passed=null`
+- `precommit_gate_evaluated=false`
+- `precommit_gate_status=not_evaluated_contract_only`
+- queue/skip/dispatch/timing/metadata branches are `not_run / missing_candidate`
+- artifact parity is `not_run / missing_artifacts`
 
 ## Not authorized
 
