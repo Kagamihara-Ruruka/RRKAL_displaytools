@@ -57,7 +57,7 @@ They prove only that the current policy object behavior is observable through im
 
 ## Recommended next step
 
-If this gate is accepted, the next low-risk step is a policy import-boundary checker or movement preimplementation gate for a future `DatashaderSamplingPolicy` helper module.
+If this gate is accepted, use `DATASHADER_SAMPLING_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md` and `scripts\validate_datashader_policy_import_boundary.py` before any future movement of this policy.
 
 Do not extract the policy in the same checkpoint as this fixture gate.
 
