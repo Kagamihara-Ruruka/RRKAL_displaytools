@@ -16,10 +16,13 @@ $targets = @(
     [ordered]@{ id = "build_compiled_layer_render_plan_packet_from_adapter_payload"; path = "render_core/layer_render_plan_compiled_reused_packets.py"; pattern = "^def build_compiled_layer_render_plan_packet_from_adapter_payload\(" },
     [ordered]@{ id = "build_reused_compiled_layer_render_plan_packet"; path = "render_core/layer_render_plan_compiled_reused_packets.py"; pattern = "^def build_reused_compiled_layer_render_plan_packet\(" },
     [ordered]@{ id = "build_reused_compiled_layer_render_plan_packet_from_adapter_payload"; path = "render_core/layer_render_plan_compiled_reused_packets.py"; pattern = "^def build_reused_compiled_layer_render_plan_packet_from_adapter_payload\(" },
-    [ordered]@{ id = "build_layer_render_plan_runtime_snapshot"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_runtime_snapshot\(" },
+    [ordered]@{ id = "build_layer_render_plan_runtime_snapshot"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def build_layer_render_plan_runtime_snapshot\(" },
+    [ordered]@{ id = "select_layer_render_plan_composition_input"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def select_layer_render_plan_composition_input\(" },
+    [ordered]@{ id = "build_layer_render_plan_style_postprocess_packet"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def build_layer_render_plan_style_postprocess_packet\(" },
+    [ordered]@{ id = "build_layer_render_plan_composition_timing_packet"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def build_layer_render_plan_composition_timing_packet\(" },
     [ordered]@{ id = "build_layer_render_plan_composition_apply_action"; path = "render_core/layer_render_plan_composition_dispatch.py"; pattern = "^def build_layer_render_plan_composition_apply_action\(" },
     [ordered]@{ id = "build_layer_render_plan_composition_dispatch_packet"; path = "render_core/layer_render_plan_composition_dispatch.py"; pattern = "^def build_layer_render_plan_composition_dispatch_packet\(" },
-    [ordered]@{ id = "build_layer_render_plan_composition_steps"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_composition_steps\(" },
+    [ordered]@{ id = "build_layer_render_plan_composition_steps"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def build_layer_render_plan_composition_steps\(" },
     [ordered]@{ id = "build_layer_render_plan_step_runtime_state"; path = "render_core/layer_render_plan_compose_queue.py"; pattern = "^def build_layer_render_plan_step_runtime_state\(" },
     [ordered]@{ id = "build_layer_render_plan_compose_queue_entries"; path = "render_core/layer_render_plan_compose_queue.py"; pattern = "^def build_layer_render_plan_compose_queue_entries\(" },
     [ordered]@{ id = "build_layer_render_plan_compose_queue_packet"; path = "render_core/layer_render_plan_compose_queue.py"; pattern = "^def build_layer_render_plan_compose_queue_packet\(" },
@@ -42,7 +45,7 @@ $targets = @(
     [ordered]@{ id = "build_layer_render_plan_cache_key"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_key\(" },
     [ordered]@{ id = "build_layer_render_plan_cache_invalidation_reasons"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_invalidation_reasons\(" },
     [ordered]@{ id = "build_layer_render_plan_cache_invalidation_scope"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_invalidation_scope\(" },
-    [ordered]@{ id = "build_layer_render_plan_batch_decisions"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_batch_decisions\(" },
+    [ordered]@{ id = "build_layer_render_plan_batch_decisions"; path = "render_core/layer_render_plan_residual_packet_surfaces.py"; pattern = "^def build_layer_render_plan_batch_decisions\(" },
     [ordered]@{ id = "compose_runtime_overlay"; path = "taichi_global_bathymetry.py"; pattern = "^\s+def compose_runtime_overlay\(" },
     [ordered]@{ id = "compose_runtime_blend"; path = "taichi_global_bathymetry.py"; pattern = "^\s+def compose_runtime_blend\(" },
     [ordered]@{ id = "layer_render_plan_runtime_snapshot"; path = "taichi_global_bathymetry.py"; pattern = "^\s+def layer_render_plan_runtime_snapshot\(" },
@@ -63,9 +66,9 @@ if ($ContractOnly) {
         source = $scriptName
         status = "contract_only_no_code_move"
         output_schema = "rrkal_displaytools.render_plan_compose_source_map.v1"
-        source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py")
+        source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py", "render_core/layer_render_plan_residual_packet_surfaces.py")
         target_module = "render_core/render_plan.py"
-        target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py")
+        target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py", "render_core/layer_render_plan_residual_packet_surfaces.py")
         target_count = $targets.Count
         boundary = "Source map only; it reads helper positions and does not move code, launch Qt/Taichi, enable runtime merge, or touch RRKAL data/cache governance."
         portable = $true
@@ -113,9 +116,9 @@ foreach ($target in $targets) {
     schema = "rrkal_displaytools.render_plan_compose_source_map.v1"
     source = $scriptName
     status = if ($missing.Count -eq 0) { "ready" } else { "incomplete" }
-    source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py")
+    source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py", "render_core/layer_render_plan_residual_packet_surfaces.py")
     target_module = "render_core/render_plan.py"
-    target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py")
+    target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py", "render_core/layer_render_plan_execution_phase_timing.py", "render_core/layer_render_plan_adapter_preflight.py", "render_core/layer_render_plan_compiled_reused_packets.py", "render_core/layer_render_plan_residual_packet_surfaces.py")
     source_owner = "HybridRenderController runtime fact collectors and render_core render-plan helpers"
     no_code_move = $true
     runtime_merge_enabled = $false

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This is a test/docs-only fixture parity gate for the remaining non-alpha, non-apply-path packet surfaces in `render_core/render_plan.py`.
+This is a fixture parity gate for the non-alpha, non-apply-path packet surfaces now physically owned by `render_core/layer_render_plan_residual_packet_surfaces.py` and re-exported by `render_core/render_plan.py`.
 
 Covered helpers:
 
@@ -30,7 +30,7 @@ Explicitly excluded helpers:
 | Composition timing packet | Numeric coercion, 3-decimal rounding, non-numeric skip, default phase totals, input order | Timing packet only; no performance readiness claim |
 | Composition steps | Boundary-layer selected path, boundary aggregate path, fixed layer order, style postprocess always present | Step list only; no alpha formula test |
 | Batch decisions | Clean reuse, global dirty, dirty flag branches, invalidation scope, postprocess decision, malformed entry skip | Decision packet only; no batch execution |
-| Bundle-level guards | Deterministic repeat calls, dict/list/scalar output, excluded helper names kept out, no runtime merge or pixel-equivalence claim | No source movement |
+| Bundle-level guards | Deterministic repeat calls, dict/list/scalar output, excluded helper names kept out, no runtime merge or pixel-equivalence claim | Minimal source movement only |
 
 ## False-Leaf Warnings
 
@@ -54,8 +54,8 @@ git diff --check
 
 Full smoke is not required for this fixture-only slice unless source-map or smoke-visible contracts change.
 
-The paired movement preimplementation gate is `LAYER_RENDER_PLAN_RESIDUAL_PACKET_SURFACES_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`. The checker is `scripts/validate_layer_render_plan_residual_packet_surfaces_import_boundary.py`; it is AST-only and does not import or execute the future helper candidate.
+The paired movement gate is `LAYER_RENDER_PLAN_RESIDUAL_PACKET_SURFACES_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`. The checker is `scripts/validate_layer_render_plan_residual_packet_surfaces_import_boundary.py`; it is AST-only and does not import or execute the helper candidate.
 
 ## Boundary Statement
 
-Test/docs-only residual render_plan packet surface fixture gate. No source movement, no helper module creation, no alpha/apply path behavior test or change, no controller/renderer/Qt/VisPy/Taichi runtime execution, no metadata sidecar writer change, no artifact writer execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Residual render_plan packet surface fixture gate consumed by minimal helper extraction. No alpha/apply path behavior test or change, no controller/renderer/Qt/VisPy/Taichi runtime execution, no metadata sidecar writer change, no artifact writer execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.

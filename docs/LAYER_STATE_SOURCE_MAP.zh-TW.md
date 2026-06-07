@@ -24,8 +24,8 @@ This document maps the current layer-state inputs that feed renderer metadata, `
 | Layer blend | `set_layer_blend_mode()`, `layer_blend_mode()` | Runtime blend, metadata `layer_blend_mode`, boundary aggregate blend | Sets `overlay_dirty` for runtime overlay blend layers | Low/Medium because only supported runtime overlay layers should move first |
 | Selected semantic target | `set_selected_layer_semantic_target()` | `selected_layer_semantic_target`, layer pick state, metadata sidecar | Does not directly render but affects UI diagnostics and scoped picking | Medium because invalid layer state is represented, not rejected |
 | Runtime state file input | `refresh_layer_runtime_state()` | Visibility, opacity, blend, selected layer, acknowledgements | Marks changed state and may skip invalid/no-op updates | Medium/High because file mtime, ack, no-op detection and error reporting are coupled |
-| Dirty flag snapshot | `layer_render_plan_runtime_snapshot()` | `build_layer_render_plan_runtime_snapshot()` in `render_core.render_plan` | Captures `force`, `changed`, `globe_dirty`, `overlay_dirty`, `hydrology_dirty`, `boundary_dirty`, `boundary_hover_dirty` | Medium because flags reflect both UI and renderer refresh phases |
-| Runtime snapshot builder | `render_core.render_plan.build_layer_render_plan_runtime_snapshot()` | Compiled layer render plan and metadata sidecar | Pure packet assembly after controller collects inputs | Low; already in `render_core` |
+| Dirty flag snapshot | `layer_render_plan_runtime_snapshot()` | `build_layer_render_plan_runtime_snapshot()` in `render_core.layer_render_plan_residual_packet_surfaces`, re-exported by `render_core.render_plan` | Captures `force`, `changed`, `globe_dirty`, `overlay_dirty`, `hydrology_dirty`, `boundary_dirty`, `boundary_hover_dirty` | Medium because flags reflect both UI and renderer refresh phases |
+| Runtime snapshot builder | `render_core.layer_render_plan_residual_packet_surfaces.build_layer_render_plan_runtime_snapshot()` | Compiled layer render plan and metadata sidecar | Pure packet assembly after controller collects inputs | Low; already in `render_core` |
 | Cache key inputs | `build_layer_render_plan_cache_key()` | Compiled plan reuse / invalidation | Includes visible layers, selected semantic target, dirty flags, boundary ids, opacity and blend | Medium because changing shape can affect reuse evidence |
 
 ## Current render-plan flow
@@ -35,7 +35,7 @@ This document maps the current layer-state inputs that feed renderer metadata, `
 3. `render_if_needed()` calls `refresh_layer_runtime_state()`.
 4. `render_if_needed()` builds `changed` from `force`, `globe_dirty`, and `overlay_dirty`.
 5. `layer_render_plan_runtime_snapshot()` collects visible layers, selected target, dirty flags and composition steps.
-6. `render_core.render_plan.build_layer_render_plan_runtime_snapshot()` returns the serializable runtime snapshot packet.
+6. `render_core.layer_render_plan_residual_packet_surfaces.build_layer_render_plan_runtime_snapshot()` returns the serializable runtime snapshot packet; `render_core.render_plan` keeps the compatibility re-export.
 7. `compile_layer_render_plan()` uses the runtime snapshot to compute cache key, invalidation reasons, batch decisions, execution phases and metadata summary.
 8. `write_output_metadata()` writes full `layer_render_plan` and `layer_render_plan_summary`.
 

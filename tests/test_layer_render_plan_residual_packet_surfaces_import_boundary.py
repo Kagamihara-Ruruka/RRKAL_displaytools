@@ -32,6 +32,18 @@ class LayerRenderPlanResidualPacketSurfacesImportBoundaryTests(unittest.TestCase
         self.assertTrue(packet["alpha_helpers_excluded"])
         self.assertTrue(packet["apply_path_excluded"])
 
+    def test_current_candidate_passes_boundary(self):
+        packet = validate_target(
+            REPO_ROOT / "render_core" / "layer_render_plan_residual_packet_surfaces.py"
+        )
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
+        self.assertTrue(packet["alpha_helpers_excluded"])
+        self.assertTrue(packet["apply_path_excluded"])
+
     def test_safe_source_passes_with_preserved_string_labels(self):
         source = (
             "from __future__ import annotations\n"

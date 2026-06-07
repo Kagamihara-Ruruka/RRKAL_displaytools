@@ -41,10 +41,10 @@ Current work remains design/evidence-only:
 
 | Concern | Current location | Finding |
 | --- | --- | --- |
-| Runtime-blend step generation | `render_core.render_plan.build_layer_render_plan_composition_steps()` | Hydrology (`lakes`, `rivers`) and boundary/maritime (`borders`, `territorial_sea`, `eez`, `high_seas`) steps are emitted as `kind=runtime_blend`. |
+| Runtime-blend step generation | `render_core.layer_render_plan_residual_packet_surfaces.build_layer_render_plan_composition_steps()`; re-exported by `render_core.render_plan` | Hydrology (`lakes`, `rivers`) and boundary/maritime (`borders`, `territorial_sea`, `eez`, `high_seas`) steps are emitted as `kind=runtime_blend`. |
 | Queue filtering | `HybridRenderController.layer_render_plan_compose_queue()` plus `render_core.render_plan.build_layer_render_plan_compose_queue_packet_from_states()` | Hidden, missing, transparent or empty overlays are removed before execution evidence. |
 | Execution | `HybridRenderController.apply_layer_render_plan_composition()` | Each queued step is dispatched sequentially. `runtime_blend` calls `HybridRenderController.compose_runtime_blend()`. |
-| Current timing | `HybridRenderController.apply_layer_render_plan_composition()` and `render_core.render_plan.build_layer_render_plan_composition_timing_packet()` | Timing is aggregated by phase id, so all runtime-blend work is folded into `compose_overlays`. |
+| Current timing | `HybridRenderController.apply_layer_render_plan_composition()` and `render_core.layer_render_plan_residual_packet_surfaces.build_layer_render_plan_composition_timing_packet()`; re-exported by `render_core.render_plan` | Timing is aggregated by phase id, so all runtime-blend work is folded into `compose_overlays`. |
 | Output metadata | `HybridRenderController.compile_layer_render_plan()` / metadata sidecar | Existing metadata exposes queue/run facts and aggregate phase timing, not per-step elapsed time. |
 
 ## Subphase timing field feasibility

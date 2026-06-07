@@ -30,7 +30,7 @@ Current conclusion:
 | Parity contract | `render_core.render_plan.build_layer_render_plan_compose_run_parity_contract()` | Keeps runtime merge disabled and requires visual parity before merge. |
 | Dispatch packet | `render_core.layer_render_plan_composition_dispatch.build_layer_render_plan_composition_dispatch_packet()`; re-exported by `render_core.render_plan` | Maps action kind and overlay presence to dispatch decision. |
 | Live pixel execution | `HybridRenderController.apply_layer_render_plan_composition()` | Applies runtime blend, alpha blend, alpha compose, runtime overlay, and style postprocess. |
-| Timing packet | `render_core.render_plan.build_layer_render_plan_composition_timing_packet()` | Normalizes controller-measured phase timing. |
+| Timing packet | `render_core.layer_render_plan_residual_packet_surfaces.build_layer_render_plan_composition_timing_packet()`; re-exported by `render_core.render_plan` | Normalizes controller-measured phase timing. |
 | Phase timing runtime packet | `render_core.render_plan.build_layer_render_plan_phase_timing_runtime_packet()` | Selects slowest phase and bottleneck recommendation. |
 | Metadata summary | `render_core.layer_render_plan_cache_diagnostics.build_layer_render_plan_metadata_summary()`; re-exported by `render_core.render_plan` | Summarizes compiled plan and phase timing without replacing full metadata. |
 
@@ -227,14 +227,14 @@ Classification:
 
 | Stage | Live behavior? | Current owner | Move risk | Next safe action |
 | ----- | -------------- | ------------- | --------- | ---------------- |
-| Composition step creation | no direct pixels | controller + `render_core.render_plan` | medium | map inputs before moving |
+| Composition step creation | no direct pixels | controller + `render_core.layer_render_plan_residual_packet_surfaces`; re-exported by `render_core.render_plan` | medium | map inputs before moving |
 | Runtime state scan | reads live controller state | controller | medium | keep controller-owned until state contract is stronger |
 | Queue packet | packet only | `render_core.render_plan` | low/medium | keep contract stable |
 | Skip reason packet | packet only, behavior-sensitive meaning | `render_core.render_plan` | medium | use as evidence, not optimization |
 | Compose run grouping | packet only | `render_core.render_plan` | low | use for parity planning |
 | Dispatch packet | packet only | `render_core.render_plan` | low/medium | keep separate from execution |
 | Pixel dispatch execution | yes | controller | high | do not move without parity |
-| Timing normalization | packet only | `render_core.render_plan` | low | evidence-only improvements possible |
+| Timing normalization | packet only | `render_core.layer_render_plan_residual_packet_surfaces`; re-exported by `render_core.render_plan` | low | evidence-only improvements possible |
 | Metadata summary | packet only | `render_core.render_plan` | low | keep schema stable |
 
 ## Safe next candidate zones

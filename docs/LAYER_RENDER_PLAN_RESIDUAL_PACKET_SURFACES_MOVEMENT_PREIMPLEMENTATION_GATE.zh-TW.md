@@ -2,16 +2,16 @@
 
 ## Scope
 
-This is a tooling/docs-only movement preimplementation gate for a possible future helper module:
+This gate has been consumed by the minimal movement slice for the residual packet helper module:
 
-- Future candidate path: `render_core/layer_render_plan_residual_packet_surfaces.py`
-- Current physical owner: `render_core/render_plan.py`
+- Current helper path: `render_core/layer_render_plan_residual_packet_surfaces.py`
+- Compatibility owner: `render_core/render_plan.py` imports and re-exports these symbols.
 
-No helper module is created in this slice and no source is moved.
+The movement was limited to the covered dict/list/scalar packet helpers. It did not include alpha helpers or `build_layer_render_plan_apply_path`.
 
-## Future helper family
+## Moved helper family
 
-The future checker boundary corresponds to these packet/list helpers:
+The checker boundary corresponds to these packet/list helpers:
 
 - `build_layer_render_plan_runtime_snapshot`
 - `select_layer_render_plan_composition_input`
@@ -27,9 +27,9 @@ Explicitly excluded:
 - `alpha_compose_transparent`
 - `build_layer_render_plan_apply_path`
 
-## Allowed future ownership
+## Allowed ownership
 
-A future helper may own dict/list/scalar residual packet construction only.
+The helper may own dict/list/scalar residual packet construction only.
 
 String labels such as `alpha_blend`, `runtime_blend`, `apply_helper`, `HybridRenderController.apply_layer_render_plan_composition`, and `future_unified_taichi_render_plan` may remain as packet data when they preserve existing behavior. These labels do not authorize imports, callable references, controller access, pixel operations, or runtime execution.
 
@@ -50,14 +50,14 @@ The import-boundary checker rejects:
 
 ## Movement requirements
 
-Before any future physical movement:
+For this physical ownership split and any later adjustment:
 
-1. `tests.test_layer_render_plan_residual_packet_surfaces` must pass before and after.
+1. `tests.test_layer_render_plan_residual_packet_surfaces` must pass.
 2. `tests.test_layer_render_plan_residual_packet_surfaces_import_boundary` must pass.
-3. `scripts/validate_layer_render_plan_residual_packet_surfaces_import_boundary.py` must pass on the candidate helper module.
+3. `scripts/validate_layer_render_plan_residual_packet_surfaces_import_boundary.py` must pass on `render_core/layer_render_plan_residual_packet_surfaces.py`.
 4. Source-map and smoke-visible ownership must be updated if physical source ownership changes.
 5. Alpha helpers and `build_layer_render_plan_apply_path` must remain excluded unless a separate o_1-reviewed gate authorizes a different slice.
 
 ## Boundary Statement
 
-Tooling/docs-only residual packet surfaces import-boundary checker and movement preimplementation gate. No helper module creation, no source movement, no alpha/apply path behavior test or change, no controller/renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Residual packet surfaces movement gate consumed by minimal helper extraction. No alpha/apply path behavior test or change, no controller/renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
