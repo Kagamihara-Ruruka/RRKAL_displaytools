@@ -114,7 +114,7 @@ $branch = (git branch --show-current).Trim()
 if ($LASTEXITCODE -ne 0) {
     throw "git branch failed"
 }
-$porcelain = @(git status --porcelain)
+$porcelain = @(git status --porcelain --untracked-files=no)
 if ($LASTEXITCODE -ne 0) {
     throw "git status failed"
 }
