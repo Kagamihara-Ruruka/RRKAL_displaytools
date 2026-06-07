@@ -2,35 +2,35 @@
 
 ## TL;DR
 
-This gate defines the import-boundary and parity requirements before any future movement of `LayerRenderBudgetPolicy`.
+This gate defines the import-boundary and parity requirements for the reviewed movement of `LayerRenderBudgetPolicy`.
 
-Cut-out note: No monolith source extracted in this slice.
+Cut-out note: This gate has been consumed by the minimal movement slice for `LAYER_RENDER_COSTS` and `LayerRenderBudgetPolicy`.
 
-This checkpoint does not create a helper module, does not move `LAYER_RENDER_COSTS`, and does not extract policy code.
+`LAYER_RENDER_COSTS` and `LayerRenderBudgetPolicy` now live together in `render_core/layer_render_budget_policy.py`. This note records the boundary only and does not authorize broader movement.
 
-## Candidate future path
+## Current helper path
 
-Future candidate path:
+Current helper path:
 
 ```text
 render_core/layer_render_budget_policy.py
 ```
 
-The candidate file is intentionally absent in this checkpoint. The standalone checker must return `not_applicable_candidate_missing` with `boundary_passed=true` while it is absent.
+The candidate file now exists after the reviewed minimal movement. The standalone checker must return `status=pass` with `boundary_passed=true` for this file. The synthetic missing-candidate behavior remains covered by tests using a deliberately absent path.
 
 ## LAYER_RENDER_COSTS movement decision
 
-Preferred future movement strategy:
+Movement strategy used in this slice:
 
-- Move `LAYER_RENDER_COSTS` into the same future helper module as `LayerRenderBudgetPolicy`.
+- `LAYER_RENDER_COSTS` moved into the same helper module as `LayerRenderBudgetPolicy`.
 
-Acceptable alternative:
+Acceptable alternative for future refactors:
 
 - Move `LAYER_RENDER_COSTS` into a pure constants module such as `render_core/layer_render_costs.py`, but only if that constants module has its own no-renderer import-boundary check.
 
 Forbidden strategy:
 
-- A future helper must not import `taichi_global_bathymetry` only to read `LAYER_RENDER_COSTS`.
+- A helper must not import `taichi_global_bathymetry` only to read `LAYER_RENDER_COSTS`.
 
 ## Preserved behavior from fixture tests
 
@@ -50,7 +50,7 @@ Future movement must preserve current fixture coverage:
 
 ## Forbidden dependencies
 
-A future layer render budget policy helper must not import or depend on:
+The layer render budget policy helper must not import or depend on:
 
 - renderer/controller modules or state
 - Qt, VisPy, or Taichi runtime modules
@@ -85,7 +85,7 @@ The checker uses stdlib AST only. It must not import or execute the target modul
 
 ## Before/after parity requirements
 
-Before any future movement, run:
+For this reviewed movement and any future edits, run:
 
 ```powershell
 py -3 -m unittest tests.test_layer_render_budget_policy
@@ -97,11 +97,11 @@ py -3 -B scripts\generated_artifact_audit_leaf_provider.py
 git diff --check
 ```
 
-If movement happens later, `taichi_global_bathymetry.py` must be limited to import/delegation or re-export wiring for this policy plus reviewed `LAYER_RENDER_COSTS` handling. Any broader source change requires a separate review.
+`taichi_global_bathymetry.py` must remain limited to import/delegation or re-export wiring for this policy plus reviewed `LAYER_RENDER_COSTS` handling. Any broader source change requires a separate review.
 
 ## Artifact audit requirements
 
-Future movement must preserve:
+This movement and any future edits must preserve:
 
 - no `state/` artifacts staged or untracked from the task
 - no PNG artifacts staged or untracked from the task
@@ -110,9 +110,9 @@ Future movement must preserve:
 
 ## Not authorized
 
-- Policy extraction.
-- Helper module creation.
-- Movement of `LAYER_RENDER_COSTS`.
+- Additional policy extraction beyond `LayerRenderBudgetPolicy`.
+- Additional helper module creation beyond `render_core/layer_render_budget_policy.py`.
+- Further movement or splitting of `LAYER_RENDER_COSTS` without a new review.
 - Renderer runtime behavior change.
 - Metadata or output behavior change.
 - Performance claim.
@@ -122,4 +122,4 @@ Future movement must preserve:
 
 ## Boundary statement
 
-Tooling/docs-only LayerRenderBudgetPolicy movement preimplementation gate. No policy extraction, no helper module creation, no renderer/Qt/Taichi runtime execution, no metadata/output behavior change, no performance claim, no visual parity readiness claim.
+Minimal LayerRenderBudgetPolicy movement gate consumed by this slice. No broader policy extraction, no renderer/Qt/Taichi runtime execution, no metadata/output behavior change, no performance claim, no visual parity readiness claim.
