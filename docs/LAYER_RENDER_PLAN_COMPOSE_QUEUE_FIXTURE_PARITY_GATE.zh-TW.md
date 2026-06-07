@@ -85,6 +85,19 @@ Before moving any controller queue method:
 4. Keep artifact writer paths outside this gate.
 5. Keep metadata schema and output behavior unchanged.
 
+## Import-boundary checker
+
+Future compose queue helper movement is guarded by:
+
+- `scripts/validate_layer_render_plan_compose_queue_import_boundary.py`
+- candidate path: `render_core/layer_render_plan_compose_queue.py`
+
+The checker is static AST-only. It must not import or execute the target module.
+
+The candidate path is intentionally missing in the current slice. Missing candidate status is not an approval to move code; it only records that there is no target helper module to validate yet.
+
+The future helper must also avoid importing `render_core.render_plan` back as a dependency. That module is still a mixed surface because it contains both pure packet helpers and ndarray alpha composition helpers.
+
 ## Boundary statement
 
 Test/docs-only compose queue fixture parity gate. No controller instantiation, no render-plan extraction, no composition hot path execution, no alpha ndarray formula test, no artifact writer execution, no metadata/output behavior change, and no runtime merge enablement.

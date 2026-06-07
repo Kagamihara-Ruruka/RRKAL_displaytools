@@ -48,6 +48,7 @@
 - `LAYER_RENDER_PLAN_OVERLAY_QUEUE_NEXT_SLICE_MAP.zh-TW.md`: docs/evidence-only source map for layer render plan, overlay queue, and composition-adjacent next fixture-gate candidates.
 - `DISPLAYTOOLS_MONOLITH_SIX_SUBSYSTEM_GRAPH_CUT_MAP.zh-TW.md`: docs/evidence-only six-subsystem graph-cut map for monolith decomposition route selection.
 - `LAYER_RENDER_PLAN_COMPOSE_QUEUE_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for `render_core.render_plan` compose queue pure helper fixture parity.
+- `LAYER_RENDER_PLAN_COMPOSE_QUEUE_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate and AST import-boundary checker for possible future compose queue helper movement.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
