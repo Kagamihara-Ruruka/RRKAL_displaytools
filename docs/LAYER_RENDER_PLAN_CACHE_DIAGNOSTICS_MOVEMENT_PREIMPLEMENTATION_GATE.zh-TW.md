@@ -2,21 +2,21 @@
 
 ## TL;DR
 
-This gate defines the static import boundary for a possible future cache diagnostics helper module.
+This gate defines the static import boundary for the cache diagnostics helper module.
 
-- future candidate path: `render_core/layer_render_plan_cache_diagnostics.py`
-- current status: candidate module is not created in this slice
+- helper path: `render_core/layer_render_plan_cache_diagnostics.py`
+- current status: helper module created by the minimal cache diagnostics movement slice
 - validator: `scripts/validate_layer_render_plan_cache_diagnostics_import_boundary.py`
 
 The checker uses Python AST parsing only. It does not import or execute the target module.
 
-## Candidate future module
+## Candidate module
 
-Proposed only:
+Current helper module:
 
 - `render_core/layer_render_plan_cache_diagnostics.py`
 
-Target symbols if a later source movement is authorized:
+Moved symbols:
 
 - `build_layer_render_plan_cache_key`
 - `build_layer_render_plan_cache_invalidation_reasons`
@@ -37,14 +37,20 @@ Allowed future behavior:
 
 ## Missing candidate behavior
 
-Because the candidate helper module does not exist yet, the checker must treat the default target as not applicable:
+When a synthetic missing path is supplied, the checker must treat it as not applicable:
 
 - `candidate_exists=false`
 - `status=not_applicable_candidate_missing`
 - `boundary_passed=true`
 - exit code `0`
 
-This behavior only means there is no candidate file to validate yet. It does not approve movement.
+This behavior only means there is no candidate file at that path. It does not approve additional movement.
+
+## Consumed movement status
+
+The minimal movement slice moved only pure cache diagnostics helpers. `render_core/render_plan.py` keeps import/re-export compatibility for existing callers.
+
+No compiled plan packet builder, reused plan packet builder, metadata sidecar writer, artifact writer, controller method, renderer hot path, or runtime behavior moved in this slice.
 
 ## Cache word versus cache lifecycle boundary
 
@@ -137,8 +143,8 @@ After any future movement:
 
 ## Not authorized in this slice
 
-- helper module creation
-- cache diagnostics source movement
+- additional helper module creation
+- additional cache diagnostics source movement
 - metadata sidecar writer change
 - artifact writer change
 - controller method movement
@@ -148,4 +154,4 @@ After any future movement:
 
 ## Boundary statement
 
-Tooling/docs-only cache diagnostics import-boundary checker and movement gate. No helper module creation, no symbol movement, no metadata sidecar writer change, no artifact writer execution, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Minimal cache diagnostics movement gate. No additional helper module creation, no additional symbol movement, no metadata sidecar writer change, no artifact writer execution, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.

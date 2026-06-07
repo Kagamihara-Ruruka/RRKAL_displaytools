@@ -31,6 +31,11 @@ if ($ContractOnly) {
 }
 
 $renderPlanSource = Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\render_plan.py") -Raw -Encoding UTF8
+$renderPlanCacheDiagnosticsSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_cache_diagnostics.py")) {
+    Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_cache_diagnostics.py") -Raw -Encoding UTF8
+} else {
+    ""
+}
 $rendererSource = Get-Content -LiteralPath (Join-Path $RepoRoot "taichi_global_bathymetry.py") -Raw -Encoding UTF8
 $metadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py")) {
     Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py") -Raw -Encoding UTF8
@@ -38,19 +43,20 @@ $metadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\m
     ""
 }
 $rendererMetadataSource = "$rendererSource`n$metadataSource"
+$renderPlanSummarySource = "$renderPlanSource`n$renderPlanCacheDiagnosticsSource"
 $markers = [ordered]@{
-    summary_schema = $renderPlanSource -like "*$summarySchema*"
-    summary_builder = $renderPlanSource -like "*build_layer_render_plan_metadata_summary*"
+    summary_schema = $renderPlanSummarySource -like "*$summarySchema*"
+    summary_builder = $renderPlanSummarySource -like "*build_layer_render_plan_metadata_summary*"
     full_plan_field = $rendererMetadataSource -like '*"layer_render_plan": layer_render_plan*'
     summary_sidecar_field = (
         ($rendererMetadataSource -like '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*') -or
         ($rendererMetadataSource -like '*"layer_render_plan_summary": layer_render_plan_summary*')
     )
     adapter_payload_schema = $renderPlanSource -like "*$adapterPayloadSchema*"
-    adapter_payload_status_field = $renderPlanSource -like "*adapter_payload_status*"
+    adapter_payload_status_field = $renderPlanSummarySource -like "*adapter_payload_status*"
     adapter_payload_contract_schema = $renderPlanSource -like "*$adapterPayloadContractSchema*"
-    adapter_payload_contract_status_field = $renderPlanSource -like "*adapter_payload_contract_status*"
-    full_plan_preserved_boundary = $renderPlanSource -like "*full layer_render_plan remains the renderer parity/debugging contract*"
+    adapter_payload_contract_status_field = $renderPlanSummarySource -like "*adapter_payload_contract_status*"
+    full_plan_preserved_boundary = $renderPlanSummarySource -like "*full layer_render_plan remains the renderer parity/debugging contract*"
     no_io_boundary = $rendererSource -like "*metadata_path.write_text*"
 }
 $missing = @()

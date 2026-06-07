@@ -32,15 +32,15 @@ $targets = @(
     [ordered]@{ id = "build_layer_render_plan_phase_timing_contract"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_phase_timing_contract\(" },
     [ordered]@{ id = "build_layer_render_plan_bottleneck_recommendation"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_bottleneck_recommendation\(" },
     [ordered]@{ id = "build_layer_render_plan_phase_timing_runtime_packet"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_phase_timing_runtime_packet\(" },
-    [ordered]@{ id = "build_layer_render_plan_metadata_summary"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_metadata_summary\(" },
+    [ordered]@{ id = "build_layer_render_plan_metadata_summary"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_metadata_summary\(" },
     [ordered]@{ id = "build_layer_render_plan_single_pass_preflight_contract"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_single_pass_preflight_contract\(" },
     [ordered]@{ id = "build_layer_render_plan_adapter_boundary_contract"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_adapter_boundary_contract\(" },
     [ordered]@{ id = "build_layer_render_plan_adapter_payload"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_adapter_payload\(" },
     [ordered]@{ id = "build_layer_render_plan_adapter_payload_contract"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_adapter_payload_contract\(" },
     [ordered]@{ id = "build_layer_render_plan_adapter_payload_summary"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_adapter_payload_summary\(" },
-    [ordered]@{ id = "build_layer_render_plan_cache_key"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_cache_key\(" },
-    [ordered]@{ id = "build_layer_render_plan_cache_invalidation_reasons"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_cache_invalidation_reasons\(" },
-    [ordered]@{ id = "build_layer_render_plan_cache_invalidation_scope"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_cache_invalidation_scope\(" },
+    [ordered]@{ id = "build_layer_render_plan_cache_key"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_key\(" },
+    [ordered]@{ id = "build_layer_render_plan_cache_invalidation_reasons"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_invalidation_reasons\(" },
+    [ordered]@{ id = "build_layer_render_plan_cache_invalidation_scope"; path = "render_core/layer_render_plan_cache_diagnostics.py"; pattern = "^def build_layer_render_plan_cache_invalidation_scope\(" },
     [ordered]@{ id = "build_layer_render_plan_batch_decisions"; path = "render_core/render_plan.py"; pattern = "^def build_layer_render_plan_batch_decisions\(" },
     [ordered]@{ id = "compose_runtime_overlay"; path = "taichi_global_bathymetry.py"; pattern = "^\s+def compose_runtime_overlay\(" },
     [ordered]@{ id = "compose_runtime_blend"; path = "taichi_global_bathymetry.py"; pattern = "^\s+def compose_runtime_blend\(" },
@@ -62,9 +62,9 @@ if ($ContractOnly) {
         source = $scriptName
         status = "contract_only_no_code_move"
         output_schema = "rrkal_displaytools.render_plan_compose_source_map.v1"
-        source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py")
+        source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py")
         target_module = "render_core/render_plan.py"
-        target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py")
+        target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py")
         target_count = $targets.Count
         boundary = "Source map only; it reads helper positions and does not move code, launch Qt/Taichi, enable runtime merge, or touch RRKAL data/cache governance."
         portable = $true
@@ -112,9 +112,9 @@ foreach ($target in $targets) {
     schema = "rrkal_displaytools.render_plan_compose_source_map.v1"
     source = $scriptName
     status = if ($missing.Count -eq 0) { "ready" } else { "incomplete" }
-    source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py")
+    source_files = @("taichi_global_bathymetry.py", "render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py")
     target_module = "render_core/render_plan.py"
-    target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py")
+    target_modules = @("render_core/render_plan.py", "render_core/layer_render_plan_compose_queue.py", "render_core/layer_render_plan_composition_dispatch.py", "render_core/layer_render_plan_cache_diagnostics.py")
     source_owner = "HybridRenderController runtime fact collectors and render_core render-plan helpers"
     no_code_move = $true
     runtime_merge_enabled = $false

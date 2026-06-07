@@ -32,7 +32,7 @@ Current conclusion:
 | Live pixel execution | `HybridRenderController.apply_layer_render_plan_composition()` | Applies runtime blend, alpha blend, alpha compose, runtime overlay, and style postprocess. |
 | Timing packet | `render_core.render_plan.build_layer_render_plan_composition_timing_packet()` | Normalizes controller-measured phase timing. |
 | Phase timing runtime packet | `render_core.render_plan.build_layer_render_plan_phase_timing_runtime_packet()` | Selects slowest phase and bottleneck recommendation. |
-| Metadata summary | `render_core.render_plan.build_layer_render_plan_metadata_summary()` | Summarizes compiled plan and phase timing without replacing full metadata. |
+| Metadata summary | `render_core.layer_render_plan_cache_diagnostics.build_layer_render_plan_metadata_summary()`; re-exported by `render_core.render_plan` | Summarizes compiled plan and phase timing without replacing full metadata. |
 
 ## A. `apply_layer_render_plan_composition()` source flow
 

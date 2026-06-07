@@ -10,10 +10,10 @@ This slice is test/docs-only. It does not move helpers, change metadata sidecar 
 
 | Candidate | Current owner | Classification | Fixture gate status | Boundary |
 | --- | --- | --- | --- | --- |
-| `build_layer_render_plan_cache_key` | `render_core.render_plan` | pure dict/scalar helper | covered by fixture tests | Builds deterministic JSON cache key only. |
-| `build_layer_render_plan_cache_invalidation_reasons` | `render_core.render_plan` | pure list helper | covered by fixture tests | Reads runtime snapshot dict only. |
-| `build_layer_render_plan_cache_invalidation_scope` | `render_core.render_plan` | pure list-of-dict helper | covered by fixture tests | Reads dirty flags and batch target dicts only. |
-| `build_layer_render_plan_metadata_summary` | `render_core.render_plan` | pure summary packet helper with metadata-sidecar proximity | covered by fixture tests | Summary only; does not write sidecar files. |
+| `build_layer_render_plan_cache_key` | `render_core.layer_render_plan_cache_diagnostics`; re-exported by `render_core.render_plan` | pure dict/scalar helper | covered by fixture tests | Builds deterministic JSON cache key only. |
+| `build_layer_render_plan_cache_invalidation_reasons` | `render_core.layer_render_plan_cache_diagnostics`; re-exported by `render_core.render_plan` | pure list helper | covered by fixture tests | Reads runtime snapshot dict only. |
+| `build_layer_render_plan_cache_invalidation_scope` | `render_core.layer_render_plan_cache_diagnostics`; re-exported by `render_core.render_plan` | pure list-of-dict helper | covered by fixture tests | Reads dirty flags and batch target dicts only. |
+| `build_layer_render_plan_metadata_summary` | `render_core.layer_render_plan_cache_diagnostics`; re-exported by `render_core.render_plan` | pure summary packet helper with metadata-sidecar proximity | covered by fixture tests | Summary only; does not write sidecar files. |
 | `build_compiled_layer_render_plan_packet` | `render_core.render_plan` | broad packet builder | excluded | Too close to full compiled plan contract for this fixture gate. |
 | `build_reused_compiled_layer_render_plan_packet` | `render_core.render_plan` | broad packet builder | excluded | Mutates copied plan packet and aggregates multiple contracts. |
 
