@@ -5,14 +5,14 @@
 This gate defines the import boundary for a possible future compose queue helper module:
 
 - candidate path: `render_core/layer_render_plan_compose_queue.py`
-- current status: candidate module is not created in this slice
+- current status: candidate module has been created by the minimal source movement slice
 - validator: `scripts/validate_layer_render_plan_compose_queue_import_boundary.py`
 
 The checker is a static AST validator. It does not import or execute the target module.
 
 ## Candidate future module
 
-Proposed only:
+Current helper module:
 
 - `render_core/layer_render_plan_compose_queue.py`
 
@@ -28,14 +28,14 @@ Allowed future behavior:
 
 ## Missing candidate behavior
 
-Because the candidate helper module does not exist yet, the checker must treat the default target as not applicable:
+For synthetic missing paths, the checker must still treat the target as not applicable:
 
 - `candidate_exists=false`
 - `status=not_applicable_candidate_missing`
 - `boundary_passed=true`
 - exit code `0`
 
-This behavior only means there is no candidate file to validate yet. It does not approve movement.
+This behavior only means there is no file at the requested path. It does not approve any additional movement.
 
 ## Forbidden dependencies
 
@@ -117,10 +117,15 @@ After any future movement:
 4. Metadata schema and output behavior must remain unchanged.
 5. Runtime merge must remain disabled unless separately authorized.
 
+Current minimal movement status:
+
+- `render_core/layer_render_plan_compose_queue.py` owns the pure queue helper surface.
+- `render_core/render_plan.py` re-exports the moved symbols for compatibility.
+- Further controller movement is not authorized by this gate.
+
 ## Not authorized in this slice
 
-- helper module creation
-- compose queue source movement
+- additional compose queue source movement beyond the reviewed pure helper surface
 - controller method movement
 - renderer hot path change
 - alpha/ndarray behavior change
