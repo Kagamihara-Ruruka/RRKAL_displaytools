@@ -57,7 +57,7 @@ They prove only that the current policy object behavior is observable through im
 
 ## Recommended next step
 
-If this gate is accepted, the next low-risk step is a movement preimplementation gate or import-boundary checker for a future `LayerRenderBudgetPolicy` helper module.
+If this gate is accepted, use `LAYER_RENDER_BUDGET_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md` and `scripts\validate_layer_render_budget_policy_import_boundary.py` before any future movement of this policy.
 
 Do not extract the policy in the same checkpoint as this fixture gate.
 

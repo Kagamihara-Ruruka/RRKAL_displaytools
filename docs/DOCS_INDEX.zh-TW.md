@@ -42,6 +42,7 @@
 - `DATASHADER_SAMPLING_POLICY_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for current `DatashaderSamplingPolicy` decision/text fixture parity before any future policy movement.
 - `DATASHADER_SAMPLING_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate for future `DatashaderSamplingPolicy` movement boundaries and import checks.
 - `LAYER_RENDER_BUDGET_POLICY_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for current `LayerRenderBudgetPolicy` decision/text fixture parity, including its `LAYER_RENDER_COSTS` dependency warning.
+- `LAYER_RENDER_BUDGET_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate for future `LayerRenderBudgetPolicy` movement boundaries, import checks, and reviewed `LAYER_RENDER_COSTS` handling.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
