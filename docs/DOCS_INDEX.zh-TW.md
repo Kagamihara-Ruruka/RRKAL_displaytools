@@ -45,6 +45,7 @@
 - `LAYER_RENDER_BUDGET_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate for future `LayerRenderBudgetPolicy` movement boundaries, import checks, and reviewed `LAYER_RENDER_COSTS` handling.
 - `ADAPTIVE_RENDER_QUALITY_POLICY_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for current `AdaptiveRenderQualityPolicy` decision/text fixture parity before any future policy movement.
 - `ADAPTIVE_RENDER_QUALITY_POLICY_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate for future `AdaptiveRenderQualityPolicy` movement boundaries and import checks.
+- `LAYER_RENDER_PLAN_OVERLAY_QUEUE_NEXT_SLICE_MAP.zh-TW.md`: docs/evidence-only source map for layer render plan, overlay queue, and composition-adjacent next fixture-gate candidates.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.
