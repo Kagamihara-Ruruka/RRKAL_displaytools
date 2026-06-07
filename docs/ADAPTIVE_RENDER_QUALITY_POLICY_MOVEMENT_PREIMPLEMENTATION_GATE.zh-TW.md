@@ -2,35 +2,35 @@
 
 ## TL;DR
 
-This gate defines the import-boundary and parity requirements before any future movement of `AdaptiveRenderQualityPolicy`.
+This gate defines the import-boundary and parity requirements for the reviewed movement of `AdaptiveRenderQualityPolicy`.
 
-Cut-out note: No monolith source extracted in this slice.
+Cut-out note: This gate has been consumed by the minimal movement slice for `AdaptiveRenderQualityPolicy`.
 
-This checkpoint does not create a helper module and does not extract policy code.
+This gate has been used for a minimal movement slice: `AdaptiveRenderQualityPolicy` now lives in `render_core/adaptive_render_quality_policy.py`. This note records the boundary only and does not authorize broader movement.
 
-## Candidate future path
+## Current helper path
 
-Future candidate path:
+Current helper path:
 
 ```text
 render_core/adaptive_render_quality_policy.py
 ```
 
-The candidate file is intentionally absent in this checkpoint. The standalone checker must return `not_applicable_candidate_missing` with `boundary_passed=true` while it is absent.
+The candidate file now exists after the reviewed minimal movement. The standalone checker must return `status=pass` with `boundary_passed=true` for this file. The synthetic missing-candidate behavior remains covered by tests using a deliberately absent path.
 
 ## Movement boundary
 
-The future helper should remain scalar-only recommendation logic.
+The helper must remain scalar-only recommendation logic.
 
 It must not imply runtime degradation is active. The current policy reports recommendation fields only; it does not change render output or renderer state by itself.
 
 It must not claim performance, readiness, or visual parity.
 
-Future movement must be import plus re-export wiring only in `taichi_global_bathymetry.py`.
+The monolith wiring must remain import plus re-export wiring only in `taichi_global_bathymetry.py`.
 
 ## Preserved behavior from fixture tests
 
-Future movement must preserve current fixture coverage:
+This movement and any future edits must preserve current fixture coverage:
 
 - unknown render timing branch
 - pressure bucket boundaries
@@ -44,7 +44,7 @@ Future movement must preserve current fixture coverage:
 
 ## Forbidden dependencies
 
-A future adaptive render quality policy helper must not import or depend on:
+The adaptive render quality policy helper must not import or depend on:
 
 - renderer/controller modules or state
 - Qt, VisPy, or Taichi runtime modules
@@ -81,7 +81,7 @@ The checker uses stdlib AST only. It must not import or execute the target modul
 
 ## Before/after parity requirements
 
-Before any future movement, run:
+For this reviewed movement and any future edits, run:
 
 ```powershell
 py -3 -m unittest tests.test_adaptive_render_quality_policy
@@ -93,11 +93,11 @@ py -3 -B scripts\generated_artifact_audit_leaf_provider.py
 git diff --check
 ```
 
-If movement happens later, `taichi_global_bathymetry.py` must be limited to import/delegation or re-export wiring for this policy. Any broader source change requires a separate review.
+`taichi_global_bathymetry.py` must remain limited to import/delegation or re-export wiring for this policy. Any broader source change requires a separate review.
 
 ## Artifact audit requirements
 
-Future movement must preserve:
+This movement and any future edits must preserve:
 
 - no `state/` artifacts staged or untracked from the task
 - no PNG artifacts staged or untracked from the task
@@ -106,8 +106,8 @@ Future movement must preserve:
 
 ## Not authorized
 
-- Policy extraction.
-- Helper module creation.
+- Additional policy extraction beyond `AdaptiveRenderQualityPolicy`.
+- Additional helper module creation beyond `render_core/adaptive_render_quality_policy.py`.
 - Renderer runtime behavior change.
 - Metadata or output behavior change.
 - Performance claim.
@@ -117,4 +117,4 @@ Future movement must preserve:
 
 ## Boundary statement
 
-Tooling/docs-only AdaptiveRenderQualityPolicy movement preimplementation gate. No policy extraction, no helper module creation, no renderer/Qt/Taichi runtime execution, no metadata/output behavior change, no performance claim, no visual parity readiness claim.
+Minimal AdaptiveRenderQualityPolicy movement gate consumed by this slice. No broader policy extraction, no renderer/Qt/Taichi runtime execution, no metadata/output behavior change, no performance claim, no visual parity readiness claim.
