@@ -64,10 +64,16 @@ It does not prove:
 Before any future movement:
 
 1. `tests.test_layer_render_plan_execution_phase_timing` must pass before and after.
-2. Any candidate helper must remain pure dict/list/scalar logic.
+2. `scripts/validate_layer_render_plan_execution_phase_timing_import_boundary.py` must pass for any candidate helper module.
 3. No renderer, controller, Qt, VisPy, Taichi, metadata writer, artifact writer, ndarray, alpha helper, parser, provider, or runtime merge dependency may be introduced.
 4. Metadata schema and output behavior must remain unchanged.
 5. Performance/readiness claims remain out of scope.
+
+## Import-boundary checker
+
+`docs/LAYER_RENDER_PLAN_EXECUTION_PHASE_TIMING_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md` defines the future movement boundary and the standalone AST checker for the proposed `render_core/layer_render_plan_execution_phase_timing.py` helper.
+
+The checker treats `build_layer_render_plan_apply_path` as explicitly excluded because it is closer to composition hot path labels.
 
 ## Boundary statement
 
