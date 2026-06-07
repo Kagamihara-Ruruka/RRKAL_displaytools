@@ -2,12 +2,12 @@
 
 ## Scope
 
-This is a tooling/docs-only movement preimplementation gate for a possible future helper module:
+This gate has been consumed by the minimal compiled/reused packet helper movement.
 
-- Future candidate path: `render_core/layer_render_plan_compiled_reused_packets.py`
-- Current physical owner: `render_core/render_plan.py`
+- Helper path: `render_core/layer_render_plan_compiled_reused_packets.py`
+- Compatibility owner: `render_core/render_plan.py` import/re-export wiring
 
-No helper module is created in this slice and no source is moved.
+The moved helper remains limited to dict/list/scalar packet assembly.
 
 ## Future helper family
 
@@ -19,6 +19,11 @@ The future checker boundary corresponds to these packet builders:
 - `build_reused_compiled_layer_render_plan_packet`
 
 If future physical movement needs private scalar helpers such as `_payload_list`, `_payload_dict`, or `_payload_schema`, they must remain private implementation details and must not become new public helper surface.
+
+Current private helpers moved with the bundle:
+
+- `_payload_list`
+- `_payload_dict`
 
 ## Allowed future ownership
 
@@ -38,6 +43,8 @@ Allowed data-field names include:
 
 These names are allowed only as packet fields or string labels. They do not authorize executable dependencies.
 
+The helper may depend on `render_core.layer_render_plan_adapter_preflight` for already-extracted adapter payload, payload contract, boundary contract, summary, and single-pass preflight packet builders. This is the narrow pure packet dependency needed to preserve existing behavior without importing `render_core.render_plan`.
+
 ## Forbidden dependencies
 
 The import-boundary checker rejects:
@@ -49,7 +56,7 @@ The import-boundary checker rejects:
 - metadata sidecar writer or artifact writer dependencies
 - provider, source, loader, fetch, download, or cache lifecycle module dependencies
 - parser or normalizer imports
-- sibling extracted render-plan helper modules unless future o_1 review explicitly narrows that boundary
+- sibling extracted render-plan helper modules, except the narrow adapter/preflight packet dependency listed above
 - existing policy helper modules/classes
 
 ## Status semantics

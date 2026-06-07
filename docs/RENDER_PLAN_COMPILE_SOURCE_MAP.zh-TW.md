@@ -27,7 +27,7 @@ This document maps `HybridRenderController.compile_layer_render_plan()` before a
 | 7. Apply path and execution | `render_core.render_plan` | `build_layer_render_plan_apply_path()`, `build_layer_render_plan_execution_summary()`, `build_layer_render_plan_execution_phases()` | serializable apply path and execution plan | Low; already pure packet construction |
 | 8. Timing contracts | `render_core.render_plan` | `build_layer_render_plan_phase_timing_contract()` and phase timing runtime state | phase timing contract and runtime packet | Low; runtime packet already produced elsewhere |
 | 9. Adapter payload | `render_core.render_plan` | `build_layer_render_plan_adapter_payload()` | normalized controller-to-core payload | Low; already available as a primary payload contract |
-| 10. Reuse / compiled packet | `render_core.render_plan` | `build_reused_compiled_layer_render_plan_packet_from_adapter_payload()` or `build_compiled_layer_render_plan_packet_from_adapter_payload()` | compiled layer render plan | Low/Medium; reuse branch depends on controller cached key and cached plan |
+| 10. Reuse / compiled packet | `render_core.layer_render_plan_compiled_reused_packets`; re-exported by `render_core.render_plan` | `build_reused_compiled_layer_render_plan_packet_from_adapter_payload()` or `build_compiled_layer_render_plan_packet_from_adapter_payload()` | compiled layer render plan | Low/Medium; reuse branch depends on controller cached key and cached plan |
 
 ## Current controller-owned inputs
 

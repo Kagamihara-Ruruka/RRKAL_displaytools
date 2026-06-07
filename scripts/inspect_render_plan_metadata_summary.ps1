@@ -36,6 +36,16 @@ $renderPlanCacheDiagnosticsSource = if (Test-Path -LiteralPath (Join-Path $RepoR
 } else {
     ""
 }
+$renderPlanAdapterPreflightSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_adapter_preflight.py")) {
+    Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_adapter_preflight.py") -Raw -Encoding UTF8
+} else {
+    ""
+}
+$renderPlanCompiledReusedPacketsSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_compiled_reused_packets.py")) {
+    Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_compiled_reused_packets.py") -Raw -Encoding UTF8
+} else {
+    ""
+}
 $rendererSource = Get-Content -LiteralPath (Join-Path $RepoRoot "taichi_global_bathymetry.py") -Raw -Encoding UTF8
 $metadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py")) {
     Get-Content -LiteralPath (Join-Path $RepoRoot "render_core\metadata.py") -Raw -Encoding UTF8
@@ -43,7 +53,7 @@ $metadataSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\m
     ""
 }
 $rendererMetadataSource = "$rendererSource`n$metadataSource"
-$renderPlanSummarySource = "$renderPlanSource`n$renderPlanCacheDiagnosticsSource"
+$renderPlanSummarySource = "$renderPlanSource`n$renderPlanCacheDiagnosticsSource`n$renderPlanAdapterPreflightSource`n$renderPlanCompiledReusedPacketsSource"
 $markers = [ordered]@{
     summary_schema = $renderPlanSummarySource -like "*$summarySchema*"
     summary_builder = $renderPlanSummarySource -like "*build_layer_render_plan_metadata_summary*"
@@ -52,9 +62,9 @@ $markers = [ordered]@{
         ($rendererMetadataSource -like '*"layer_render_plan_summary": build_layer_render_plan_metadata_summary(layer_render_plan)*') -or
         ($rendererMetadataSource -like '*"layer_render_plan_summary": layer_render_plan_summary*')
     )
-    adapter_payload_schema = $renderPlanSource -like "*$adapterPayloadSchema*"
+    adapter_payload_schema = $renderPlanSummarySource -like "*$adapterPayloadSchema*"
     adapter_payload_status_field = $renderPlanSummarySource -like "*adapter_payload_status*"
-    adapter_payload_contract_schema = $renderPlanSource -like "*$adapterPayloadContractSchema*"
+    adapter_payload_contract_schema = $renderPlanSummarySource -like "*$adapterPayloadContractSchema*"
     adapter_payload_contract_status_field = $renderPlanSummarySource -like "*adapter_payload_contract_status*"
     full_plan_preserved_boundary = $renderPlanSummarySource -like "*full layer_render_plan remains the renderer parity/debugging contract*"
     no_io_boundary = $rendererSource -like "*metadata_path.write_text*"

@@ -2,18 +2,18 @@
 
 ## TL;DR
 
-This gate pins current dict/list/scalar packet behavior for the remaining compiled/reused layer render plan packet builders in `render_core.render_plan`.
+This gate pins current dict/list/scalar packet behavior for the compiled/reused layer render plan packet builders. The helpers are physically owned by `render_core.layer_render_plan_compiled_reused_packets` and remain available through `render_core.render_plan` import/re-export compatibility.
 
-This slice is test/docs-only. It does not create a helper module, move source, change `render_core/render_plan.py`, execute renderer code, touch metadata or artifact writers, or authorize runtime merge, pixel equivalence, visual parity, performance, or readiness claims.
+The original fixture-gate slice was test/docs-only. The later minimal movement keeps the same packet behavior and does not execute renderer code, touch metadata or artifact writers, or authorize runtime merge, pixel equivalence, visual parity, performance, or readiness claims.
 
 ## Helpers covered
 
 | Helper | Current owner | Fixture focus |
 | --- | --- | --- |
-| `build_compiled_layer_render_plan_packet_from_adapter_payload` | `render_core.render_plan` | adapter payload passthrough, source label, frame index, compiled status |
-| `build_reused_compiled_layer_render_plan_packet_from_adapter_payload` | `render_core.render_plan` | cached plan copy, adapter payload passthrough, reused status |
-| `build_compiled_layer_render_plan_packet` | `render_core.render_plan` | exact top-level key set, compiled/cache-miss status, counts, provenance labels |
-| `build_reused_compiled_layer_render_plan_packet` | `render_core.render_plan` | exact top-level key set plus preserved cached fields, reused/cache-hit status, overridden runtime packet fields |
+| `build_compiled_layer_render_plan_packet_from_adapter_payload` | `render_core.layer_render_plan_compiled_reused_packets`; re-exported by `render_core.render_plan` | adapter payload passthrough, source label, frame index, compiled status |
+| `build_reused_compiled_layer_render_plan_packet_from_adapter_payload` | `render_core.layer_render_plan_compiled_reused_packets`; re-exported by `render_core.render_plan` | cached plan copy, adapter payload passthrough, reused status |
+| `build_compiled_layer_render_plan_packet` | `render_core.layer_render_plan_compiled_reused_packets`; re-exported by `render_core.render_plan` | exact top-level key set, compiled/cache-miss status, counts, provenance labels |
+| `build_reused_compiled_layer_render_plan_packet` | `render_core.layer_render_plan_compiled_reused_packets`; re-exported by `render_core.render_plan` | exact top-level key set plus preserved cached fields, reused/cache-hit status, overridden runtime packet fields |
 
 ## Explicit exclusions
 

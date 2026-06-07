@@ -32,6 +32,16 @@ class LayerRenderPlanCompiledReusedPacketsImportBoundaryTests(unittest.TestCase)
         self.assertTrue(packet["cache_metadata_field_names_allowed_as_data"])
         self.assertTrue(packet["cache_lifecycle_imports_forbidden"])
 
+    def test_current_candidate_passes_boundary(self):
+        packet = validate_target(
+            REPO_ROOT / "render_core" / "layer_render_plan_compiled_reused_packets.py"
+        )
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
+
     def test_safe_packet_source_passes_with_allowed_field_names(self):
         source = (
             "from __future__ import annotations\n"
@@ -49,6 +59,19 @@ class LayerRenderPlanCompiledReusedPacketsImportBoundaryTests(unittest.TestCase)
             "        'runtime_path_unchanged': True,\n"
             "        'runtime_optimization_applied': False,\n"
             "    }\n"
+        )
+        packet = validate_source(source)
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
+
+    def test_adapter_preflight_dependency_is_allowed_for_payload_contracts(self):
+        source = (
+            "from render_core.layer_render_plan_adapter_preflight import (\n"
+            "    build_layer_render_plan_adapter_payload,\n"
+            "    build_layer_render_plan_adapter_payload_contract,\n"
+            ")\n"
         )
         packet = validate_source(source)
 
@@ -108,7 +131,6 @@ class LayerRenderPlanCompiledReusedPacketsImportBoundaryTests(unittest.TestCase)
             "from render_core.layer_render_plan_composition_dispatch import build_layer_render_plan_composition_dispatch_packet\n",
             "from render_core.layer_render_plan_cache_diagnostics import build_layer_render_plan_cache_key\n",
             "from render_core.layer_render_plan_execution_phase_timing import build_layer_render_plan_execution_summary\n",
-            "from render_core.layer_render_plan_adapter_preflight import build_layer_render_plan_adapter_payload\n",
         ]
         for source in snippets:
             with self.subTest(source=source):
