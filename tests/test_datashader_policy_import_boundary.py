@@ -78,6 +78,18 @@ class DatashaderPolicyImportBoundaryTests(unittest.TestCase):
         self.assertEqual(packet["status"], "fail")
         self.assertFalse(packet["boundary_passed"])
 
+    def test_dataframe_and_datashader_imports_fail(self):
+        snippets = [
+            "import pandas as pd\n",
+            "import numpy as np\n",
+            "import datashader as ds\n",
+        ]
+        for source in snippets:
+            with self.subTest(source=source):
+                packet = validate_source(source)
+                self.assertEqual(packet["status"], "fail")
+                self.assertFalse(packet["boundary_passed"])
+
     def test_parser_normalizer_provider_and_point_policy_imports_fail(self):
         snippets = [
             "from taichi_global_bathymetry import dataframe_from_text\n",

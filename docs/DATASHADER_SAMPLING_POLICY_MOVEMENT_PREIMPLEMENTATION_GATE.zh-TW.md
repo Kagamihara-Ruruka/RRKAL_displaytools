@@ -43,11 +43,14 @@ A future Datashader policy helper must not import or depend on:
 - provider/source loaders
 - parser functions
 - DataFrame normalizer modules
+- `pandas`
+- `numpy`
+- `datashader`
 - `pyais`
 - `PointOverlayBudgetPolicy`
 - runtime merge behavior
 
-The Datashader policy is a scalar policy object. It should not depend on point-overlay policy behavior unless a separate review explicitly changes that boundary.
+The Datashader policy is a scalar policy object. It should not depend on DataFrame, array, Datashader rendering, or point-overlay policy behavior unless a separate review explicitly changes that boundary.
 
 ## Import-boundary checker
 
