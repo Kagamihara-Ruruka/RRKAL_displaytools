@@ -54,6 +54,8 @@ Before any future checker or movement:
 3. `render_core.render_plan` compatibility imports must preserve existing packet behavior.
 4. Metadata/output schema and runtime merge state must remain unchanged.
 
+The paired movement preimplementation gate is `LAYER_RENDER_PLAN_COMPILED_REUSED_PACKETS_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`. The checker is `scripts/validate_layer_render_plan_compiled_reused_packets_import_boundary.py`; it is AST-only and does not import or execute the future helper candidate.
+
 ## Boundary statement
 
 Test/docs-only compiled/reused packet builder fixture gate. No source movement, no helper module creation, no alpha/apply path behavior test or change, no batch decision change, no metadata sidecar writer change, no artifact writer execution, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
