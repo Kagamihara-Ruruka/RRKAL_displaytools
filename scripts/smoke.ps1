@@ -6844,11 +6844,16 @@ $renderPlanExecutionPhaseTimingSource = if (Test-Path -LiteralPath (Join-Path $R
 } else {
     ""
 }
+$renderPlanAdapterPreflightSource = if (Test-Path -LiteralPath (Join-Path $RepoRoot "render_core\layer_render_plan_adapter_preflight.py")) {
+    Get-Content -Raw -Encoding UTF8 (Join-Path $RepoRoot "render_core\layer_render_plan_adapter_preflight.py")
+} else {
+    ""
+}
 $displayCoreSource = @(
     (Get-Content -Raw -Encoding UTF8 display_core\__init__.py),
     (Get-Content -Raw -Encoding UTF8 display_core\render_matrix.py)
 ) -join "`n"
-$renderPlanCombinedSource = "$rendererSource`n$renderPlanCoreSource`n$renderPlanComposeQueueSource`n$renderPlanCompositionDispatchSource`n$renderPlanCacheDiagnosticsSource`n$renderPlanExecutionPhaseTimingSource`n$renderPlanPerformanceModuleSource`n$runtimeOptimizationReviewModuleSource"
+$renderPlanCombinedSource = "$rendererSource`n$renderPlanCoreSource`n$renderPlanComposeQueueSource`n$renderPlanCompositionDispatchSource`n$renderPlanCacheDiagnosticsSource`n$renderPlanExecutionPhaseTimingSource`n$renderPlanAdapterPreflightSource`n$renderPlanPerformanceModuleSource`n$runtimeOptimizationReviewModuleSource"
 $rendererMetadataSource = "$rendererSource`n$renderCoreMetadataSource"
 if ($displayCoreSource -notlike "*rrkal_displaytools.display_shell_render_matrix.v1*") {
     throw "Display shell render matrix capability schema is missing"

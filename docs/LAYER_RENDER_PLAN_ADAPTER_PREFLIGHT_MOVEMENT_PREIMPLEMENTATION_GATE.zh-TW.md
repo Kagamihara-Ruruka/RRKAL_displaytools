@@ -2,16 +2,16 @@
 
 ## TL;DR
 
-This gate defines the import-boundary checks required before any future movement of the adapter/preflight packet helper bundle.
+This gate defines the import-boundary checks required around the minimal movement of the adapter/preflight packet helper bundle.
 
-This slice is tooling/docs-only. It does not create `render_core/layer_render_plan_adapter_preflight.py`, move source, change `render_core/render_plan.py`, execute renderer code, or authorize runtime merge, pixel equivalence, performance, visual parity, or readiness claims.
+The minimal movement slice creates `render_core/layer_render_plan_adapter_preflight.py` and keeps `render_core.render_plan` as the compatibility import/re-export surface. It does not execute renderer code or authorize runtime merge, pixel equivalence, performance, visual parity, or readiness claims.
 
 ## Future candidate module
 
 | Field | Value |
 | --- | --- |
 | Candidate path | `render_core/layer_render_plan_adapter_preflight.py` |
-| Candidate status | not present in this slice |
+| Candidate status | created by minimal movement slice |
 | Checker | `scripts/validate_layer_render_plan_adapter_preflight_import_boundary.py` |
 | Checker mode | stdlib AST only; no target import or execution |
 | Missing candidate behavior | `status=not_applicable_candidate_missing`, `candidate_exists=false`, `boundary_passed=true` |
@@ -20,12 +20,12 @@ This slice is tooling/docs-only. It does not create `render_core/layer_render_pl
 
 | Symbol | Current owner | Movement status |
 | --- | --- | --- |
-| `build_layer_render_plan_single_pass_preflight_contract` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_adapter_boundary_contract` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_adapter_payload_summary` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_adapter_payload` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_compile_input` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_adapter_payload_contract` | `render_core.render_plan` | future candidate only |
+| `build_layer_render_plan_single_pass_preflight_contract` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_adapter_boundary_contract` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_adapter_payload_summary` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_adapter_payload` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_compile_input` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_adapter_payload_contract` | `render_core/layer_render_plan_adapter_preflight.py` | moved; re-exported by `render_core.render_plan` |
 
 ## Explicit exclusions
 
@@ -49,11 +49,11 @@ The future helper must not import or reference:
 - parser/normalizer/provider/source/download/cache-lifecycle modules or names
 - sibling policy modules/classes
 
-## Required before/after parity if movement is proposed later
+## Required before/after parity for the movement slice
 
 1. `tests.test_layer_render_plan_adapter_preflight` must pass before and after.
 2. The import-boundary checker must return `boundary_passed=true` for the candidate module.
-3. No source file outside the future helper and `render_core.render_plan` import/re-export wiring may change without a separate review.
+3. No source file outside the helper, source-map inspector, smoke source aggregation, docs, tests, and `render_core.render_plan` import/re-export wiring may change without a separate review.
 4. No renderer, controller, Qt, VisPy, Taichi, ndarray, alpha, metadata writer, artifact writer, provider/cache lifecycle, parser/normalizer, compiled/reused packet builder, or batch decision dependency may become part of this movement.
 5. Metadata/output schema and runtime merge state must remain unchanged.
 
@@ -81,4 +81,4 @@ Stop before any future movement if:
 
 ## Boundary statement
 
-Tooling/docs-only adapter/preflight import-boundary checker and movement preimplementation gate. No helper module creation, no source movement, no `render_core/render_plan.py` changes, no `taichi_global_bathymetry.py` changes, no alpha/apply path behavior test or change, no compiled/reused packet builder change, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Adapter/preflight movement gate consumed by a minimal helper extraction. No alpha/apply path behavior test or change, no compiled/reused packet builder change, no `taichi_global_bathymetry.py` change, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.

@@ -10,12 +10,12 @@ This slice is test/docs-only. It does not create a helper module, move source, c
 
 | Helper | Current owner | Fixture focus |
 | --- | --- | --- |
-| `build_layer_render_plan_single_pass_preflight_contract` | `render_core.render_plan` | empty input, candidate status, false-safety fields, exact key set, deterministic repeat |
-| `build_layer_render_plan_adapter_boundary_contract` | `render_core.render_plan` | schema/source/status, controller/core field lists, forbidden render-core responsibilities, exact key set |
-| `build_layer_render_plan_adapter_payload_summary` | `render_core.render_plan` | empty payload, populated counts, id ordering, exact key set |
-| `build_layer_render_plan_adapter_payload` | `render_core.render_plan` | synthetic payload shape, runtime snapshot/composition/apply path stored as data only, exact key set |
-| `build_layer_render_plan_compile_input` | `render_core.render_plan` | packaged compile inputs, coercion of boolean/frame index, deterministic repeat, exact key set |
-| `build_layer_render_plan_adapter_payload_contract` | `render_core.render_plan` | incomplete/ready status, required fields, boundary fields, exact key set |
+| `build_layer_render_plan_single_pass_preflight_contract` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | empty input, candidate status, false-safety fields, exact key set, deterministic repeat |
+| `build_layer_render_plan_adapter_boundary_contract` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | schema/source/status, controller/core field lists, forbidden render-core responsibilities, exact key set |
+| `build_layer_render_plan_adapter_payload_summary` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | empty payload, populated counts, id ordering, exact key set |
+| `build_layer_render_plan_adapter_payload` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | synthetic payload shape, runtime snapshot/composition/apply path stored as data only, exact key set |
+| `build_layer_render_plan_compile_input` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | packaged compile inputs, coercion of boolean/frame index, deterministic repeat, exact key set |
+| `build_layer_render_plan_adapter_payload_contract` | `render_core/layer_render_plan_adapter_preflight.py`; re-exported by `render_core.render_plan` | incomplete/ready status, required fields, boundary fields, exact key set |
 
 ## Helpers explicitly excluded
 

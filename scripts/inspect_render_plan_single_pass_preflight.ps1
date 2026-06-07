@@ -23,7 +23,10 @@ if ($ContractOnly) {
     exit 0
 }
 
-$sourcePath = Join-Path $RepoRoot "render_core\render_plan.py"
+$sourcePath = Join-Path $RepoRoot "render_core\layer_render_plan_adapter_preflight.py"
+if (-not (Test-Path -LiteralPath $sourcePath)) {
+    $sourcePath = Join-Path $RepoRoot "render_core\render_plan.py"
+}
 $source = Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8
 $markers = [ordered]@{
     contract_schema = $source -like "*$contractSchema*"
