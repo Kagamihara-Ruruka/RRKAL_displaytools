@@ -59,7 +59,7 @@ No renderer controller execution, Qt/VisPy/Taichi runtime call, file/cache read,
 2. `DatashaderSamplingPolicy`
    - Category: `policy_object_candidate`.
    - Why: deterministic budget/sampling decision object with explicit count/lod/scale inputs.
-   - Suggested gate: fixture parity gate for low/medium/high records and realtime/offline modes.
+   - Current gate: `DATASHADER_SAMPLING_POLICY_FIXTURE_PARITY_GATE.zh-TW.md` with focused fixtures for record thresholds, lod budgets, scale floor, realtime/offline modes, output keys, and text formatting.
 
 3. `*_MODULE_API` static snapshot/text family, starting with `provider_manifests_module_api_snapshot/text`
    - Category: `static_packet_builder_candidate`.
