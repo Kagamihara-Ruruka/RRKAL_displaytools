@@ -17,13 +17,21 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_layer_render_plan_execution_phase_tim
 
 class LayerRenderPlanExecutionPhaseTimingImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_returns_not_applicable_pass(self):
-        packet = validate_target(REPO_ROOT / "render_core" / "layer_render_plan_execution_phase_timing.py")
+        packet = validate_target(REPO_ROOT / "render_core" / "missing_layer_render_plan_execution_phase_timing.py")
 
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
         self.assertEqual(packet["violations"], [])
         self.assertTrue(packet["apply_path_excluded"])
+
+    def test_current_candidate_passes_boundary(self):
+        packet = validate_target(REPO_ROOT / "render_core" / "layer_render_plan_execution_phase_timing.py")
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_safe_execution_phase_timing_source_passes(self):
         source = (
@@ -108,7 +116,7 @@ class LayerRenderPlanExecutionPhaseTimingImportBoundaryTests(unittest.TestCase):
 
     def test_cli_missing_target_output_is_valid_json(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "layer_render_plan_execution_phase_timing.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_layer_render_plan_execution_phase_timing.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,

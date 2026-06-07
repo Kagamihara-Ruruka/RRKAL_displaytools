@@ -10,11 +10,11 @@ This slice is test/docs-only. It does not move source, create a helper module, e
 
 | Helper | Current owner | Classification | Fixture coverage |
 | --- | --- | --- | --- |
-| `build_layer_render_plan_execution_summary` | `render_core.render_plan` | pure dict packet helper | key set, counts, blocker list, helper/decision counts, deterministic repeat |
-| `build_layer_render_plan_execution_phases` | `render_core.render_plan` | pure list-of-dict packet helper | phase order, decisions, empty input behavior, future candidate blocker field |
-| `build_layer_render_plan_phase_timing_contract` | `render_core.render_plan` | pure dict packet helper | exact schema/source/status, probe order, probe key formatting, summary fields |
-| `build_layer_render_plan_bottleneck_recommendation` | `render_core.render_plan` | pure dict packet helper | measured/unmeasured status and all current branch recommendations |
-| `build_layer_render_plan_phase_timing_runtime_packet` | `render_core.render_plan` | pure dict packet helper | empty timing behavior, rounding, slow-frame threshold, embedded bottleneck recommendation |
+| `build_layer_render_plan_execution_summary` | `render_core/layer_render_plan_execution_phase_timing.py`; re-exported by `render_core.render_plan` | pure dict packet helper | key set, counts, blocker list, helper/decision counts, deterministic repeat |
+| `build_layer_render_plan_execution_phases` | `render_core/layer_render_plan_execution_phase_timing.py`; re-exported by `render_core.render_plan` | pure list-of-dict packet helper | phase order, decisions, empty input behavior, future candidate blocker field |
+| `build_layer_render_plan_phase_timing_contract` | `render_core/layer_render_plan_execution_phase_timing.py`; re-exported by `render_core.render_plan` | pure dict packet helper | exact schema/source/status, probe order, probe key formatting, summary fields |
+| `build_layer_render_plan_bottleneck_recommendation` | `render_core/layer_render_plan_execution_phase_timing.py`; re-exported by `render_core.render_plan` | pure dict packet helper | measured/unmeasured status and all current branch recommendations |
+| `build_layer_render_plan_phase_timing_runtime_packet` | `render_core/layer_render_plan_execution_phase_timing.py`; re-exported by `render_core.render_plan` | pure dict packet helper | empty timing behavior, rounding, slow-frame threshold, embedded bottleneck recommendation |
 
 ## Helper excluded
 

@@ -2,16 +2,16 @@
 
 ## TL;DR
 
-This gate defines the import-boundary checks required before any future movement of execution summary, execution phase, phase timing, and bottleneck packet helpers.
+This gate defines the import-boundary checks required around the minimal movement of execution summary, execution phase, phase timing, and bottleneck packet helpers.
 
-This slice is tooling/docs-only. It does not create `render_core/layer_render_plan_execution_phase_timing.py`, move source, execute renderer code, or authorize runtime performance/readiness claims.
+The minimal movement slice creates `render_core/layer_render_plan_execution_phase_timing.py` and keeps `render_core.render_plan` as the compatibility import/re-export surface. It does not execute renderer code or authorize runtime performance/readiness claims.
 
 ## Future candidate module
 
 | Field | Value |
 | --- | --- |
 | Candidate path | `render_core/layer_render_plan_execution_phase_timing.py` |
-| Candidate status | not present in this slice |
+| Candidate status | created by minimal movement slice |
 | Checker | `scripts/validate_layer_render_plan_execution_phase_timing_import_boundary.py` |
 | Checker mode | stdlib AST only; no target import or execution |
 | Missing candidate behavior | `status=not_applicable_candidate_missing`, `candidate_exists=false`, `boundary_passed=true` |
@@ -20,11 +20,11 @@ This slice is tooling/docs-only. It does not create `render_core/layer_render_pl
 
 | Symbol | Current owner | Movement status |
 | --- | --- | --- |
-| `build_layer_render_plan_execution_summary` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_execution_phases` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_phase_timing_contract` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_bottleneck_recommendation` | `render_core.render_plan` | future candidate only |
-| `build_layer_render_plan_phase_timing_runtime_packet` | `render_core.render_plan` | future candidate only |
+| `build_layer_render_plan_execution_summary` | `render_core/layer_render_plan_execution_phase_timing.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_execution_phases` | `render_core/layer_render_plan_execution_phase_timing.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_phase_timing_contract` | `render_core/layer_render_plan_execution_phase_timing.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_bottleneck_recommendation` | `render_core/layer_render_plan_execution_phase_timing.py` | moved; re-exported by `render_core.render_plan` |
+| `build_layer_render_plan_phase_timing_runtime_packet` | `render_core/layer_render_plan_execution_phase_timing.py` | moved; re-exported by `render_core.render_plan` |
 
 ## Explicit exclusion
 
@@ -44,11 +44,11 @@ The future helper must not import or reference:
 - parser/normalizer/provider/source/download/cache-lifecycle modules or names
 - sibling policy modules/classes
 
-## Required before/after parity if movement is proposed later
+## Required before/after parity for the movement slice
 
 1. `tests.test_layer_render_plan_execution_phase_timing` must pass before and after.
 2. The import-boundary checker must return `boundary_passed=true` for the candidate module.
-3. No source file outside the future helper and `render_core.render_plan` import/re-export wiring may change without a separate review.
+3. No source file outside the helper, source-map inspector, docs, tests, and `render_core.render_plan` import/re-export wiring may change without a separate review.
 4. No metadata sidecar writer, artifact writer, renderer, controller, Qt, VisPy, Taichi, ndarray, or alpha helper may become part of this movement.
 5. `build_layer_render_plan_apply_path` must remain excluded unless a separate gate covers it.
 6. Metadata/output schema and runtime merge state must remain unchanged.
@@ -77,4 +77,4 @@ Stop before any future movement if:
 
 ## Boundary statement
 
-Tooling/docs-only execution phase timing import-boundary checker and movement preimplementation gate. No helper module creation, no source movement, no `render_core/render_plan.py` changes, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Execution phase timing movement gate consumed by a minimal helper extraction. No `build_layer_render_plan_apply_path` movement, no alpha/composition hot path movement, no `taichi_global_bathymetry.py` change, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
