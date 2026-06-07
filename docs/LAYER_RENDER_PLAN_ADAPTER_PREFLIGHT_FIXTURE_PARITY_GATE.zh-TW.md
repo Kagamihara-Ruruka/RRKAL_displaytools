@@ -62,9 +62,15 @@ The packet fields that mention parity, timing, or future runtime steps are curre
 Before any future checker or movement:
 
 1. `tests.test_layer_render_plan_adapter_preflight` must pass before and after.
-2. A future helper boundary must prohibit renderer/controller/Qt/VisPy/Taichi, ndarray/alpha, metadata writer, artifact writer, provider/cache lifecycle, parser/normalizer, and compiled/reused packet builder dependencies.
+2. `scripts/validate_layer_render_plan_adapter_preflight_import_boundary.py` must pass for any candidate helper module.
 3. `render_core.render_plan` compatibility imports must preserve existing packet behavior.
 4. Metadata/output schema and runtime merge state must remain unchanged.
+
+## Import-boundary checker
+
+`docs/LAYER_RENDER_PLAN_ADAPTER_PREFLIGHT_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md` defines the future movement boundary and the standalone AST checker for the proposed `render_core/layer_render_plan_adapter_preflight.py` helper.
+
+The checker treats alpha helpers, `build_layer_render_plan_apply_path`, compiled/reused packet builders, and `build_layer_render_plan_batch_decisions` as explicitly excluded from this bundle.
 
 ## Boundary statement
 
