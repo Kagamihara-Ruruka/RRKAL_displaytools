@@ -35,10 +35,12 @@ Observed dependencies:
 | continental/local lod budgets | `continental=500_000`, `local=1_250_000` |
 | offline mode | effective budget is raised to records and aggregates all |
 | user scale floor | scale below `0.05` is clamped to `0.05` |
+| sample fraction lower clamp | very large realtime records clamp `sample_fraction` to `0.001` |
 | negative records | coerces to `0` and aggregates all |
 | decision output keys | exact key set is pinned |
 | deterministic repeat call | same input returns same output |
 | text output | split-line order, mode/lod wording, budget fields, sample fraction formatting, and rule line are pinned |
+| offline text output | split-line order, section order, `1.0000` sample fractions, and `aggregate-all` strategies are pinned |
 
 ## Current fixture evidence
 

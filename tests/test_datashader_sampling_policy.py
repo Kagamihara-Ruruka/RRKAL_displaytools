@@ -72,6 +72,13 @@ class DatashaderSamplingPolicyFixtureTests(unittest.TestCase):
         self.assertEqual(decision["sample_fraction"], 0.125)
         self.assertEqual(decision["strategy"], "pre-sample-then-aggregate")
 
+    def test_sample_fraction_lower_clamp_is_pinned(self):
+        decision = self.policy.decision(1_000_000_000, "global", 0.05, True)
+
+        self.assertEqual(decision["effective_budget"], 12_500)
+        self.assertEqual(decision["sample_fraction"], 0.001)
+        self.assertEqual(decision["strategy"], "pre-sample-then-aggregate")
+
     def test_negative_records_coerce_to_zero(self):
         decision = self.policy.decision(-10, "global", 1.0, True)
 
@@ -144,10 +151,29 @@ class DatashaderSamplingPolicyFixtureTests(unittest.TestCase):
             mode="offline",
         )
 
-        self.assertIn("- mode: offline", text)
-        self.assertIn("- effective budget: 800000", text)
-        self.assertIn("- effective budget: 2000000", text)
-        self.assertIn("- sample fraction: 1.0000", text)
+        self.assertEqual(
+            text.splitlines(),
+            [
+                "Datashader sampling policy",
+                "",
+                "- mode: offline",
+                "- lod: global",
+                "",
+                "AIS:",
+                "- records: 800000",
+                "- effective budget: 800000",
+                "- sample fraction: 1.0000",
+                "- strategy: aggregate-all",
+                "",
+                "ADS-B:",
+                "- records: 2000000",
+                "- effective budget: 2000000",
+                "- sample fraction: 1.0000",
+                "- strategy: aggregate-all",
+                "",
+                "Rule: Datashader should aggregate all points when affordable; sampling is a realtime FPS valve.",
+            ],
+        )
 
 
 if __name__ == "__main__":
