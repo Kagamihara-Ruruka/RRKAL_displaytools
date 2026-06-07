@@ -61,6 +61,7 @@
 - `LAYER_RENDER_PLAN_COMPILED_REUSED_PACKETS_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for compiled/reused layer render plan packet builder fixture parity.
 - `LAYER_RENDER_PLAN_COMPILED_REUSED_PACKETS_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate and AST import-boundary checker for possible future compiled/reused packet helper movement.
 - `LAYER_RENDER_PLAN_RESIDUAL_PACKET_SURFACES_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for residual non-alpha, non-apply-path render-plan packet surfaces.
+- `LAYER_RENDER_PLAN_RESIDUAL_PACKET_SURFACES_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate and AST import-boundary checker for possible future residual packet-surface helper movement.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.

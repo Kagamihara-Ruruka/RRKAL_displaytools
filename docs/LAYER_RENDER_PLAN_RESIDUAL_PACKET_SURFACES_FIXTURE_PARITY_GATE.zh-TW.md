@@ -54,6 +54,8 @@ git diff --check
 
 Full smoke is not required for this fixture-only slice unless source-map or smoke-visible contracts change.
 
+The paired movement preimplementation gate is `LAYER_RENDER_PLAN_RESIDUAL_PACKET_SURFACES_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`. The checker is `scripts/validate_layer_render_plan_residual_packet_surfaces_import_boundary.py`; it is AST-only and does not import or execute the future helper candidate.
+
 ## Boundary Statement
 
 Test/docs-only residual render_plan packet surface fixture gate. No source movement, no helper module creation, no alpha/apply path behavior test or change, no controller/renderer/Qt/VisPy/Taichi runtime execution, no metadata sidecar writer change, no artifact writer execution, no metadata/output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
