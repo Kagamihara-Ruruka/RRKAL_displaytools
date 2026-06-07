@@ -64,6 +64,12 @@ Before any future helper movement:
 4. Metadata schema and output behavior must remain unchanged.
 5. Runtime merge must remain disabled unless separately authorized.
 
+## Import-boundary checker
+
+`scripts/validate_layer_render_plan_cache_diagnostics_import_boundary.py` defines the future movement import boundary for `render_core/layer_render_plan_cache_diagnostics.py`.
+
+The checker treats a missing candidate as not applicable and passing. It allows `cache` in helper and field names, but bans provider/source/download/cache lifecycle module imports.
+
 ## Boundary statement
 
 Test/docs-only cache diagnostics fixture gate. No helper extraction, no metadata sidecar writer change, no artifact writer execution, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no output schema change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
