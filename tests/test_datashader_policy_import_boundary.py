@@ -14,7 +14,7 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_datashader_policy_import_boundary.py"
 
 class DatashaderPolicyImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_returns_json_pass(self):
-        packet = validate_target(REPO_ROOT / "render_core" / "datashader_sampling_policy.py")
+        packet = validate_target(REPO_ROOT / "render_core" / "missing_datashader_sampling_policy.py")
 
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
@@ -43,7 +43,7 @@ class DatashaderPolicyImportBoundaryTests(unittest.TestCase):
 
     def test_cli_missing_candidate_output_is_json(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "datashader_sampling_policy.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_datashader_sampling_policy.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
