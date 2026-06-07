@@ -51,6 +51,7 @@
 - `LAYER_RENDER_PLAN_COMPOSE_QUEUE_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate and AST import-boundary checker for possible future compose queue helper movement.
 - `RENDER_PLAN_COMPOSE_QUEUE_EXTRACTION_CLOSEOUT_NEXT_SLICE_MAP.zh-TW.md`: docs/evidence-only close-out map for compose queue extraction and next safe render-plan slice selection.
 - `LAYER_RENDER_PLAN_COMPOSITION_DISPATCH_FIXTURE_PARITY_GATE.zh-TW.md`: test/docs-only gate for composition action and dispatch packet helper fixture parity.
+- `LAYER_RENDER_PLAN_COMPOSITION_DISPATCH_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: tooling/docs-only gate and AST import-boundary checker for possible future composition dispatch helper movement.
 ## Positioning
 
 `RRKAL_displaytools` is the visualization/display layer for RRKAL-related renderer work. `APIkeys_collection` / RRKAL remains responsible for dataset discovery, download, import, install registry, manifest, cache governance, and renderer bridge asset ownership.

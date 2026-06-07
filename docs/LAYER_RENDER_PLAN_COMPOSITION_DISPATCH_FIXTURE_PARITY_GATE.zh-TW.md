@@ -78,6 +78,17 @@ Before any future movement of these helpers:
 4. Keep composition hot path and artifact writer paths outside this gate.
 5. Keep metadata schema and output behavior unchanged.
 
+## Import-boundary checker
+
+Future composition dispatch helper movement is guarded by:
+
+- `scripts/validate_layer_render_plan_composition_dispatch_import_boundary.py`
+- candidate path: `render_core/layer_render_plan_composition_dispatch.py`
+
+The checker is static AST-only. It must not import or execute the target module.
+
+The candidate path is intentionally missing in the current slice. Missing candidate status is not an approval to move code; it only records that there is no target helper module to validate yet.
+
 ## Boundary statement
 
 Test/docs-only composition dispatch packet fixture gate. No helper extraction, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no ndarray alpha formula test/change, no artifact writer execution, no metadata/output behavior change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
