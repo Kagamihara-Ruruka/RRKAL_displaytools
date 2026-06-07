@@ -5,18 +5,18 @@
 This gate defines the import boundary for a possible future composition dispatch helper module:
 
 - candidate path: `render_core/layer_render_plan_composition_dispatch.py`
-- current status: candidate module is not created in this slice
+- current status: helper module created by the minimal composition dispatch movement slice
 - validator: `scripts/validate_layer_render_plan_composition_dispatch_import_boundary.py`
 
 The checker is a static AST validator. It does not import or execute the target module.
 
-## Candidate future module
+## Candidate module
 
-Proposed only:
+Current helper module:
 
 - `render_core/layer_render_plan_composition_dispatch.py`
 
-Target symbols if a later source movement is authorized:
+Moved symbols:
 
 - `build_layer_render_plan_composition_apply_action`
 - `build_layer_render_plan_composition_dispatch_packet`
@@ -33,14 +33,14 @@ Allowed future behavior:
 
 ## Missing candidate behavior
 
-Because the candidate helper module does not exist yet, the checker must treat the default target as not applicable:
+When a synthetic missing path is supplied, the checker must treat it as not applicable:
 
 - `candidate_exists=false`
 - `status=not_applicable_candidate_missing`
 - `boundary_passed=true`
 - exit code `0`
 
-This behavior only means there is no candidate file to validate yet. It does not approve movement.
+This behavior only means there is no candidate file at that path. It does not approve additional movement.
 
 ## Forbidden dependencies
 
@@ -107,6 +107,12 @@ It must not import sibling policy classes:
 - `LayerRenderBudgetPolicy`
 - `AdaptiveRenderQualityPolicy`
 
+## Consumed movement status
+
+The minimal movement slice moved only pure dispatch packet helpers. `render_core/render_plan.py` keeps import/re-export compatibility for existing callers.
+
+No controller method, alpha helper, compose queue helper, artifact writer, metadata writer, or runtime composition path moved in this slice.
+
 ## Before/after requirements for any future movement
 
 Before any movement:
@@ -126,8 +132,8 @@ After any future movement:
 
 ## Not authorized in this slice
 
-- helper module creation
-- composition dispatch source movement
+- additional helper module creation
+- additional composition dispatch source movement
 - controller method movement
 - renderer hot path change
 - alpha/ndarray behavior change
@@ -138,4 +144,4 @@ After any future movement:
 
 ## Boundary statement
 
-Tooling/docs-only movement preimplementation gate. No candidate helper module creation, no composition dispatch extraction, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output behavior change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.
+Minimal composition dispatch movement gate. No additional helper module creation, no controller instantiation, no renderer/Qt/VisPy/Taichi runtime execution, no metadata/output behavior change, no runtime merge enablement, and no pixel-equivalence/performance/readiness claim.

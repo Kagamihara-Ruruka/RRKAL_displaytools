@@ -28,7 +28,7 @@ Current conclusion:
 | Queue and skip packet construction | `render_core.render_plan.build_layer_render_plan_compose_queue_packet_from_states()` | Pure packet construction after controller-collected runtime state. |
 | Compose run grouping | `render_core.render_plan.build_layer_render_plan_compose_runs()` | Groups adjacent queue entries and marks merge candidates. |
 | Parity contract | `render_core.render_plan.build_layer_render_plan_compose_run_parity_contract()` | Keeps runtime merge disabled and requires visual parity before merge. |
-| Dispatch packet | `render_core.render_plan.build_layer_render_plan_composition_dispatch_packet()` | Maps action kind and overlay presence to dispatch decision. |
+| Dispatch packet | `render_core.layer_render_plan_composition_dispatch.build_layer_render_plan_composition_dispatch_packet()`; re-exported by `render_core.render_plan` | Maps action kind and overlay presence to dispatch decision. |
 | Live pixel execution | `HybridRenderController.apply_layer_render_plan_composition()` | Applies runtime blend, alpha blend, alpha compose, runtime overlay, and style postprocess. |
 | Timing packet | `render_core.render_plan.build_layer_render_plan_composition_timing_packet()` | Normalizes controller-measured phase timing. |
 | Phase timing runtime packet | `render_core.render_plan.build_layer_render_plan_phase_timing_runtime_packet()` | Selects slowest phase and bottleneck recommendation. |

@@ -24,6 +24,14 @@ class LayerRenderPlanCompositionDispatchImportBoundaryTests(unittest.TestCase):
         self.assertTrue(packet["boundary_passed"])
         self.assertEqual(packet["violations"], [])
 
+    def test_current_candidate_passes_boundary(self):
+        packet = validate_target(REPO_ROOT / "render_core" / "layer_render_plan_composition_dispatch.py")
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
+
     def test_safe_source_passes(self):
         source = (
             "from __future__ import annotations\n"
