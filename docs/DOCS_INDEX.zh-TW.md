@@ -22,6 +22,7 @@
 - `RENDER_PLAN_COMPILE_SOURCE_MAP.zh-TW.md`: compile-layer-render-plan source map before compile facade / payload helper extraction.
 - `DISPLAYTOOLS_RENDER_GLOBE_CRATON_AGE_TABLE_AND_TECTONIC_CLOSEOUT_MAP.zh-TW.md`: docs/evidence-only craton age table and horizontal graph-cut closeout map for render globe responsibilities.
 - `DISPLAYTOOLS_GLOBE_COORDINATE_OWNERSHIP_DIAGNOSTIC_GATE.zh-TW.md`: docs/evidence-only coordinate ownership diagnostic gate for terrain, lighting, grid, dynamic points, vector overlays, masks, screen/UI, and postprocess frames.
+- `DISPLAYTOOLS_HISTORICAL_VIEW_CONE_FIRST_CONTINENT_DECISION_GATE.zh-TW.md`: docs/evidence-only historical view-cone synthesis and first-continent decision gate across pre-product, 14k basement, 21k sediment, and current `render_core` migrations.
 - `STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md`: `prepare_batches` / vector overlay cache source map before static batch cache work.
 - `RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md`: runtime-blend subphase timing feasibility, safe insertion points, and parity/safety gate before instrumentation.
 - `DEMO_READINESS_BASELINE.zh-TW.md`: latest renderer preview, repeated quick render, warm-frame, and runtime-blend timing evidence for demo-readiness judgment.
