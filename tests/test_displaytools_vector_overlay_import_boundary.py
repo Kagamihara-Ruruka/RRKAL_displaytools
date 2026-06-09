@@ -136,7 +136,7 @@ class DisplaytoolsVectorOverlayImportBoundaryTests(unittest.TestCase):
 
     def test_cli_missing_target_output_shape_is_pinned(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "vector_overlay_boundary.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_vector_overlay_boundary.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
@@ -166,6 +166,22 @@ class DisplaytoolsVectorOverlayImportBoundaryTests(unittest.TestCase):
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
+
+    def test_cli_current_candidate_passes(self):
+        result = subprocess.run(
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "vector_overlay_boundary.py")],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        packet = json.loads(result.stdout)
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_cli_forbidden_file_exits_nonzero_with_json(self):
         with tempfile.TemporaryDirectory() as tmpdir:

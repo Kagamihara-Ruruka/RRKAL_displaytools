@@ -63,6 +63,10 @@ from render_core.render_plan import (
 )
 from render_core.metadata import build_renderer_output_metadata_payload
 from render_core.preview import write_preview_frame_png
+from render_core.vector_overlay_boundary import (
+    BOUNDARY_SPECS,
+    HYDROLOGY_SPECS,
+)
 from render_core.layer_state import build_layer_runtime_snapshot_input
 from render_core.batch_prepare import build_prepare_batch_cache_evidence
 from render_core.dataframe_normalizers import (
@@ -4252,56 +4256,6 @@ class GeoVectorLineOverlay:
                 best["feature"] = feature
         return best
 
-
-
-BOUNDARY_SPECS = {
-    "borders": {
-        "name": "\u570b\u754c",
-        "color": (220, 225, 235),
-        "prefix": "border",
-        "natural_earth_layer": "admin_0_boundary_lines_land",
-        "source_note": "Natural Earth admin_0_boundary_lines_land. For strict work, pin the dataset version and dispute policy.",
-    },
-    "territorial_sea": {
-        "name": "\u9818\u6d77",
-        "color": (64, 224, 255),
-        "prefix": "territorial_sea",
-        "marine_regions_layer": "eez_12nm",
-        "source_note": "Strict mode should use Marine Regions World 12 Nautical Miles Zone or equivalent official maritime boundary data.",
-    },
-    "eez": {
-        "name": "\u7d93\u6fdf\u6d77\u57df EEZ",
-        "color": (255, 213, 74),
-        "prefix": "eez",
-        "marine_regions_layer": "eez_boundaries",
-        "source_note": "Strict mode should use Marine Regions World EEZ or equivalent official maritime boundary data.",
-    },
-    "high_seas": {
-        "name": "\u516c\u6d77",
-        "color": (177, 130, 255),
-        "prefix": "high_seas",
-        "marine_regions_layer": "high_seas",
-        "source_note": "High-seas visualization should come from a maritime boundary dataset, not from guessed country buffers.",
-    },
-}
-
-
-HYDROLOGY_SPECS = {
-    "lakes": {
-        "name": "\u6e56\u6cca / \u6c34\u5eab",
-        "color": (74, 194, 235),
-        "natural_earth_layer": "lakes",
-        "source_note": "Natural Earth lakes are the basic layer; strict/local work should switch to HydroLAKES or OSM water polygons.",
-        "prefix": "lake",
-    },
-    "rivers": {
-        "name": "\u4e3b\u8981\u6cb3\u5ddd",
-        "color": (92, 210, 255),
-        "natural_earth_layer": "rivers_lake_centerlines",
-        "source_note": "Natural Earth rivers_lake_centerlines are the basic layer; strict/local work should switch to HydroRIVERS, MERIT Hydro, or OSM waterways.",
-        "prefix": "river",
-    },
-}
 
 
 HYDROLOGY_RENDER_LOD_PROFILES = {
