@@ -136,6 +136,8 @@ def build_cutout_cartography_packet() -> dict[str, object]:
     for entry in EXTRACTED_HELPERS:
         helper_entries.append({**entry, "line_count": line_count(entry["path"])})
     helper_line_total = sum(entry["line_count"] for entry in helper_entries)
+    checker_inventory = build_checker_inventory()
+    helper_test_inventory = build_helper_test_inventory()
     return {
         "schema": "rrkal_displaytools.dynamic_point_cutout_cartography.v1",
         "monolith": {
@@ -145,15 +147,15 @@ def build_cutout_cartography_packet() -> dict[str, object]:
             "monolith_modified_in_this_gate": False,
         },
         "extracted_helpers": helper_entries,
-        "checker_inventory": build_checker_inventory(),
-        "helper_test_inventory": build_helper_test_inventory(),
+        "checker_inventory": checker_inventory,
+        "helper_test_inventory": helper_test_inventory,
         "gate_inventory": build_gate_inventory(),
         "remaining_surfaces": list(REMAINING_SURFACES),
         "quantification": {
             "extracted_helper_count": len(helper_entries),
             "extracted_helper_line_total": helper_line_total,
-            "dynamic_point_checker_count": len(build_checker_inventory()),
-            "dynamic_point_helper_test_count": len(build_helper_test_inventory()),
+            "dynamic_point_checker_count": len(checker_inventory),
+            "dynamic_point_helper_test_count": len(helper_test_inventory),
             "current_monolith_delta_from_these_extractions": "not_measurable_from_current_static_snapshot_without_pre_extraction_baseline_diff",
             "source_movement_authorized": False,
             "helper_module_creation_authorized": False,
@@ -199,6 +201,8 @@ class DynamicPointCutoutCartographyTests(unittest.TestCase):
         self.assertGreater(packet["monolith"]["total_lines"], 20000)
         self.assertEqual(packet["quantification"]["extracted_helper_count"], 3)
         self.assertGreater(packet["quantification"]["extracted_helper_line_total"], 500)
+        self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], len(packet["checker_inventory"]))
+        self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], len(packet["helper_test_inventory"]))
         self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], 4)
         self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], 4)
         self.assertFalse(packet["quantification"]["source_movement_authorized"])
