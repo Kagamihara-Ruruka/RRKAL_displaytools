@@ -18,7 +18,7 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_displaytools_terrain_bathymetry_impor
 class DisplaytoolsTerrainBathymetryImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_cli_returns_json_pass(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "terrain_bathymetry_boundary.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_terrain_bathymetry_boundary.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
@@ -204,6 +204,10 @@ class DisplaytoolsTerrainBathymetryImportBoundaryTests(unittest.TestCase):
                 "boundary",
             },
         )
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_negative_self_test_passes_and_detects_all_snippets(self):
         result = subprocess.run(
