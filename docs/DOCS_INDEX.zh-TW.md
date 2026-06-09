@@ -46,6 +46,7 @@
 - `DISPLAYTOOLS_DYNAMIC_POINT_BOUNDARY_FIXTURE_GATE.zh-TW.md`: test/docs-only fixture gate for AIS/aircraft dynamic point source, payload, projection, time/replay, selection, render policy, safety, and known-fault descriptor boundaries.
 - `DISPLAYTOOLS_DYNAMIC_POINT_SOURCE_SURFACE_MOVEMENT_PREIMPLEMENTATION_GATE.zh-TW.md`: docs/test-only preimplementation gate classifying AIS/aircraft dynamic point descriptor/policy/ledger candidates versus SQL replay, live stream, dataframe/projection runtime, controller selection, and renderer host blockers.
 - `DISPLAYTOOLS_DYNAMIC_POINT_BOUNDARY_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md`: docs/test-only planning gate for a future descriptor/policy/ledger-only AIS/aircraft dynamic point boundary helper target, with SQL/live/dataframe/projection/controller/runtime blockers.
+- `DISPLAYTOOLS_DYNAMIC_POINT_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md`: tooling/docs-only AST import/name boundary checker gate for a future `render_core\dynamic_point_boundary.py` descriptor helper, with missing-candidate pass and string-label allowance.
 - `STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md`: `prepare_batches` / vector overlay cache source map before static batch cache work.
 - `RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md`: runtime-blend subphase timing feasibility, safe insertion points, and parity/safety gate before instrumentation.
 - `DEMO_READINESS_BASELINE.zh-TW.md`: latest renderer preview, repeated quick render, warm-frame, and runtime-blend timing evidence for demo-readiness judgment.
