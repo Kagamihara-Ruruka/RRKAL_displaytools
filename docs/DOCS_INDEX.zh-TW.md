@@ -137,3 +137,6 @@ Every development round must end with:
 
 - Documentation governance reference: Kagamihara-Ruruka/APIkeys_collection.
 - Product boundary reference: `APIkeys_collection/docs/PRODUCT_POSITIONING.zh-TW.md`, especially the renderer bridge and tile/cache asset sections.
+## Displaytools canvas creation order depth cross-subsystem counterexample gate
+
+- [Displaytools Canvas Creation Order Depth Cross-Subsystem Counterexample Gate](DISPLAYTOOLS_CANVAS_CREATION_ORDER_DEPTH_CROSS_SUBSYSTEM_COUNTEREXAMPLE_GATE.zh-TW.md)
