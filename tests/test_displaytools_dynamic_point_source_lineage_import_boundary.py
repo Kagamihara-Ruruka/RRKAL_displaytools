@@ -1,4 +1,4 @@
-﻿import json
+import json
 import subprocess
 import sys
 import tempfile
@@ -46,8 +46,10 @@ class DisplaytoolsDynamicPointSourceLineageImportBoundaryTests(unittest.TestCase
         packet = json.loads(result.stdout)
 
         self.assertEqual(packet["target"], "render_core\\dynamic_point_source_lineage_boundary.py")
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertEqual(packet["status"], "pass")
         self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_missing_candidate_function_returns_pass(self):
         packet = validate_target(REPO_ROOT / "render_core" / "missing_dynamic_point_source_lineage_boundary.py")
@@ -55,6 +57,13 @@ class DisplaytoolsDynamicPointSourceLineageImportBoundaryTests(unittest.TestCase
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
+    def test_candidate_exists_function_returns_pass(self):
+        packet = validate_target(REPO_ROOT / "render_core" / "dynamic_point_source_lineage_boundary.py")
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_clean_temporary_candidate_passes(self):
         source = (
