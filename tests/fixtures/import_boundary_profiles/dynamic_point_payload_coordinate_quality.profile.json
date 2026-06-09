@@ -1,0 +1,224 @@
+{
+  "schema": "rrkal.import_boundary_profile.v1",
+  "capability": "dynamic_point_payload_coordinate_quality",
+  "target": "render_core/dynamic_point_payload_coordinate_quality_boundary.py",
+  "trust_level": "L1_shadow",
+  "blocking": false,
+  "handwritten_checker_is_source_of_truth": true,
+  "allowed_string_labels": [
+    "payload_shape",
+    "coordinate_quality",
+    "timestamp_quality",
+    "source_id_quality",
+    "speed_heading_quality",
+    "missing",
+    "invalid",
+    "stale",
+    "unknown",
+    "anti_meridian_candidate",
+    "timezone_ambiguity",
+    "point_vector_sync_fault",
+    "projection_dependency",
+    "live_source_dependency",
+    "controller_selection_dependency",
+    "renderer_runtime_dependency"
+  ],
+  "forbidden_families": {
+    "monolith": [
+      "taichi_global_bathymetry"
+    ],
+    "live_source": [
+      "pymysql",
+      "sqlalchemy",
+      "websocket",
+      "AISStream",
+      "ADSBStream",
+      "live AIS",
+      "live ADS-B"
+    ],
+    "cache_database_io": [
+      "cache read",
+      "cache write",
+      "cache load",
+      "cache save",
+      "DB URL",
+      "replay query",
+      "database read"
+    ],
+    "runtime_dataframe": [
+      "pandas",
+      "datashader",
+      "numpy"
+    ],
+    "projection_formula": [
+      "projection formula",
+      "flip formula",
+      "mask formula",
+      "project_point",
+      "lon_lat_to_screen"
+    ],
+    "controller_selection": [
+      "selected vehicle runtime",
+      "picker",
+      "hit-test",
+      "controller mutation"
+    ],
+    "renderer_host": [
+      "TaichiGlobeRenderer",
+      "QtHybridWindow",
+      "VisPyHybridViewer",
+      "taichi",
+      "PyQt6",
+      "PySide6",
+      "vispy"
+    ],
+    "hot_path": [
+      "alpha_compose",
+      "alpha_blend_compose",
+      "alpha_compose_transparent",
+      "build_layer_render_plan_apply_path",
+      "apply_layer_render_plan_composition"
+    ],
+    "artifact_metadata": [
+      "render_core.metadata",
+      "metadata sidecar writer",
+      "artifact writer",
+      "state writer",
+      "PNG writer",
+      "runtime JSON writer"
+    ]
+  },
+  "negative_self_test_snippets": [
+    {
+      "name": "monolith",
+      "source": "import taichi_global_bathymetry\n"
+    },
+    {
+      "name": "pymysql",
+      "source": "import pymysql\n"
+    },
+    {
+      "name": "sqlalchemy",
+      "source": "from sqlalchemy import create_engine\n"
+    },
+    {
+      "name": "websocket",
+      "source": "import websocket\n"
+    },
+    {
+      "name": "ais_stream",
+      "source": "class AISStream:\n    pass\n"
+    },
+    {
+      "name": "adsb_stream",
+      "source": "async def ADSBStream():\n    return None\n"
+    },
+    {
+      "name": "cache_read",
+      "source": "def cache_read():\n    return None\n"
+    },
+    {
+      "name": "cache_write",
+      "source": "def f(obj):\n    return obj.cache_write\n"
+    },
+    {
+      "name": "database_read",
+      "source": "def f():\n    return database_read()\n"
+    },
+    {
+      "name": "db_url",
+      "source": "def f():\n    return DB_URL\n"
+    },
+    {
+      "name": "replay_query",
+      "source": "def replay_query():\n    return None\n"
+    },
+    {
+      "name": "pandas",
+      "source": "import pandas as pd\n"
+    },
+    {
+      "name": "datashader",
+      "source": "import datashader\n"
+    },
+    {
+      "name": "numpy",
+      "source": "import numpy as np\n"
+    },
+    {
+      "name": "projection",
+      "source": "def projection_formula():\n    return None\n"
+    },
+    {
+      "name": "project_point",
+      "source": "def f():\n    return project_point()\n"
+    },
+    {
+      "name": "lon_lat_to_screen",
+      "source": "def f():\n    return lon_lat_to_screen\n"
+    },
+    {
+      "name": "selected_vehicle_runtime",
+      "source": "def selected_vehicle_runtime():\n    return None\n"
+    },
+    {
+      "name": "picker",
+      "source": "def f(obj):\n    return obj.picker\n"
+    },
+    {
+      "name": "hit_test",
+      "source": "def f():\n    return hit_test()\n"
+    },
+    {
+      "name": "controller",
+      "source": "async def controller_mutation():\n    return None\n"
+    },
+    {
+      "name": "renderer",
+      "source": "class TaichiGlobeRenderer:\n    pass\n"
+    },
+    {
+      "name": "qt",
+      "source": "from PyQt6 import QtWidgets\n"
+    },
+    {
+      "name": "vispy",
+      "source": "import vispy\n"
+    },
+    {
+      "name": "taichi",
+      "source": "import taichi as ti\n"
+    },
+    {
+      "name": "alpha",
+      "source": "from render_core.render_plan import alpha_compose\n"
+    },
+    {
+      "name": "apply_path",
+      "source": "def f():\n    return apply_layer_render_plan_composition\n"
+    },
+    {
+      "name": "metadata",
+      "source": "from render_core.metadata import build_renderer_output_metadata_payload\n"
+    },
+    {
+      "name": "artifact_writer",
+      "source": "def f():\n    return runtime_json_writer\n"
+    }
+  ],
+  "ast_nodes": [
+    "Import",
+    "ImportFrom",
+    "Name",
+    "Attribute",
+    "Call",
+    "FunctionDef",
+    "AsyncFunctionDef",
+    "ClassDef"
+  ],
+  "runtime_flags": {
+    "runtime_render_invoked": false,
+    "runtime_merge_enabled": false,
+    "readiness_claimed": false
+  }
+}
