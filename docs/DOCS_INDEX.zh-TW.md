@@ -48,6 +48,7 @@
 - `DISPLAYTOOLS_DYNAMIC_POINT_BOUNDARY_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md`: docs/test-only planning gate for a future descriptor/policy/ledger-only AIS/aircraft dynamic point boundary helper target, with SQL/live/dataframe/projection/controller/runtime blockers.
 - `DISPLAYTOOLS_DYNAMIC_POINT_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md`: tooling/docs-only AST import/name boundary checker gate for a future `render_core\dynamic_point_boundary.py` descriptor helper, with missing-candidate pass and string-label allowance.
 - `DISPLAYTOOLS_DYNAMIC_POINT_CRATON_ABLATION_CAPABILITY_MATRIX_GATE.zh-TW.md`: docs/test-only craton ablation capability matrix and deterministic boundary fill methodology trial for AIS/aircraft dynamic point descriptor, stop-line, checker, and planning cells.
+- `DISPLAYTOOLS_DYNAMIC_POINT_BOUNDARY_MINIMAL_EXTRACTION_GATE.zh-TW.md`: minimal descriptor/policy/ledger-only AIS/aircraft dynamic point boundary helper extraction after `a_1` macro observer review, excluding SQL/live/dataframe/projection/controller/runtime and writer surfaces.
 - `STATIC_BATCH_PREPARE_SOURCE_MAP.zh-TW.md`: `prepare_batches` / vector overlay cache source map before static batch cache work.
 - `RUNTIME_BLEND_SUBPHASE_TIMING_DESIGN.zh-TW.md`: runtime-blend subphase timing feasibility, safe insertion points, and parity/safety gate before instrumentation.
 - `DEMO_READINESS_BASELINE.zh-TW.md`: latest renderer preview, repeated quick render, warm-frame, and runtime-blend timing evidence for demo-readiness judgment.

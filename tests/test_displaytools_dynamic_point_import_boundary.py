@@ -1,4 +1,4 @@
-﻿import json
+import json
 import subprocess
 import sys
 import tempfile
@@ -183,7 +183,7 @@ class DisplaytoolsDynamicPointImportBoundaryTests(unittest.TestCase):
         self.assertFalse(packet["boundary_passed"])
         self.assertTrue(packet["violations"])
 
-    def test_cli_json_shape_is_pinned_for_missing_candidate(self):
+    def test_cli_json_shape_is_pinned_for_existing_candidate(self):
         result = subprocess.run(
             [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "dynamic_point_boundary.py")],
             cwd=REPO_ROOT,
@@ -212,8 +212,8 @@ class DisplaytoolsDynamicPointImportBoundaryTests(unittest.TestCase):
                 "boundary",
             },
         )
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
-        self.assertFalse(packet["candidate_exists"])
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
         self.assertEqual(packet["violations"], [])
 
