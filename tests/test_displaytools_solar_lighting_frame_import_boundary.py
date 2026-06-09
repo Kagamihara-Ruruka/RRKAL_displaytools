@@ -18,7 +18,7 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_displaytools_solar_lighting_frame_imp
 class DisplaytoolsSolarLightingFrameImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_cli_returns_json_pass(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "solar_lighting_frame_boundary.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_solar_lighting_frame_boundary.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
@@ -181,7 +181,7 @@ class DisplaytoolsSolarLightingFrameImportBoundaryTests(unittest.TestCase):
         self.assertFalse(packet["boundary_passed"])
         self.assertTrue(packet["violations"])
 
-    def test_cli_json_shape_is_pinned_for_missing_candidate(self):
+    def test_cli_json_shape_is_pinned_for_existing_candidate(self):
         result = subprocess.run(
             [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "solar_lighting_frame_boundary.py")],
             cwd=REPO_ROOT,
@@ -210,8 +210,8 @@ class DisplaytoolsSolarLightingFrameImportBoundaryTests(unittest.TestCase):
                 "boundary",
             },
         )
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
-        self.assertFalse(packet["candidate_exists"])
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
         self.assertEqual(packet["violations"], [])
 
