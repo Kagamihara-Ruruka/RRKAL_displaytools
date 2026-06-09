@@ -46,7 +46,8 @@ class DisplaytoolsDynamicPointSelectionRenderPolicyImportBoundaryTests(unittest.
         packet = json.loads(result.stdout)
 
         self.assertEqual(packet["target"], "render_core\\dynamic_point_selection_render_policy_boundary.py")
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
 
     def test_missing_candidate_function_returns_pass(self):
@@ -55,6 +56,14 @@ class DisplaytoolsDynamicPointSelectionRenderPolicyImportBoundaryTests(unittest.
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
+
+    def test_real_candidate_exists_and_passes(self):
+        packet = validate_target(REPO_ROOT / DEFAULT_TARGET)
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_clean_temporary_candidate_passes(self):
         source = (
