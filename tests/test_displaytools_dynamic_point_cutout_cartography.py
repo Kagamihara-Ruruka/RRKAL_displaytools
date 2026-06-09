@@ -199,15 +199,15 @@ class DynamicPointCutoutCartographyTests(unittest.TestCase):
         self.assertGreater(packet["monolith"]["total_lines"], 20000)
         self.assertEqual(packet["quantification"]["extracted_helper_count"], 3)
         self.assertGreater(packet["quantification"]["extracted_helper_line_total"], 500)
-        self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], 3)
-        self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], 3)
+        self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], 4)
+        self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], 4)
         self.assertFalse(packet["quantification"]["source_movement_authorized"])
         self.assertFalse(packet["quantification"]["helper_module_creation_authorized"])
 
     def test_checker_and_helper_test_inventory_are_static_only(self):
         packet = build_cutout_cartography_packet()
-        self.assertEqual(len(packet["checker_inventory"]), 3)
-        self.assertEqual(len(packet["helper_test_inventory"]), 3)
+        self.assertEqual(len(packet["checker_inventory"]), 4)
+        self.assertEqual(len(packet["helper_test_inventory"]), 4)
         for checker in packet["checker_inventory"]:
             self.assertTrue(checker["ast_only_checker"])
             self.assertFalse(checker["runtime_import_allowed"])
