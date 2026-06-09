@@ -19,7 +19,7 @@ SCRIPT = REPO_ROOT / "scripts" / "validate_displaytools_dynamic_point_render_cap
 class DisplaytoolsDynamicPointRenderCapAdaptiveSamplingImportBoundaryTests(unittest.TestCase):
     def test_missing_candidate_cli_returns_json_pass(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "dynamic_point_render_cap_adaptive_sampling_boundary.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_dynamic_point_render_cap_adaptive_sampling_boundary.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,
@@ -46,16 +46,24 @@ class DisplaytoolsDynamicPointRenderCapAdaptiveSamplingImportBoundaryTests(unitt
         packet = json.loads(result.stdout)
 
         self.assertEqual(packet["target"], "render_core\\dynamic_point_render_cap_adaptive_sampling_boundary.py")
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
-        self.assertFalse(packet["candidate_exists"])
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
 
     def test_missing_candidate_function_returns_pass(self):
-        packet = validate_target(REPO_ROOT / DEFAULT_TARGET)
+        packet = validate_target(REPO_ROOT / "render_core" / "missing_dynamic_point_render_cap_adaptive_sampling_boundary.py")
 
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertFalse(packet["candidate_exists"])
         self.assertTrue(packet["boundary_passed"])
+
+    def test_real_candidate_exists_and_passes(self):
+        packet = validate_target(REPO_ROOT / DEFAULT_TARGET)
+
+        self.assertEqual(packet["status"], "pass")
+        self.assertTrue(packet["candidate_exists"])
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
 
     def test_clean_temporary_candidate_passes(self):
         source = (
@@ -205,7 +213,7 @@ class DisplaytoolsDynamicPointRenderCapAdaptiveSamplingImportBoundaryTests(unitt
 
     def test_cli_json_shape_is_pinned_for_missing_candidate(self):
         result = subprocess.run(
-            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "dynamic_point_render_cap_adaptive_sampling_boundary.py")],
+            [sys.executable, "-B", str(SCRIPT), str(REPO_ROOT / "render_core" / "missing_dynamic_point_render_cap_adaptive_sampling_boundary.py")],
             cwd=REPO_ROOT,
             check=True,
             capture_output=True,

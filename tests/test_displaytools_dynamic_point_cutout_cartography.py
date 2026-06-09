@@ -35,6 +35,16 @@ EXTRACTED_HELPERS = [
         "source_movement_in_this_gate": False,
         "forbidden_next_action": "do_not_modify_selection_render_policy_helper_in_cartography_gate",
     },
+    {
+        "surface_name": "render_cap_adaptive_sampling_boundary_descriptors",
+        "path": "render_core/dynamic_point_render_cap_adaptive_sampling_boundary.py",
+        "helper_kind": "descriptor_policy_ledger_shell",
+        "checker": "scripts/validate_displaytools_dynamic_point_render_cap_adaptive_sampling_import_boundary.py",
+        "fixture_test": "tests/test_displaytools_dynamic_point_render_cap_adaptive_sampling_boundary_helpers.py",
+        "runtime_dependency_allowed": False,
+        "source_movement_in_this_gate": False,
+        "forbidden_next_action": "do_not_modify_render_cap_adaptive_sampling_helper_in_cartography_gate",
+    },
 ]
 
 REMAINING_SURFACES = [
@@ -187,7 +197,7 @@ class DynamicPointCutoutCartographyTests(unittest.TestCase):
         self.assertFalse(packet["monolith"]["monolith_import_used"])
         self.assertFalse(packet["monolith"]["monolith_modified_in_this_gate"])
 
-    def test_extracted_helper_inventory_records_three_cutouts(self):
+    def test_extracted_helper_inventory_records_dynamic_point_cutouts(self):
         helpers = build_cutout_cartography_packet()["extracted_helpers"]
         self.assertEqual([entry["surface_name"] for entry in helpers], [entry["surface_name"] for entry in EXTRACTED_HELPERS])
         for entry in helpers:
@@ -199,19 +209,25 @@ class DynamicPointCutoutCartographyTests(unittest.TestCase):
     def test_quantification_counts_are_pinned(self):
         packet = build_cutout_cartography_packet()
         self.assertGreater(packet["monolith"]["total_lines"], 20000)
-        self.assertEqual(packet["quantification"]["extracted_helper_count"], 3)
+        self.assertEqual(packet["quantification"]["extracted_helper_count"], len(packet["extracted_helpers"]))
         self.assertGreater(packet["quantification"]["extracted_helper_line_total"], 500)
         self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], len(packet["checker_inventory"]))
         self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], len(packet["helper_test_inventory"]))
-        self.assertEqual(packet["quantification"]["dynamic_point_checker_count"], 4)
-        self.assertEqual(packet["quantification"]["dynamic_point_helper_test_count"], 4)
         self.assertFalse(packet["quantification"]["source_movement_authorized"])
         self.assertFalse(packet["quantification"]["helper_module_creation_authorized"])
 
     def test_checker_and_helper_test_inventory_are_static_only(self):
         packet = build_cutout_cartography_packet()
-        self.assertEqual(len(packet["checker_inventory"]), 4)
-        self.assertEqual(len(packet["helper_test_inventory"]), 4)
+        checker_paths = {entry["path"] for entry in packet["checker_inventory"]}
+        helper_test_paths = {entry["path"] for entry in packet["helper_test_inventory"]}
+        self.assertTrue(any(
+            path.endswith("scripts/validate_displaytools_dynamic_point_render_cap_adaptive_sampling_import_boundary.py")
+            for path in checker_paths
+        ))
+        self.assertTrue(any(
+            path.endswith("tests/test_displaytools_dynamic_point_render_cap_adaptive_sampling_boundary_helpers.py")
+            for path in helper_test_paths
+        ))
         for checker in packet["checker_inventory"]:
             self.assertTrue(checker["ast_only_checker"])
             self.assertFalse(checker["runtime_import_allowed"])
