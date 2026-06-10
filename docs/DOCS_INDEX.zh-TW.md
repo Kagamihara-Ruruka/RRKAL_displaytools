@@ -257,3 +257,6 @@ Every development round must end with:
 ## Dynamic point LOD view-frame presentation count import-boundary checker gate
 
 - [Dynamic Point LOD View-frame Presentation Count Import-Boundary Checker Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_COUNT_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md)
+## Dynamic point LOD view-frame presentation count minimal extraction planning gate
+
+- [Dynamic Point LOD View-frame Presentation Count Minimal Extraction Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_COUNT_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md)
