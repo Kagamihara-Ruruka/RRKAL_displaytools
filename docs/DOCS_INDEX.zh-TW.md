@@ -179,3 +179,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame runtime characterization planning gate
 
 - [Dynamic Point LOD View-frame Runtime Characterization Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_RUNTIME_CHARACTERIZATION_PLANNING_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame runtime probe authorization review gate
+
+- [Dynamic Point LOD View-frame Runtime Probe Authorization Review Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_RUNTIME_PROBE_AUTHORIZATION_REVIEW_GATE.zh-TW.md)
