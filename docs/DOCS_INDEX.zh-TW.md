@@ -326,3 +326,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame post source-lineage guard next bridge selection gate
 
 - [Dynamic Point LOD View-Frame Post Source-Lineage Guard Next Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_POST_SOURCE_LINEAGE_GUARD_NEXT_BRIDGE_SELECTION_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame presentation reduction contract planning gate
+
+- [Dynamic Point LOD View-Frame Presentation Reduction Contract Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_REDUCTION_CONTRACT_PLANNING_GATE.zh-TW.md)
