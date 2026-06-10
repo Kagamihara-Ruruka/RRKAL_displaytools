@@ -350,3 +350,7 @@ Every development round must end with:
 ## Dynamic point mask occlusion legacy anatomy classification gate
 
 - [Dynamic Point Mask Occlusion Legacy Anatomy Classification Gate](DISPLAYTOOLS_DYNAMIC_POINT_MASK_OCCLUSION_LEGACY_ANATOMY_CLASSIFICATION_GATE.zh-TW.md)
+
+## Dynamic point andesite registry milestone settlement gate
+
+- [Dynamic Point Andesite Registry Milestone Settlement Gate](DISPLAYTOOLS_DYNAMIC_POINT_ANDESITE_REGISTRY_MILESTONE_SETTLEMENT_GATE.zh-TW.md)
