@@ -167,3 +167,7 @@ Every development round must end with:
 ## Displaytools early runtime pipeline characterization gate
 
 - [Displaytools Early Runtime Pipeline Characterization Gate](DISPLAYTOOLS_EARLY_RUNTIME_PIPELINE_CHARACTERIZATION_GATE.zh-TW.md)
+
+## Dynamic point grafting path minimal evidence gate
+
+- [Dynamic Point Grafting Path Minimal Evidence Gate](DISPLAYTOOLS_DYNAMIC_POINT_GRAFTING_PATH_MINIMAL_EVIDENCE_GATE.zh-TW.md)
