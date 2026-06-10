@@ -264,3 +264,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame presentation count minimal extraction gate
 
 - [Dynamic Point LOD View-frame Presentation Count Minimal Extraction Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_COUNT_MINIMAL_EXTRACTION_GATE.zh-TW.md)
+
+## Dynamic point presentation count cartography update gate
+
+- [Dynamic Point Presentation Count Cartography Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_PRESENTATION_COUNT_CARTOGRAPHY_UPDATE_GATE.zh-TW.md)
