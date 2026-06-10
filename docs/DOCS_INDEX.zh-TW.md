@@ -215,3 +215,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame sampling visibility followup planning gate
 
 - [Dynamic Point LOD View-frame Sampling Visibility Followup Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_FOLLOWUP_PLANNING_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame sampling visibility followup probe design gate
+
+- [Dynamic Point LOD View-frame Sampling Visibility Followup Probe Design Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_FOLLOWUP_PROBE_DESIGN_GATE.zh-TW.md)
