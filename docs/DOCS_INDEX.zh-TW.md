@@ -140,3 +140,6 @@ Every development round must end with:
 ## Displaytools canvas creation order depth cross-subsystem counterexample gate
 
 - [Displaytools Canvas Creation Order Depth Cross-Subsystem Counterexample Gate](DISPLAYTOOLS_CANVAS_CREATION_ORDER_DEPTH_CROSS_SUBSYSTEM_COUNTEREXAMPLE_GATE.zh-TW.md)
+## Dynamic point projection interface shadow import-boundary checker gate
+
+- [Dynamic Point Projection Interface Shadow Import-Boundary Checker Gate](DISPLAYTOOLS_DYNAMIC_POINT_PROJECTION_INTERFACE_SHADOW_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md)
