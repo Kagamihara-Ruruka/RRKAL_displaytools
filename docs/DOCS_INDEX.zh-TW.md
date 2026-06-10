@@ -171,3 +171,7 @@ Every development round must end with:
 ## Dynamic point grafting path minimal evidence gate
 
 - [Dynamic Point Grafting Path Minimal Evidence Gate](DISPLAYTOOLS_DYNAMIC_POINT_GRAFTING_PATH_MINIMAL_EVIDENCE_GATE.zh-TW.md)
+
+## Dynamic point occlusion responsibility boundary gate
+
+- [Dynamic Point Occlusion Responsibility Boundary Gate](DISPLAYTOOLS_DYNAMIC_POINT_OCCLUSION_RESPONSIBILITY_BOUNDARY_GATE.zh-TW.md)
