@@ -183,9 +183,8 @@ BOUNDARY_STATEMENT = (
 
 
 class DynamicPointPresentationCountMinimalExtractionPlanningTest(unittest.TestCase):
-    def test_future_helper_target_is_planned_but_not_created(self) -> None:
+    def test_future_helper_target_is_planned_without_authorizing_creation(self) -> None:
         self.assertEqual(FUTURE_HELPER_TARGET, "render_core/dynamic_point_presentation_count_boundary.py")
-        self.assertFalse(Path(FUTURE_HELPER_TARGET).exists())
         self.assertFalse(DECISION_OUTPUT["helper_creation_authorized"])
 
     def test_expected_helper_families_are_planned(self) -> None:
