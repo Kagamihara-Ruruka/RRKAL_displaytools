@@ -175,3 +175,7 @@ Every development round must end with:
 ## Dynamic point occlusion responsibility boundary gate
 
 - [Dynamic Point Occlusion Responsibility Boundary Gate](DISPLAYTOOLS_DYNAMIC_POINT_OCCLUSION_RESPONSIBILITY_BOUNDARY_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame runtime characterization planning gate
+
+- [Dynamic Point LOD View-frame Runtime Characterization Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_RUNTIME_CHARACTERIZATION_PLANNING_GATE.zh-TW.md)
