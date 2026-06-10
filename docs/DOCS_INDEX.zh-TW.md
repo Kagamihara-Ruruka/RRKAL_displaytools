@@ -195,3 +195,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame one-shot runtime probe adapter dry contract gate
 
 - [Dynamic Point LOD View-frame One-shot Runtime Probe Adapter Dry Contract Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_ONE_SHOT_RUNTIME_PROBE_ADAPTER_DRY_CONTRACT_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame one-shot probe adapter static wiring gate
+
+- [Dynamic Point LOD View-frame One-shot Probe Adapter Static Wiring Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_ONE_SHOT_PROBE_ADAPTER_STATIC_WIRING_GATE.zh-TW.md)
