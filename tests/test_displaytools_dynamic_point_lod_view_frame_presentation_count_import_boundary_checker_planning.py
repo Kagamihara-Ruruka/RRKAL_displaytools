@@ -182,7 +182,7 @@ class DynamicPointPresentationCountImportBoundaryCheckerPlanningTest(unittest.Te
         )
         self.assertFalse(PACKET["evidence_sources"]["runtime_executed_by_this_gate"])
 
-    def test_future_targets_are_defined_but_not_created(self) -> None:
+    def test_future_targets_are_defined_and_helper_is_not_created(self) -> None:
         self.assertEqual(
             FUTURE_TARGETS["future_helper_target"],
             "render_core/dynamic_point_presentation_count_boundary.py",
@@ -192,7 +192,14 @@ class DynamicPointPresentationCountImportBoundaryCheckerPlanningTest(unittest.Te
             "scripts/validate_displaytools_dynamic_point_presentation_count_import_boundary.py",
         )
         self.assertFalse(Path(FUTURE_TARGETS["future_helper_target"]).exists())
-        self.assertFalse(Path(FUTURE_TARGETS["future_checker_target"]).exists())
+
+    def test_future_checker_target_is_lifecycle_tolerant(self) -> None:
+        self.assertEqual(
+            FUTURE_TARGETS["future_checker_target"],
+            "scripts/validate_displaytools_dynamic_point_presentation_count_import_boundary.py",
+        )
+        self.assertFalse(CREATION_AUTHORIZATION["checker_creation_authorized"])
+        self.assertFalse(PLANNING_ANSWERS["checker_creation_authorized"])
 
     def test_checker_expectations_are_ast_only_and_non_executing(self) -> None:
         self.assertTrue(CHECKER_EXPECTATIONS["ast_only"])
