@@ -342,3 +342,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame presentation reduction minimal extraction planning gate
 
 - [Dynamic Point LOD View-Frame Presentation Reduction Minimal Extraction Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_REDUCTION_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame presentation reduction minimal extraction gate
+
+- [Dynamic Point LOD View-Frame Presentation Reduction Minimal Extraction Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_REDUCTION_MINIMAL_EXTRACTION_GATE.zh-TW.md)

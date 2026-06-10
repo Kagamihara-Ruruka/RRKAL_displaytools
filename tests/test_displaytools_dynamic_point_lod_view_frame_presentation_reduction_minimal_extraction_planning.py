@@ -284,11 +284,14 @@ class DynamicPointPresentationReductionMinimalExtractionPlanningTest(unittest.Te
     def test_required_checker_available_and_missing_target_passes(self) -> None:
         packet = reduction_checker.validate_target(Path(FUTURE_HELPER_TARGET))
         self.assertTrue(DECISION_OUTPUT["required_checker_available"])
-        self.assertFalse(packet["candidate_exists"])
-        self.assertEqual(packet["status"], "not_applicable_candidate_missing")
         self.assertTrue(packet["boundary_passed"])
         self.assertFalse(packet["target_imported"])
         self.assertFalse(packet["target_executed"])
+        if packet["candidate_exists"]:
+            self.assertEqual(packet["status"], "pass")
+        else:
+            self.assertEqual(packet["status"], "not_applicable_candidate_missing")
+        self.assertFalse(DECISION_OUTPUT["helper_creation_authorized"])
 
     def test_planned_helper_families_match_minimal_extraction_surface(self) -> None:
         self.assertEqual(

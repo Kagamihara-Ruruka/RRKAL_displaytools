@@ -18,9 +18,18 @@ class DynamicPointPresentationReductionImportBoundaryCheckerTest(unittest.TestCa
         )
 
     def test_missing_target_passes_as_not_applicable(self) -> None:
-        packet = checker.validate_target(Path("render_core/dynamic_point_presentation_reduction_boundary.py"))
+        packet = checker.validate_target(Path("render_core/__missing_dynamic_point_presentation_reduction_boundary_candidate__.py"))
         self.assertFalse(packet["candidate_exists"])
         self.assertEqual(packet["status"], "not_applicable_candidate_missing")
+        self.assertTrue(packet["boundary_passed"])
+        self.assertEqual(packet["violations"], [])
+        self.assertFalse(packet["target_imported"])
+        self.assertFalse(packet["target_executed"])
+
+    def test_default_target_exists_and_passes_after_minimal_extraction(self) -> None:
+        packet = checker.validate_target(Path("render_core/dynamic_point_presentation_reduction_boundary.py"))
+        self.assertTrue(packet["candidate_exists"])
+        self.assertEqual(packet["status"], "pass")
         self.assertTrue(packet["boundary_passed"])
         self.assertEqual(packet["violations"], [])
         self.assertFalse(packet["target_imported"])
