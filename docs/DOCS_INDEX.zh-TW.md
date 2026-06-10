@@ -322,3 +322,7 @@ Every development round must end with:
 ## Dynamic point source-lineage guard cartography update gate
 
 - [Dynamic Point Source-Lineage Guard Cartography Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_SOURCE_LINEAGE_GUARD_CARTOGRAPHY_UPDATE_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame post source-lineage guard next bridge selection gate
+
+- [Dynamic Point LOD View-Frame Post Source-Lineage Guard Next Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_POST_SOURCE_LINEAGE_GUARD_NEXT_BRIDGE_SELECTION_GATE.zh-TW.md)
