@@ -161,3 +161,6 @@ Every development round must end with:
 ## Dynamic point view-frame occlusion ablation-conditioned token-trace gate
 
 - [Dynamic Point View-Frame Occlusion Ablation-Conditioned Token-Trace Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_ABLATION_CONDITIONED_TOKEN_TRACE_GATE.zh-TW.md)
+## Dynamic point view-frame occlusion structure settlement gate
+
+- [Dynamic Point View-Frame Occlusion Structure Settlement Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_STRUCTURE_SETTLEMENT_GATE.zh-TW.md)
