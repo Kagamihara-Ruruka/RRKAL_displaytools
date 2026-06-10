@@ -152,3 +152,6 @@ Every development round must end with:
 ## Dynamic point view-frame occlusion core-lineage validation gate
 
 - [Dynamic Point View-Frame Occlusion Core-Lineage Validation Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_CORE_LINEAGE_VALIDATION_GATE.zh-TW.md)
+## Dynamic point view-frame occlusion token-trace mode matrix gate
+
+- [Dynamic Point View-Frame Occlusion Token-Trace Mode Matrix Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_TOKEN_TRACE_MODE_MATRIX_GATE.zh-TW.md)
