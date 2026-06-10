@@ -279,3 +279,6 @@ Every development round must end with:
 ## Dynamic point LOD view-frame computed-but-hidden import-boundary checker planning gate
 
 - [Dynamic Point LOD View-frame Computed-But-Hidden Import-Boundary Checker Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_COMPUTED_BUT_HIDDEN_IMPORT_BOUNDARY_CHECKER_PLANNING_GATE.zh-TW.md)
+## Dynamic point LOD view-frame computed-but-hidden import-boundary checker gate
+
+- [Dynamic Point LOD View-frame Computed-But-Hidden Import-Boundary Checker Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_COMPUTED_BUT_HIDDEN_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md)
