@@ -239,3 +239,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame sampling visibility import-boundary checker gate
 
 - [Dynamic Point LOD View-frame Sampling Visibility Import-Boundary Checker Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame sampling visibility minimal extraction gate
+
+- [Dynamic Point LOD View-frame Sampling Visibility Minimal Extraction Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_MINIMAL_EXTRACTION_GATE.zh-TW.md)
