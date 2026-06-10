@@ -143,3 +143,6 @@ Every development round must end with:
 ## Dynamic point projection interface shadow import-boundary checker gate
 
 - [Dynamic Point Projection Interface Shadow Import-Boundary Checker Gate](DISPLAYTOOLS_DYNAMIC_POINT_PROJECTION_INTERFACE_SHADOW_IMPORT_BOUNDARY_CHECKER_GATE.zh-TW.md)
+## Dynamic point projection interface shadow minimal extraction planning gate
+
+- [Dynamic Point Projection Interface Shadow Minimal Extraction Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_PROJECTION_INTERFACE_SHADOW_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md)
