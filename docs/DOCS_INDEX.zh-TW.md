@@ -272,3 +272,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame post-presentation-count next bridge selection gate
 
 - [Dynamic Point LOD View-frame Post-Presentation-Count Next Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_POST_PRESENTATION_COUNT_NEXT_BRIDGE_SELECTION_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame computed-but-hidden contract planning gate
+
+- [Dynamic Point LOD View-frame Computed-But-Hidden Contract Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_COMPUTED_BUT_HIDDEN_CONTRACT_PLANNING_GATE.zh-TW.md)
