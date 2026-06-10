@@ -314,3 +314,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame source-lineage guard minimal extraction planning gate
 
 - [Dynamic Point LOD View-Frame Source-Lineage Guard Minimal Extraction Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SOURCE_LINEAGE_GUARD_MINIMAL_EXTRACTION_PLANNING_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame source-lineage guard minimal extraction gate
+
+- [Dynamic Point LOD View-Frame Source-Lineage Guard Minimal Extraction Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SOURCE_LINEAGE_GUARD_MINIMAL_EXTRACTION_GATE.zh-TW.md)
