@@ -302,3 +302,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame source-lineage guard contract planning gate
 
 - [Dynamic Point LOD View-Frame Source-Lineage Guard Contract Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SOURCE_LINEAGE_GUARD_CONTRACT_PLANNING_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame source-lineage guard import-boundary checker planning gate
+
+- [Dynamic Point LOD View-Frame Source-Lineage Guard Import-Boundary Checker Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SOURCE_LINEAGE_GUARD_IMPORT_BOUNDARY_CHECKER_PLANNING_GATE.zh-TW.md)
