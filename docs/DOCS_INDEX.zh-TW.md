@@ -155,3 +155,6 @@ Every development round must end with:
 ## Dynamic point view-frame occlusion token-trace mode matrix gate
 
 - [Dynamic Point View-Frame Occlusion Token-Trace Mode Matrix Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_TOKEN_TRACE_MODE_MATRIX_GATE.zh-TW.md)
+## Dynamic point view-frame occlusion token-trace lithology transition gate
+
+- [Dynamic Point View-Frame Occlusion Token-Trace Lithology Transition Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_TOKEN_TRACE_LITHOLOGY_TRANSITION_GATE.zh-TW.md)
