@@ -203,3 +203,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame one-shot runtime probe execution authorization gate
 
 - [Dynamic Point LOD View-frame One-shot Runtime Probe Execution Authorization Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_ONE_SHOT_RUNTIME_PROBE_EXECUTION_AUTHORIZATION_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame one-shot runtime probe execution gate
+
+- [Dynamic Point LOD View-frame One-shot Runtime Probe Execution Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_ONE_SHOT_RUNTIME_PROBE_EXECUTION_GATE.zh-TW.md)
