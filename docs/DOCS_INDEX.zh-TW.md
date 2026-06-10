@@ -290,3 +290,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame computed-but-hidden minimal extraction gate
 
 - [Dynamic Point LOD View-frame Computed-But-Hidden Minimal Extraction Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_COMPUTED_BUT_HIDDEN_MINIMAL_EXTRACTION_GATE.zh-TW.md)
+
+## Dynamic point post computed-but-hidden cartography update gate
+
+- [Dynamic Point Post Computed-But-Hidden Cartography Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_POST_COMPUTED_BUT_HIDDEN_CARTOGRAPHY_UPDATE_GATE.zh-TW.md)
