@@ -223,3 +223,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame sampling visibility probe script update gate
 
 - [Dynamic Point LOD View-frame Sampling Visibility Probe Script Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_PROBE_SCRIPT_UPDATE_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame sampling visibility runtime probe result interpretation gate
+
+- [Dynamic Point LOD View-frame Sampling Visibility Runtime Probe Result Interpretation Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SAMPLING_VISIBILITY_RUNTIME_PROBE_RESULT_INTERPRETATION_GATE.zh-TW.md)
