@@ -164,3 +164,6 @@ Every development round must end with:
 ## Dynamic point view-frame occlusion structure settlement gate
 
 - [Dynamic Point View-Frame Occlusion Structure Settlement Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_STRUCTURE_SETTLEMENT_GATE.zh-TW.md)
+## Displaytools early runtime pipeline characterization gate
+
+- [Displaytools Early Runtime Pipeline Characterization Gate](DISPLAYTOOLS_EARLY_RUNTIME_PIPELINE_CHARACTERIZATION_GATE.zh-TW.md)
