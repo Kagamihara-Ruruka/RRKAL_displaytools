@@ -298,3 +298,7 @@ Every development round must end with:
 ## Dynamic point post computed-but-hidden next bridge selection gate
 
 - [Dynamic Point Post Computed-But-Hidden Next Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_POST_COMPUTED_BUT_HIDDEN_NEXT_BRIDGE_SELECTION_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame source-lineage guard contract planning gate
+
+- [Dynamic Point LOD View-Frame Source-Lineage Guard Contract Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_SOURCE_LINEAGE_GUARD_CONTRACT_PLANNING_GATE.zh-TW.md)
