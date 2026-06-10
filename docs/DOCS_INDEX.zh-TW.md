@@ -183,3 +183,7 @@ Every development round must end with:
 ## Dynamic point LOD view-frame runtime probe authorization review gate
 
 - [Dynamic Point LOD View-frame Runtime Probe Authorization Review Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_RUNTIME_PROBE_AUTHORIZATION_REVIEW_GATE.zh-TW.md)
+
+## Dynamic point LOD view-frame one-shot synthetic probe design gate
+
+- [Dynamic Point LOD View-frame One-shot Synthetic Probe Design Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_ONE_SHOT_SYNTHETIC_PROBE_DESIGN_GATE.zh-TW.md)
