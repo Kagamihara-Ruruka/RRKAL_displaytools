@@ -149,3 +149,6 @@ Every development round must end with:
 ## Dynamic point view-frame occlusion monkey ablation matrix gate
 
 - [Dynamic Point View-Frame Occlusion Monkey Ablation Matrix Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_MONKEY_ABLATION_MATRIX_GATE.zh-TW.md)
+## Dynamic point view-frame occlusion core-lineage validation gate
+
+- [Dynamic Point View-Frame Occlusion Core-Lineage Validation Gate](DISPLAYTOOLS_DYNAMIC_POINT_VIEW_FRAME_OCCLUSION_CORE_LINEAGE_VALIDATION_GATE.zh-TW.md)
