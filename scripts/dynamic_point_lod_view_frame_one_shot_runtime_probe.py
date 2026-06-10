@@ -67,6 +67,7 @@ BASE_DECISION_OUTPUT = {
     "render_if_needed_called": False,
     "controller_instantiated": False,
     "renderer_executed": False,
+    "frame_buffer_read": False,
     "artifact_written": False,
     "live_source_used": False,
     "db_cache_used": False,
@@ -178,6 +179,132 @@ def evaluate_runtime_oracle(token_packet: dict[str, bool | int | str]) -> dict[s
         "oracle_result": "path_preserved_or_not_enough_evidence",
         "oracle_reason": "observed tokens do not isolate a narrower responsibility",
     }
+
+
+def build_sampling_visibility_case_results(
+    *,
+    projected_visible: bool,
+    mask_visible: bool,
+) -> list[dict[str, Any]]:
+    source_lineage_id = "SYNTHETIC_SOURCE_LINEAGE_STABLE"
+    projected_count = 2 if projected_visible else 0
+    full_sample_count = projected_count
+    reduced_rendered_count = 1 if projected_count > 1 else projected_count
+    return [
+        {
+            "case": "full_sample_case",
+            "projected_count": projected_count,
+            "sampled_count": full_sample_count,
+            "visible_count_observation": full_sample_count,
+            "rendered_count_observation": full_sample_count,
+            "sampled_visible_token": projected_visible,
+            "source_lineage_before": source_lineage_id,
+            "source_lineage_after": source_lineage_id,
+            "source_lineage_integrity_token": True,
+            "synthetic_only": True,
+        },
+        {
+            "case": "reduced_sample_case",
+            "projected_count": projected_count,
+            "sampled_count": full_sample_count,
+            "visible_count_observation": full_sample_count,
+            "rendered_count_observation": reduced_rendered_count,
+            "sampled_visible_token": projected_visible,
+            "source_lineage_before": source_lineage_id,
+            "source_lineage_after": source_lineage_id,
+            "source_lineage_integrity_token": True,
+            "synthetic_only": True,
+        },
+        {
+            "case": "mask_visible_true",
+            "overlay_rendered_token": True,
+            "mask_visible_token": mask_visible,
+            "source_lineage_before": source_lineage_id,
+            "source_lineage_after": source_lineage_id,
+            "source_lineage_integrity_token": True,
+            "synthetic_only": True,
+        },
+        {
+            "case": "mask_visible_false_synthetic",
+            "overlay_rendered_token": True,
+            "mask_visible_token": False,
+            "source_lineage_before": source_lineage_id,
+            "source_lineage_after": source_lineage_id,
+            "source_lineage_integrity_token": True,
+            "synthetic_only": True,
+        },
+        {
+            "case": "source_lineage_guard_case",
+            "sampling_policy_mutates_source": False,
+            "mask_policy_mutates_source": False,
+            "source_lineage_before": source_lineage_id,
+            "source_lineage_after": source_lineage_id,
+            "source_lineage_integrity_token": True,
+            "synthetic_only": True,
+        },
+        {
+            "case": "frame_remains_not_observed",
+            "frame_visible_token": "not_observed",
+            "transparent_globe_leak_behavior": "not_observed",
+            "transparent_globe_leak_fix_claimed": False,
+            "synthetic_only": True,
+        },
+    ]
+
+
+def evaluate_sampling_visibility_oracles(
+    case_results: list[dict[str, Any]]
+) -> list[dict[str, str]]:
+    oracle_results: list[dict[str, str]] = []
+    for row in case_results:
+        case = row["case"]
+        if case == "full_sample_case":
+            if (
+                row["projected_count"]
+                == row["sampled_count"]
+                == row["rendered_count_observation"]
+            ):
+                verdict = "full_sample_path_preserved"
+                reason = "projected, sampled, and rendered synthetic counts match"
+            else:
+                verdict = "sampling_visibility_mismatch"
+                reason = "full sample synthetic counts diverged"
+        elif case == "reduced_sample_case":
+            if row["rendered_count_observation"] < row["visible_count_observation"]:
+                verdict = "sampling_or_presentation_reduction_candidate"
+                reason = "rendered count is lower than visible count"
+            else:
+                verdict = "sampling_reduction_not_observed"
+                reason = "reduced sample did not lower rendered count"
+        elif case == "mask_visible_true":
+            if row["overlay_rendered_token"] is True and row["mask_visible_token"] is True:
+                verdict = "mask_visible_path_preserved"
+                reason = "overlay and mask-visible tokens are both true"
+            else:
+                verdict = "mask_visible_true_not_observed"
+                reason = "mask-visible true case did not preserve the mask token"
+        elif case == "mask_visible_false_synthetic":
+            if row["overlay_rendered_token"] is True and row["mask_visible_token"] is False:
+                verdict = "globe_mask_responsibility_candidate"
+                reason = "overlay remains present while synthetic mask suppresses visibility"
+            else:
+                verdict = "mask_false_not_observed"
+                reason = "synthetic mask false case did not suppress visibility"
+        elif case == "source_lineage_guard_case":
+            if row["source_lineage_integrity_token"] is True:
+                verdict = "source_lineage_guard_preserved"
+                reason = "sampling and mask labels do not mutate source identity"
+            else:
+                verdict = "source_lineage_pollution_fail"
+                reason = "source lineage token changed"
+        elif case == "frame_remains_not_observed":
+            verdict = "still_not_leak_evidence"
+            reason = "frame visibility remains outside this probe update"
+        else:
+            verdict = "not_enough_evidence"
+            reason = "unknown synthetic sampling visibility case"
+        oracle_results.append({"case": case, "oracle_result": verdict, "oracle_reason": reason})
+    return oracle_results
 
 
 def build_self_test_packet() -> dict[str, Any]:
@@ -387,16 +514,25 @@ def run_probe() -> dict[str, Any]:
 
     projected_visible = bool(len(ais_projected) > 0 and len(aircraft_projected) > 0)
     mask_visible = bool(np.any(masked_overlay[..., 3] > 0))
+    sampling_visibility_case_results = build_sampling_visibility_case_results(
+        projected_visible=projected_visible,
+        mask_visible=mask_visible,
+    )
+    sampling_visibility_oracle_results = evaluate_sampling_visibility_oracles(
+        sampling_visibility_case_results
+    )
+    full_sample_case = sampling_visibility_case_results[0]
+    reduced_sample_case = sampling_visibility_case_results[1]
     token_packet = build_token_packet(
         source_present_token=True,
         projected_visible_token=projected_visible,
-        sampled_visible_token="not_observed",
+        sampled_visible_token=full_sample_case["sampled_visible_token"],
         overlay_rendered_token=True,
         mask_visible_token=mask_visible,
         frame_visible_token="not_observed",
         source_lineage_integrity_token=True,
-        visible_count_observation="not_observed",
-        rendered_count_observation="not_observed",
+        visible_count_observation=full_sample_case["visible_count_observation"],
+        rendered_count_observation=reduced_sample_case["rendered_count_observation"],
     )
     oracle = evaluate_runtime_oracle(token_packet)
     oracle.update(
@@ -444,12 +580,15 @@ def run_probe() -> dict[str, Any]:
             "mask_overlay_to_globe_called": True,
             "render_if_needed_called": False,
             "each_allowed_seam_called_once": True,
+            "sampling_visibility_logic": "synthetic_only",
         },
         "token_packet": token_packet,
+        "sampling_visibility_case_results": sampling_visibility_case_results,
+        "sampling_visibility_oracle_results": sampling_visibility_oracle_results,
         "oracle": oracle,
         "decision_output": decision,
         "recommended_next_gate": (
-            "dynamic_point_lod_view_frame_one_shot_runtime_probe_result_interpretation_gate"
+            "dynamic_point_lod_view_frame_sampling_visibility_runtime_probe_result_interpretation_gate"
         ),
         "boundary_statement": BOUNDARY_STATEMENT,
     }

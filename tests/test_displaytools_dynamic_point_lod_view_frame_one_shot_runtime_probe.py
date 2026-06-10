@@ -36,6 +36,7 @@ class DynamicPointLodViewFrameOneShotRuntimeProbeTest(unittest.TestCase):
         self.assertFalse(decision["project_aircraft_to_screen_called"])
         self.assertFalse(decision["mask_overlay_to_globe_called"])
         self.assertFalse(decision["render_if_needed_called"])
+        self.assertFalse(decision["frame_buffer_read"])
 
     def test_blocked_packet_shape_and_boundaries(self) -> None:
         packet = probe.blocked_packet("blocked_import_safety", "fixture")
@@ -105,6 +106,7 @@ class DynamicPointLodViewFrameOneShotRuntimeProbeTest(unittest.TestCase):
         self.assertFalse(decision["render_if_needed_called"])
         self.assertFalse(decision["controller_instantiated"])
         self.assertFalse(decision["renderer_executed"])
+        self.assertFalse(decision["frame_buffer_read"])
         self.assertFalse(decision["artifact_written"])
         self.assertFalse(decision["live_source_used"])
         self.assertFalse(decision["db_cache_used"])
@@ -158,10 +160,78 @@ class DynamicPointLodViewFrameOneShotRuntimeProbeTest(unittest.TestCase):
         )
         packet = json.loads(completed.stdout)
         self.assertEqual(packet["status"], "runtime_probe_stdout_packet")
+        self.assertIn("sampling_visibility_case_results", packet)
+        self.assertIn("sampling_visibility_oracle_results", packet)
+        self.assertIs(packet["token_packet"]["sampled_visible_token"], True)
+        self.assertIsInstance(packet["token_packet"]["visible_count_observation"], int)
+        self.assertIsInstance(packet["token_packet"]["rendered_count_observation"], int)
+        self.assertFalse(packet["decision_output"]["frame_buffer_read"])
         self.assertTrue(packet["import_safety"]["import_stdout_suppressed"])
         self.assertGreaterEqual(packet["import_safety"]["import_stdout_line_count"], 1)
         self.assertNotIn("[Taichi]", completed.stdout)
         self.assertIn("import_stderr_suppressed", packet["import_safety"])
+        self.assertEqual(
+            packet["recommended_next_gate"],
+            "dynamic_point_lod_view_frame_sampling_visibility_runtime_probe_result_interpretation_gate",
+        )
+
+    def test_sampling_visibility_case_oracles(self) -> None:
+        cases = probe.build_sampling_visibility_case_results(
+            projected_visible=True,
+            mask_visible=True,
+        )
+        cases_by_name = {row["case"]: row for row in cases}
+        self.assertEqual(
+            set(cases_by_name),
+            {
+                "full_sample_case",
+                "reduced_sample_case",
+                "mask_visible_true",
+                "mask_visible_false_synthetic",
+                "source_lineage_guard_case",
+                "frame_remains_not_observed",
+            },
+        )
+        full = cases_by_name["full_sample_case"]
+        self.assertEqual(full["projected_count"], full["sampled_count"])
+        self.assertEqual(full["sampled_count"], full["rendered_count_observation"])
+        reduced = cases_by_name["reduced_sample_case"]
+        self.assertLess(
+            reduced["rendered_count_observation"],
+            reduced["visible_count_observation"],
+        )
+        self.assertTrue(cases_by_name["mask_visible_true"]["mask_visible_token"])
+        self.assertFalse(cases_by_name["mask_visible_false_synthetic"]["mask_visible_token"])
+        self.assertTrue(
+            cases_by_name["source_lineage_guard_case"]["source_lineage_integrity_token"]
+        )
+        self.assertEqual(
+            cases_by_name["frame_remains_not_observed"]["frame_visible_token"],
+            "not_observed",
+        )
+
+        oracle_results = {
+            row["case"]: row["oracle_result"]
+            for row in probe.evaluate_sampling_visibility_oracles(cases)
+        }
+        self.assertEqual(oracle_results["full_sample_case"], "full_sample_path_preserved")
+        self.assertEqual(
+            oracle_results["reduced_sample_case"],
+            "sampling_or_presentation_reduction_candidate",
+        )
+        self.assertEqual(oracle_results["mask_visible_true"], "mask_visible_path_preserved")
+        self.assertEqual(
+            oracle_results["mask_visible_false_synthetic"],
+            "globe_mask_responsibility_candidate",
+        )
+        self.assertEqual(
+            oracle_results["source_lineage_guard_case"],
+            "source_lineage_guard_preserved",
+        )
+        self.assertEqual(
+            oracle_results["frame_remains_not_observed"],
+            "still_not_leak_evidence",
+        )
 
 
 if __name__ == "__main__":
