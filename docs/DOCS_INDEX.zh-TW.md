@@ -247,3 +247,6 @@ Every development round must end with:
 ## Dynamic point sampling visibility cartography update gate
 
 - [Dynamic Point Sampling Visibility Cartography Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_SAMPLING_VISIBILITY_CARTOGRAPHY_UPDATE_GATE.zh-TW.md)
+## Dynamic point LOD view-frame next andesite bridge selection gate
+
+- [Dynamic Point LOD View-frame Next Andesite Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_NEXT_ANDESITE_BRIDGE_SELECTION_GATE.zh-TW.md)
