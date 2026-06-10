@@ -294,3 +294,7 @@ Every development round must end with:
 ## Dynamic point post computed-but-hidden cartography update gate
 
 - [Dynamic Point Post Computed-But-Hidden Cartography Update Gate](DISPLAYTOOLS_DYNAMIC_POINT_POST_COMPUTED_BUT_HIDDEN_CARTOGRAPHY_UPDATE_GATE.zh-TW.md)
+
+## Dynamic point post computed-but-hidden next bridge selection gate
+
+- [Dynamic Point Post Computed-But-Hidden Next Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_POST_COMPUTED_BUT_HIDDEN_NEXT_BRIDGE_SELECTION_GATE.zh-TW.md)
