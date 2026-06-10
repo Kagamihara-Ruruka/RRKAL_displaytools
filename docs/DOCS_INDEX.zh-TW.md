@@ -250,3 +250,4 @@ Every development round must end with:
 ## Dynamic point LOD view-frame next andesite bridge selection gate
 
 - [Dynamic Point LOD View-frame Next Andesite Bridge Selection Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_NEXT_ANDESITE_BRIDGE_SELECTION_GATE.zh-TW.md)
+- [Dynamic Point LOD View-Frame Presentation Count Contract Planning Gate](DISPLAYTOOLS_DYNAMIC_POINT_LOD_VIEW_FRAME_PRESENTATION_COUNT_CONTRACT_PLANNING_GATE.zh-TW.md) - docs/test-only planning for visible/rendered count contract semantics, reduction candidate boundaries, frame/leak stop-line, and next checker planning.
