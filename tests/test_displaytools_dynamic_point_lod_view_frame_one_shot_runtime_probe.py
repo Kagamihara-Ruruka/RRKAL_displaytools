@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import ast
 import inspect
+import json
+import subprocess
+import sys
 import unittest
 
 from scripts import dynamic_point_lod_view_frame_one_shot_runtime_probe as probe
@@ -139,7 +142,26 @@ class DynamicPointLodViewFrameOneShotRuntimeProbeTest(unittest.TestCase):
                 imported_roots.update(alias.name.split(".", 1)[0] for alias in node.names)
             elif isinstance(node, ast.ImportFrom):
                 imported_roots.add((node.module or "").split(".", 1)[0])
-        self.assertEqual(imported_roots, {"__future__", "importlib", "inspect", "json", "pathlib", "sys", "typing", "scripts"})
+        self.assertEqual(imported_roots, {"__future__", "contextlib", "importlib", "inspect", "io", "json", "pathlib", "sys", "typing", "scripts"})
+
+    def test_run_probe_stdout_is_single_json_packet(self) -> None:
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/dynamic_point_lod_view_frame_one_shot_runtime_probe.py",
+                "--run-probe",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        packet = json.loads(completed.stdout)
+        self.assertEqual(packet["status"], "runtime_probe_stdout_packet")
+        self.assertTrue(packet["import_safety"]["import_stdout_suppressed"])
+        self.assertGreaterEqual(packet["import_safety"]["import_stdout_line_count"], 1)
+        self.assertNotIn("[Taichi]", completed.stdout)
+        self.assertIn("import_stderr_suppressed", packet["import_safety"])
 
 
 if __name__ == "__main__":

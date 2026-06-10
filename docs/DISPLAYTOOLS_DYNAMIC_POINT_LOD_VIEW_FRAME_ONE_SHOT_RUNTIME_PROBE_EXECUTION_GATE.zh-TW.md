@@ -49,6 +49,17 @@ If import fails or import safety cannot be established, the script emits stdout 
 }
 ```
 
+Import-time stdout noise is captured during the monolith import safety path. If a dependency writes a banner during import, the banner is suppressed from process stdout and recorded inside the JSON packet:
+
+```text
+import_stdout_suppressed = true
+import_stdout_line_count = 1
+import_stderr_suppressed = true or false
+import_stderr_line_count = 0 or more
+```
+
+This preserves the core contract that the whole process stdout is one parseable JSON packet. If a dependency emits diagnostic text on stderr outside Python stream redirection, that diagnostic is not part of the stdout token and oracle packet.
+
 ## Phase B: function availability check
 
 After import safety passes, the script checks only:

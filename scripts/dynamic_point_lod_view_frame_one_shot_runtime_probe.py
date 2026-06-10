@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
+import io
 import json
 import sys
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from typing import Any
 
@@ -245,19 +247,22 @@ def blocked_packet(status: str, reason: str, **decision_updates: Any) -> dict[st
     }
 
 
-def import_monolith_safely() -> tuple[Any | None, str | None]:
+def import_monolith_safely() -> tuple[Any | None, str | None, str, str]:
     target = REPO_ROOT / "taichi_global_bathymetry.py"
+    stdout_buffer = io.StringIO()
+    stderr_buffer = io.StringIO()
     try:
         spec = importlib.util.spec_from_file_location(
             "dynamic_point_probe_taichi_global_bathymetry", target
         )
         if spec is None or spec.loader is None:
-            return None, "unable to build import spec"
+            return None, "unable to build import spec", stdout_buffer.getvalue(), stderr_buffer.getvalue()
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module, None
+        with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
+            spec.loader.exec_module(module)
+        return module, None, stdout_buffer.getvalue(), stderr_buffer.getvalue()
     except BaseException as exc:  # noqa: BLE001 - blocked probe packet must catch import-time failures.
-        return None, f"{type(exc).__name__}: {exc}"
+        return None, f"{type(exc).__name__}: {exc}", stdout_buffer.getvalue(), stderr_buffer.getvalue()
 
 
 def verify_function_availability(module: Any) -> tuple[bool, str, dict[str, bool]]:
@@ -277,12 +282,18 @@ def verify_signatures(module: Any) -> tuple[bool, str]:
 
 
 def run_probe() -> dict[str, Any]:
-    module, import_error = import_monolith_safely()
+    module, import_error, import_stdout, import_stderr = import_monolith_safely()
+    import_stdout_lines = [line for line in import_stdout.splitlines() if line.strip()]
+    import_stderr_lines = [line for line in import_stderr.splitlines() if line.strip()]
     if module is None:
         return blocked_packet(
             "blocked_import_safety",
             import_error or "unknown import safety failure",
             import_safety_passed=False,
+            import_stdout_suppressed=bool(import_stdout),
+            import_stdout_line_count=len(import_stdout_lines),
+            import_stderr_suppressed=bool(import_stderr),
+            import_stderr_line_count=len(import_stderr_lines),
         )
 
     available, availability_reason, availability = verify_function_availability(module)
@@ -411,6 +422,10 @@ def run_probe() -> dict[str, Any]:
             "import_safety_passed": True,
             "function_availability": availability,
             "signature_check": signature_reason,
+            "import_stdout_suppressed": bool(import_stdout),
+            "import_stdout_line_count": len(import_stdout_lines),
+            "import_stderr_suppressed": bool(import_stderr),
+            "import_stderr_line_count": len(import_stderr_lines),
         },
         "synthetic_payload_summary": {
             "source_labels": ["AIS_SYNTHETIC", "ADSB_SYNTHETIC"],
