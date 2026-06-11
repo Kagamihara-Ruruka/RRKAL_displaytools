@@ -45,7 +45,8 @@ The previous planning test is updated only to tolerate the lifecycle transition 
 
 The planning decision still records:
 
-- `yaml_fixture_creation_authorized = false`
+- `planned_fixture_creation_completed = true`
+- `additional_yaml_fixture_creation_authorized = false`
 - `formal_dictionary_creation_authorized = false`
 - `schema_json_modification_authorized = false`
 - `validator_modification_authorized = false`

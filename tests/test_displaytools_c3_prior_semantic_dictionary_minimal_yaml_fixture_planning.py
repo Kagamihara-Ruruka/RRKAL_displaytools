@@ -161,7 +161,8 @@ DECISION_OUTPUT = {
     "validator_fixture_settlement_passed": fixture_settlement.DECISION_OUTPUT[
         "validator_fixture_material_settlement_passed"
     ],
-    "yaml_fixture_creation_authorized": False,
+    "planned_fixture_creation_completed": True,
+    "additional_yaml_fixture_creation_authorized": False,
     "formal_dictionary_creation_authorized": False,
     "schema_json_modification_authorized": False,
     "validator_modification_authorized": False,
@@ -224,7 +225,8 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
         self.assertEqual(contract["dictionary_path"], FUTURE_VALID_FIXTURE_TARGET)
         self.assertEqual(contract["schema_path"], SCHEMA_JSON_TARGET)
         self.assertEqual(contract["validator_path"], VALIDATOR_TARGET)
-        self.assertFalse(DECISION_OUTPUT["yaml_fixture_creation_authorized"])
+        self.assertTrue(DECISION_OUTPUT["planned_fixture_creation_completed"])
+        self.assertFalse(DECISION_OUTPUT["additional_yaml_fixture_creation_authorized"])
         self.assertFalse(Path(FORMAL_DICTIONARY_TARGET).exists())
 
     def test_invalid_fixture_family_plan_is_complete(self) -> None:
@@ -284,7 +286,7 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
             self.assertIn(stop_line, STOP_LINES_PRESERVED)
         self.assertTrue(DECISION_OUTPUT["minimal_yaml_fixture_planning_gate_passed"])
         for key in [
-            "yaml_fixture_creation_authorized",
+            "additional_yaml_fixture_creation_authorized",
             "formal_dictionary_creation_authorized",
             "schema_json_modification_authorized",
             "validator_modification_authorized",
