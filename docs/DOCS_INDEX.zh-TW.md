@@ -354,3 +354,6 @@ Every development round must end with:
 ## Dynamic point andesite registry milestone settlement gate
 
 - [Dynamic Point Andesite Registry Milestone Settlement Gate](DISPLAYTOOLS_DYNAMIC_POINT_ANDESITE_REGISTRY_MILESTONE_SETTLEMENT_GATE.zh-TW.md)
+## C3 prior dictionary international law registry gate
+
+- [C3 Prior Dictionary International Law Registry Gate](DISPLAYTOOLS_C3_PRIOR_DICTIONARY_INTERNATIONAL_LAW_REGISTRY_GATE.zh-TW.md)
