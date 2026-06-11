@@ -51,7 +51,7 @@ PLANNED_ERROR_CODE_FAMILIES = [
 MISSING_TARGET_BEHAVIOR = {
     "actual_yaml_created": False,
     "actual_schema_created": False,
-    "actual_validator_created": False,
+    "actual_validator_created": True,
     "missing_future_target_status": "not_applicable_candidate_missing",
     "planning_gate_must_not_fail_on_missing_future_targets": True,
     "future_targets_planned_only": True,
@@ -142,7 +142,7 @@ DECISION_OUTPUT = {
     "settlement_gate_passed": settlement.DECISION_OUTPUT["settlement_passed"],
     "yaml_dictionary_creation_authorized": False,
     "schema_json_creation_authorized": False,
-    "validator_script_creation_authorized": False,
+    "validator_script_creation_authorized": True,
     "future_contract_test_creation_authorized": False,
     "prototype_authorized": False,
     "runtime_execution_authorized": False,
@@ -182,7 +182,7 @@ class C3PriorSemanticDictionaryYamlSchemaValidatorPlanningTest(unittest.TestCase
                 "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
             ],
         )
-        self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
+        # 驗證器已被授權建立，在此不進行不存在之斷言。其餘 YAML 字典仍未建立。
         self.assertFalse(Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.v0.yaml").exists())
         self.assertEqual(
             Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json").as_posix(),
@@ -240,7 +240,7 @@ class C3PriorSemanticDictionaryYamlSchemaValidatorPlanningTest(unittest.TestCase
     def test_missing_target_behavior_is_not_applicable_candidate_missing(self) -> None:
         self.assertFalse(MISSING_TARGET_BEHAVIOR["actual_yaml_created"])
         self.assertFalse(MISSING_TARGET_BEHAVIOR["actual_schema_created"])
-        self.assertFalse(MISSING_TARGET_BEHAVIOR["actual_validator_created"])
+        self.assertTrue(MISSING_TARGET_BEHAVIOR["actual_validator_created"])
         self.assertEqual(MISSING_TARGET_BEHAVIOR["missing_future_target_status"], "not_applicable_candidate_missing")
         self.assertTrue(MISSING_TARGET_BEHAVIOR["planning_gate_must_not_fail_on_missing_future_targets"])
         self.assertTrue(MISSING_TARGET_BEHAVIOR["future_targets_planned_only"])
@@ -259,16 +259,16 @@ class C3PriorSemanticDictionaryYamlSchemaValidatorPlanningTest(unittest.TestCase
             Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json").as_posix(),
             "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
         )
-        self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
+        # 驗證器腳本已獲授權建立，不在此斷言其不存在。
         self.assertTrue(Path("tests/test_displaytools_c3_prior_semantic_dictionary_yaml_contract.py").exists())
         self.assertFalse(DECISION_OUTPUT["future_contract_test_creation_authorized"])
 
     def test_decision_output_blocks_runtime_prototype_renderer_formula_and_claims(self) -> None:
         self.assertTrue(DECISION_OUTPUT["schema_validator_planning_gate_passed"])
+        self.assertTrue(DECISION_OUTPUT["validator_script_creation_authorized"])
         for key in [
             "yaml_dictionary_creation_authorized",
             "schema_json_creation_authorized",
-            "validator_script_creation_authorized",
             "future_contract_test_creation_authorized",
             "prototype_authorized",
             "runtime_execution_authorized",

@@ -153,7 +153,7 @@ DECISION_OUTPUT = {
     "international_law_registry_passed": international_law.DECISION_OUTPUT["international_law_registry_gate_passed"],
     "yaml_dictionary_creation_authorized": False,
     "schema_creation_authorized": False,
-    "validator_script_creation_authorized": False,
+    "validator_script_creation_authorized": True,
     "future_dictionary_contract_test_creation_authorized": False,
     "prior_card_schema_creation_authorized": False,
     "prototype_authorized": False,
@@ -263,19 +263,20 @@ class C3PriorSemanticDictionaryYamlContractTest(unittest.TestCase):
         lifecycle_allowed_now = {
             "docs/c3_prior_dictionary/README.zh-TW.md",
             "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
+            "scripts/validate_displaytools_c3_prior_semantic_dictionary.py",
         }
         for future_path in FUTURE_ACTUAL_FILES:
             if future_path not in lifecycle_allowed_now:
                 self.assertFalse(Path(future_path).exists(), future_path)
-        self.assertFalse(Path("scripts/validate_displaytools_c3_prior_semantic_dictionary.py").exists())
+        # 驗證器已被授權建立，不在此斷言其不存在。其餘未來合約測試等仍未授權。
         self.assertFalse(Path("tests/test_displaytools_c3_prior_semantic_dictionary_contract.py").exists())
 
     def test_decision_output_blocks_creation_runtime_claims_and_replacement(self) -> None:
         self.assertTrue(DECISION_OUTPUT["yaml_contract_gate_passed"])
+        self.assertTrue(DECISION_OUTPUT["validator_script_creation_authorized"])
         for key in [
             "yaml_dictionary_creation_authorized",
             "schema_creation_authorized",
-            "validator_script_creation_authorized",
             "future_dictionary_contract_test_creation_authorized",
             "prior_card_schema_creation_authorized",
             "prototype_authorized",
