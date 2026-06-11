@@ -32,6 +32,9 @@ LIFECYCLE_CREATED_FIXTURE_TARGETS = {
     "tests/fixtures/c3_prior_dictionary/invalid_missing_required_section.yaml",
     "tests/fixtures/c3_prior_dictionary/invalid_bare_high_risk_term_id.yaml",
     "tests/fixtures/c3_prior_dictionary/invalid_forbidden_runtime_field.yaml",
+    "tests/fixtures/c3_prior_dictionary/invalid_legacy_fossil_direct_adoption.yaml",
+    "tests/fixtures/c3_prior_dictionary/invalid_c4_mediation_bypass.yaml",
+    "tests/fixtures/c3_prior_dictionary/invalid_readiness_claim.yaml",
 }
 
 REQUIRED_TOP_LEVEL_SECTIONS = [

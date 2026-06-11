@@ -16,6 +16,9 @@ INVALID_FIXTURES = {
     "invalid_missing_required_section.yaml": "missing_required_section",
     "invalid_bare_high_risk_term_id.yaml": "bare_high_risk_term_id",
     "invalid_forbidden_runtime_field.yaml": "Forbidden key detected",
+    "invalid_legacy_fossil_direct_adoption.yaml": "legacy_fossil_direct_adoption",
+    "invalid_c4_mediation_bypass.yaml": "c4_mediation_bypassed",
+    "invalid_readiness_claim.yaml": "Forbidden key detected",
 }
 
 

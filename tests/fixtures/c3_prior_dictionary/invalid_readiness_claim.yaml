@@ -1,0 +1,29 @@
+dictionary_metadata:
+  dictionary_id: c3_prior_semantic_dictionary_invalid_readiness_claim
+  version: v0
+  owner: c_3
+  lifecycle_status: planned
+  source_commit: "270e587"
+  readiness_claimed: true
+authority_sources: []
+phenomenon_translation_map: []
+prior_terms: []
+view_families: []
+layer_taxonomy: []
+recipe_authoring:
+  recipe_owns_truth: true
+  preview_consumes_recipe: true
+  export_consumes_recipe: true
+  ui_does_not_own_truth: true
+c4_mediation:
+  ingress_mediated_by_c4: true
+  egress_mediated_by_c4: true
+  direct_c3_to_c1_forbidden: true
+legacy_fossil_translation:
+  - legacy_term: legacy_mask
+    observed_need: observed historical pressure
+    translated_ideal_candidate: layered_occluding_body_visibility_contract_candidate
+    direct_adoption_forbidden: true
+stop_lines: []
+unknown_stop_lines: []
+validator_expectations: []

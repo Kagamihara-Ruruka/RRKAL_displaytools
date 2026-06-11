@@ -410,3 +410,7 @@ Every development round must end with:
 ## C3 prior semantic dictionary validator legacy fossil direct adoption extension gate
 
 - [C3 Prior Semantic Dictionary Validator Legacy Fossil Direct Adoption Extension Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_VALIDATOR_LEGACY_FOSSIL_DIRECT_ADOPTION_EXTENSION_GATE.zh-TW.md)
+
+## C3 prior semantic dictionary remaining invalid YAML fixture gate
+
+- [C3 Prior Semantic Dictionary Remaining Invalid YAML Fixture Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_REMAINING_INVALID_YAML_FIXTURE_GATE.zh-TW.md)
