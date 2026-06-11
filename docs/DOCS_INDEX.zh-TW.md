@@ -371,3 +371,6 @@ Every development round must end with:
 ## C3 prior semantic dictionary YAML schema validator planning gate
 
 - [C3 Prior Semantic Dictionary YAML Schema Validator Planning Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_YAML_SCHEMA_VALIDATOR_PLANNING_GATE.zh-TW.md)
+## C3 prior semantic dictionary schema JSON contract planning gate
+
+- [C3 Prior Semantic Dictionary Schema JSON Contract Planning Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_SCHEMA_JSON_CONTRACT_PLANNING_GATE.zh-TW.md)
