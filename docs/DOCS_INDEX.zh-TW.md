@@ -384,3 +384,6 @@ Every development round must end with:
 
 - [C3 Prior Dictionary README](c3_prior_dictionary/README.zh-TW.md)
 - [C3 Prior Semantic Dictionary Schema v0](c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json)
+## C3 prior material fourth settlement gate
+
+- [C3 Prior Material Fourth Settlement Gate](DISPLAYTOOLS_C3_PRIOR_MATERIAL_FOURTH_SETTLEMENT_GATE.zh-TW.md)
