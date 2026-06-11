@@ -406,3 +406,7 @@ Every development round must end with:
 ## C3 prior YAML fixture expectation material settlement gate
 
 - [C3 Prior YAML Fixture Expectation Material Settlement Gate](DISPLAYTOOLS_C3_PRIOR_YAML_FIXTURE_EXPECTATION_MATERIAL_SETTLEMENT_GATE.zh-TW.md)
+
+## C3 prior semantic dictionary validator legacy fossil direct adoption extension gate
+
+- [C3 Prior Semantic Dictionary Validator Legacy Fossil Direct Adoption Extension Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_VALIDATOR_LEGACY_FOSSIL_DIRECT_ADOPTION_EXTENSION_GATE.zh-TW.md)

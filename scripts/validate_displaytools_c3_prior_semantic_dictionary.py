@@ -122,6 +122,14 @@ def main():
                         sys.stderr.write("missing_required_entry_field: {} in prior_terms\n".format(field))
                         sys.exit(1)
 
+    legacy_fossil_translation = data.get("legacy_fossil_translation", [])
+    if isinstance(legacy_fossil_translation, list):
+        for entry in legacy_fossil_translation:
+            if isinstance(entry, dict):
+                if entry.get("direct_adoption_forbidden") is not True:
+                    sys.stderr.write("legacy_fossil_direct_adoption detected\n")
+                    sys.exit(1)
+
     # (2) stop_lines_must_not_authorize_implementation
     # stop_lines 中的 blocked_claims 不能包含 implementation_authorized
     stop_lines = data.get("stop_lines", [])

@@ -30,6 +30,40 @@ class TestC3PriorSemanticDictionaryValidator(unittest.TestCase):
         )
         return result.returncode, result.stdout, result.stderr
 
+    def build_minimal_yaml(self, legacy_direct_adoption_forbidden="true", include_legacy_field=True):
+        legacy_field = ""
+        if include_legacy_field:
+            legacy_field = f"\n    direct_adoption_forbidden: {legacy_direct_adoption_forbidden}"
+        return f"""
+dictionary_metadata:
+  dictionary_id: test_dict
+  version: v0
+  owner: c_3
+  lifecycle_status: planned
+  source_commit: abc1234
+authority_sources: []
+phenomenon_translation_map: []
+prior_terms: []
+view_families: []
+layer_taxonomy: []
+recipe_authoring:
+  recipe_owns_truth: true
+  preview_consumes_recipe: true
+  export_consumes_recipe: true
+  ui_does_not_own_truth: true
+c4_mediation:
+  ingress_mediated_by_c4: true
+  egress_mediated_by_c4: true
+  direct_c3_to_c1_forbidden: true
+legacy_fossil_translation:
+  - legacy_term: legacy_mask
+    observed_need: observed historical pressure
+    translated_ideal_candidate: layered_occluding_body_visibility_contract_candidate{legacy_field}
+stop_lines: []
+unknown_stop_lines: []
+validator_expectations: []
+"""
+
     def test_missing_yaml_target_passes_as_not_applicable(self):
         # 使用一個不存在的 YAML 檔
         non_existent_yaml = "docs/c3_prior_dictionary/non_existent_file.yaml"
@@ -253,6 +287,45 @@ validator_expectations:
         try:
             code, stdout, stderr = self.run_validator(temp_yaml, self.default_schema_path)
             self.assertEqual(code, 0)
+            self.assertIn("Validation passed successfully", stdout)
+        finally:
+            if os.path.exists(temp_yaml):
+                os.remove(temp_yaml)
+
+    def test_legacy_fossil_direct_adoption_false_fails(self):
+        with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False, mode="w", encoding="utf-8") as f:
+            f.write(self.build_minimal_yaml(legacy_direct_adoption_forbidden="false"))
+            temp_yaml = f.name
+
+        try:
+            code, stdout, stderr = self.run_validator(temp_yaml, self.default_schema_path)
+            self.assertEqual(code, 1)
+            self.assertIn("legacy_fossil_direct_adoption", stderr)
+        finally:
+            if os.path.exists(temp_yaml):
+                os.remove(temp_yaml)
+
+    def test_legacy_fossil_direct_adoption_missing_fails(self):
+        with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False, mode="w", encoding="utf-8") as f:
+            f.write(self.build_minimal_yaml(include_legacy_field=False))
+            temp_yaml = f.name
+
+        try:
+            code, stdout, stderr = self.run_validator(temp_yaml, self.default_schema_path)
+            self.assertEqual(code, 1)
+            self.assertIn("legacy_fossil_direct_adoption", stderr)
+        finally:
+            if os.path.exists(temp_yaml):
+                os.remove(temp_yaml)
+
+    def test_legacy_fossil_direct_adoption_true_passes_this_rule(self):
+        with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False, mode="w", encoding="utf-8") as f:
+            f.write(self.build_minimal_yaml(legacy_direct_adoption_forbidden="true"))
+            temp_yaml = f.name
+
+        try:
+            code, stdout, stderr = self.run_validator(temp_yaml, self.default_schema_path)
+            self.assertEqual(code, 0, stderr)
             self.assertIn("Validation passed successfully", stdout)
         finally:
             if os.path.exists(temp_yaml):
