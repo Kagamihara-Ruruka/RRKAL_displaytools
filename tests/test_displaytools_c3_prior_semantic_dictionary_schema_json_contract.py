@@ -21,11 +21,11 @@ def load_schema():
 
 
 class C3PriorSemanticDictionarySchemaJsonContractTest(unittest.TestCase):
-    def test_schema_and_readme_exist_but_yaml_and_validator_do_not(self):
+    def test_schema_and_readme_exist_and_yaml_is_still_absent(self):
         self.assertTrue(SCHEMA_PATH.exists())
         self.assertTrue(README_PATH.exists())
         self.assertFalse(YAML_DICTIONARY_PATH.exists())
-        self.assertFalse(VALIDATOR_PATH.exists())
+        self.assertEqual(VALIDATOR_PATH.as_posix(), planning.FUTURE_VALIDATOR_TARGET)
 
     def test_schema_json_parses_and_has_identity_fields(self):
         schema = load_schema()
