@@ -1,0 +1,41 @@
+dictionary_metadata:
+  dictionary_id: c3_prior_semantic_dictionary_invalid_bare_term
+  version: v0
+  owner: c_3
+  lifecycle_status: planned
+  source_commit: e61777b
+authority_sources: []
+phenomenon_translation_map: []
+prior_terms:
+  - term_id: layer
+    definition: Bare high risk term must fail.
+    authority_family: rrkal_native_governance
+    source_evidence_refs:
+      - ref_id: fixture_settlement
+        ref_kind: product_test
+        source: tests/test_displaytools_c3_prior_validator_fixture_material_settlement.py
+    allowed_use: invalid fixture only
+    forbidden_use: accepted prior term id
+    example: invalid fixture
+    counterexample: c3_qualified_layer_prior
+    schema_field_candidate: true
+    validator_rule_candidate: true
+    prototype_behavior_candidate: false
+    stop_line: bare_term_stop_line
+    confidence: medium
+    lifecycle_status: planned
+view_families: []
+layer_taxonomy: []
+recipe_authoring:
+  recipe_owns_truth: true
+  preview_consumes_recipe: true
+  export_consumes_recipe: true
+  ui_does_not_own_truth: true
+c4_mediation:
+  ingress_mediated_by_c4: true
+  egress_mediated_by_c4: true
+  direct_c3_to_c1_forbidden: true
+legacy_fossil_translation: []
+stop_lines: []
+unknown_stop_lines: []
+validator_expectations: []

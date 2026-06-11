@@ -27,6 +27,13 @@ FUTURE_INVALID_FIXTURE_TARGETS = [
     "tests/fixtures/c3_prior_dictionary/invalid_readiness_claim.yaml",
 ]
 
+LIFECYCLE_CREATED_FIXTURE_TARGETS = {
+    FUTURE_VALID_FIXTURE_TARGET,
+    "tests/fixtures/c3_prior_dictionary/invalid_missing_required_section.yaml",
+    "tests/fixtures/c3_prior_dictionary/invalid_bare_high_risk_term_id.yaml",
+    "tests/fixtures/c3_prior_dictionary/invalid_forbidden_runtime_field.yaml",
+}
+
 REQUIRED_TOP_LEVEL_SECTIONS = [
     "dictionary_metadata",
     "authority_sources",
@@ -179,7 +186,7 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
             "c3_prior_semantic_dictionary_minimal_yaml_fixture_planning_gate",
         )
 
-    def test_future_fixture_topology_is_planned_but_absent(self) -> None:
+    def test_future_fixture_topology_is_planned_with_lifecycle_tolerant_existence(self) -> None:
         self.assertEqual(
             FUTURE_VALID_FIXTURE_TARGET,
             "tests/fixtures/c3_prior_dictionary/minimal_first_slice.valid.v0.yaml",
@@ -187,7 +194,10 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
         self.assertEqual(len(FUTURE_INVALID_FIXTURE_TARGETS), 6)
         for future_path in [FUTURE_VALID_FIXTURE_TARGET, *FUTURE_INVALID_FIXTURE_TARGETS]:
             self.assertTrue(future_path.endswith(".yaml"))
-            self.assertFalse(Path(future_path).exists(), future_path)
+            if future_path in LIFECYCLE_CREATED_FIXTURE_TARGETS:
+                self.assertTrue(Path(future_path).exists(), future_path)
+            else:
+                self.assertFalse(Path(future_path).exists(), future_path)
 
     def test_formal_dictionary_remains_absent(self) -> None:
         self.assertFalse(Path(FORMAL_DICTIONARY_TARGET).exists())
@@ -209,12 +219,13 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
         ]:
             self.assertIn(section, REQUIRED_TOP_LEVEL_SECTIONS)
 
-    def test_valid_fixture_plans_validator_input_without_creating_input(self) -> None:
+    def test_valid_fixture_plans_validator_input_without_authorizing_formal_dictionary(self) -> None:
         contract = VALID_FIXTURE_MINIMUM_SHAPE["validator_input_contract"]
         self.assertEqual(contract["dictionary_path"], FUTURE_VALID_FIXTURE_TARGET)
         self.assertEqual(contract["schema_path"], SCHEMA_JSON_TARGET)
         self.assertEqual(contract["validator_path"], VALIDATOR_TARGET)
-        self.assertFalse(Path(contract["dictionary_path"]).exists())
+        self.assertFalse(DECISION_OUTPUT["yaml_fixture_creation_authorized"])
+        self.assertFalse(Path(FORMAL_DICTIONARY_TARGET).exists())
 
     def test_invalid_fixture_family_plan_is_complete(self) -> None:
         self.assertEqual(
@@ -230,7 +241,10 @@ class C3PriorSemanticDictionaryMinimalYamlFixturePlanningTest(unittest.TestCase)
         )
         for family in INVALID_FIXTURE_FAMILY_PLAN.values():
             self.assertIn(family["future_target"], FUTURE_INVALID_FIXTURE_TARGETS)
-            self.assertFalse(Path(family["future_target"]).exists())
+            if family["future_target"] in LIFECYCLE_CREATED_FIXTURE_TARGETS:
+                self.assertTrue(Path(family["future_target"]).exists())
+            else:
+                self.assertFalse(Path(family["future_target"]).exists())
 
     def test_seed_terms_are_separated_from_lab_evidence_only_material(self) -> None:
         self.assertIn("recipe_owns_truth_prior", SEED_TERM_FIXTURE_MATERIAL["allowed_as_fixture_material"])

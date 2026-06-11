@@ -398,3 +398,7 @@ Every development round must end with:
 ## C3 prior semantic dictionary minimal YAML fixture planning gate
 
 - [C3 Prior Semantic Dictionary Minimal YAML Fixture Planning Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_MINIMAL_YAML_FIXTURE_PLANNING_GATE.zh-TW.md)
+
+## C3 prior semantic dictionary minimal YAML fixture gate
+
+- [C3 Prior Semantic Dictionary Minimal YAML Fixture Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_MINIMAL_YAML_FIXTURE_GATE.zh-TW.md)

@@ -1,0 +1,79 @@
+dictionary_metadata:
+  dictionary_id: c3_prior_semantic_dictionary_minimal_fixture
+  version: v0
+  owner: c_3
+  lifecycle_status: planned
+  source_commit: e61777b
+authority_sources:
+  - source_id: fixture_settlement
+    authority_family: local_semantic_evidence
+    source_ref: tests/test_displaytools_c3_prior_validator_fixture_material_settlement.py
+    adoption_status: fixture_material_only
+    forbidden_overread: not_formal_dictionary_authorization
+phenomenon_translation_map:
+  - naive_observed_phrase: validator fixture material
+    formal_engineering_term: minimal validator fixture surface
+    rrkal_prior_candidate: c3_prior_minimal_fixture_candidate
+    stop_line: formal_dictionary_creation_stop_line
+prior_terms:
+  - term_id: c3_recipe_owns_truth_fixture_prior
+    definition: Minimal fixture term stating that recipe truth is not owned by UI state.
+    authority_family: rrkal_native_governance
+    source_evidence_refs:
+      - ref_id: validator_fixture_settlement
+        ref_kind: product_test
+        source: tests/test_displaytools_c3_prior_validator_fixture_material_settlement.py
+    allowed_use: validator fixture coverage for recipe truth semantics
+    forbidden_use: dictionary usable claim or runtime behavior authorization
+    example: recipe_owns_truth remains true in fixture data
+    counterexample: UI state becomes export truth
+    schema_field_candidate: true
+    validator_rule_candidate: true
+    prototype_behavior_candidate: false
+    stop_line: prototype_authorization_stop_line
+    confidence: medium
+    lifecycle_status: planned
+view_families:
+  - view_family_id: fixture_view_family
+    view_kind: planning_fixture_view
+    input_contract: fixture_recipe_contract
+    output_contract: fixture_validation_result
+    non_goals:
+      - no_renderer_behavior
+layer_taxonomy:
+  - layer_kind: fixture_layer_kind
+    owns_truth: recipe_document
+    consumer: validator_fixture_only
+    forbidden_confusion: layer is not a bare high risk term id
+recipe_authoring:
+  recipe_owns_truth: true
+  preview_consumes_recipe: true
+  export_consumes_recipe: true
+  ui_does_not_own_truth: true
+c4_mediation:
+  ingress_mediated_by_c4: true
+  egress_mediated_by_c4: true
+  direct_c3_to_c1_forbidden: true
+legacy_fossil_translation:
+  - legacy_term: legacy_mask
+    observed_need: observed historical fixture pressure
+    translated_ideal_candidate: layered_occluding_body_visibility_contract_candidate
+    direct_adoption_forbidden: true
+stop_lines:
+  - stop_line_id: formal_dictionary_creation_stop_line
+    reason: Fixture is not the formal dictionary.
+    blocked_claims:
+      - dictionary_usable_claim
+      - readiness_claim
+    reopen_condition: future formal dictionary gate
+    status: blocked
+unknown_stop_lines:
+  - unknown_id: fixture_unknown_stop_line
+    why_unknown: Fixture does not resolve prototype behavior.
+    allowed_reference_use: validator fixture reference only
+    resolution_gate: future_o1_review_gate
+validator_expectations:
+  - rule_id: fixture_validates_minimal_shape
+    checked_surface: minimal_first_slice_fixture
+    fail_condition: missing required validator surface
+    error_code: fixture_missing_required_surface
