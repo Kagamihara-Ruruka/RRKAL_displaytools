@@ -390,3 +390,7 @@ Every development round must end with:
 ## C3 prior semantic dictionary validator gate
 
 - [C3 Prior Semantic Dictionary Validator Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_VALIDATOR_GATE.zh-TW.md)
+
+## C3 prior validator fixture material settlement gate
+
+- [C3 Prior Validator Fixture Material Settlement Gate](DISPLAYTOOLS_C3_PRIOR_VALIDATOR_FIXTURE_MATERIAL_SETTLEMENT_GATE.zh-TW.md)
