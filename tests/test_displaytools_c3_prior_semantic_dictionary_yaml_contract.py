@@ -260,9 +260,13 @@ class C3PriorSemanticDictionaryYamlContractTest(unittest.TestCase):
             self.assertIn(stop_line, STOP_LINE_CONTRACTS)
 
     def test_future_actual_files_are_still_not_created(self) -> None:
+        lifecycle_allowed_now = {
+            "docs/c3_prior_dictionary/README.zh-TW.md",
+            "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
+        }
         for future_path in FUTURE_ACTUAL_FILES:
-            self.assertFalse(Path(future_path).exists(), future_path)
-        self.assertFalse(Path("docs/c3_prior_dictionary").exists())
+            if future_path not in lifecycle_allowed_now:
+                self.assertFalse(Path(future_path).exists(), future_path)
         self.assertFalse(Path("scripts/validate_displaytools_c3_prior_semantic_dictionary.py").exists())
         self.assertFalse(Path("tests/test_displaytools_c3_prior_semantic_dictionary_contract.py").exists())
 

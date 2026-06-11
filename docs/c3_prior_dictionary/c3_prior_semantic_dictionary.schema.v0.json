@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://rrkal.local/displaytools/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
+  "title": "RRKAL c3 prior semantic dictionary v0",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {},
+  "required": [
+    "dictionary_metadata",
+    "authority_sources",
+    "phenomenon_translation_map",
+    "prior_terms",
+    "view_families",
+    "layer_taxonomy",
+    "recipe_authoring",
+    "c4_mediation",
+    "legacy_fossil_translation",
+    "stop_lines",
+    "unknown_stop_lines",
+    "validator_expectations"
+  ],
+  "properties": {
+    "dictionary_metadata": { "$ref": "#/$defs/dictionary_metadata" },
+    "authority_sources": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/authority_source_entry" }
+    },
+    "phenomenon_translation_map": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/phenomenon_translation_entry" }
+    },
+    "prior_terms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/prior_term_entry" }
+    },
+    "view_families": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/view_family_entry" }
+    },
+    "layer_taxonomy": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/layer_taxonomy_entry" }
+    },
+    "recipe_authoring": { "$ref": "#/$defs/recipe_authoring_contract" },
+    "c4_mediation": { "$ref": "#/$defs/c4_mediation_contract" },
+    "legacy_fossil_translation": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/legacy_fossil_translation_entry" }
+    },
+    "stop_lines": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/stop_line_entry" }
+    },
+    "unknown_stop_lines": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/unknown_stop_line_entry" }
+    },
+    "validator_expectations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/validator_expectation_entry" }
+    }
+  },
+  "$defs": {
+    "authority_family_values": {
+      "type": "string",
+      "enum": [
+        "external_standard",
+        "external_reference_implementation",
+        "external_mature_tool_model",
+        "rrkal_native_governance",
+        "legacy_fossil_evidence",
+        "local_semantic_evidence",
+        "candidate_pending_review"
+      ]
+    },
+    "confidence_values": {
+      "type": "string",
+      "enum": ["low", "medium", "high", "evidence_gap"]
+    },
+    "lifecycle_status_values": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "accepted_candidate",
+        "authority_reference_only",
+        "legacy_fossil_evidence",
+        "ideal_form_embryo",
+        "stop_line",
+        "unknown_stop_line"
+      ]
+    },
+    "entry_kind_values": {
+      "type": "string",
+      "enum": ["mapping", "list"]
+    },
+    "stop_line_status_values": {
+      "type": "string",
+      "enum": [
+        "blocked",
+        "planned_only",
+        "not_applicable_candidate_missing",
+        "requires_resolution_gate"
+      ]
+    },
+    "forbidden_field_family_values": {
+      "type": "string",
+      "enum": [
+        "runtime_state",
+        "renderer_state",
+        "frame_buffer",
+        "callable",
+        "runtime_object",
+        "dataframe",
+        "raw_payload_contract",
+        "c1_direct_dependency",
+        "odoriba_bypass",
+        "ui_state_as_truth",
+        "legacy_runtime_patch_as_ideal_form",
+        "implementation_authorized",
+        "readiness_claimed"
+      ]
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref_id", "ref_kind", "source"],
+      "properties": {
+        "ref_id": { "type": "string", "minLength": 1 },
+        "ref_kind": { "type": "string", "minLength": 1 },
+        "source": { "type": "string", "minLength": 1 },
+        "notes": { "type": "string" }
+      }
+    },
+    "dictionary_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dictionary_id", "version", "owner", "lifecycle_status", "source_commit"],
+      "properties": {
+        "dictionary_id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^v[0-9]+$" },
+        "owner": { "type": "string", "const": "c_3" },
+        "lifecycle_status": { "$ref": "#/$defs/lifecycle_status_values" },
+        "source_commit": { "type": "string", "minLength": 7 }
+      }
+    },
+    "authority_source_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "authority_family", "source_ref", "adoption_status", "forbidden_overread"],
+      "properties": {
+        "source_id": { "type": "string", "minLength": 1 },
+        "authority_family": { "$ref": "#/$defs/authority_family_values" },
+        "source_ref": { "type": "string", "minLength": 1 },
+        "adoption_status": { "type": "string", "minLength": 1 },
+        "forbidden_overread": { "type": "string", "minLength": 1 },
+        "evidence_refs": { "type": "array", "items": { "$ref": "#/$defs/evidence_ref" } }
+      }
+    },
+    "phenomenon_translation_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["naive_observed_phrase", "formal_engineering_term", "rrkal_prior_candidate", "stop_line"],
+      "properties": {
+        "naive_observed_phrase": { "type": "string", "minLength": 1 },
+        "formal_engineering_term": { "type": "string", "minLength": 1 },
+        "rrkal_prior_candidate": { "type": "string", "minLength": 1 },
+        "stop_line": { "type": "string", "minLength": 1 },
+        "evidence_refs": { "type": "array", "items": { "$ref": "#/$defs/evidence_ref" } }
+      }
+    },
+    "prior_term_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "term_id",
+        "definition",
+        "authority_family",
+        "source_evidence_refs",
+        "allowed_use",
+        "forbidden_use",
+        "example",
+        "counterexample",
+        "schema_field_candidate",
+        "validator_rule_candidate",
+        "prototype_behavior_candidate",
+        "stop_line",
+        "confidence",
+        "lifecycle_status"
+      ],
+      "properties": {
+        "term_id": {
+          "type": "string",
+          "minLength": 1,
+          "not": { "enum": ["layer", "mask", "view", "projection", "frame", "render", "recipe"] }
+        },
+        "definition": { "type": "string", "minLength": 1 },
+        "authority_family": { "$ref": "#/$defs/authority_family_values" },
+        "source_evidence_refs": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidence_ref" } },
+        "allowed_use": { "type": "string", "minLength": 1 },
+        "forbidden_use": { "type": "string", "minLength": 1 },
+        "example": { "type": "string", "minLength": 1 },
+        "counterexample": { "type": "string", "minLength": 1 },
+        "schema_field_candidate": { "type": "boolean" },
+        "validator_rule_candidate": { "type": "boolean" },
+        "prototype_behavior_candidate": { "type": "boolean" },
+        "stop_line": { "type": "string", "minLength": 1 },
+        "confidence": { "$ref": "#/$defs/confidence_values" },
+        "lifecycle_status": { "$ref": "#/$defs/lifecycle_status_values" }
+      }
+    },
+    "view_family_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["view_family_id", "view_kind", "input_contract", "output_contract", "non_goals"],
+      "properties": {
+        "view_family_id": { "type": "string", "minLength": 1 },
+        "view_kind": { "type": "string", "minLength": 1 },
+        "input_contract": { "type": "string", "minLength": 1 },
+        "output_contract": { "type": "string", "minLength": 1 },
+        "non_goals": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "layer_taxonomy_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["layer_kind", "owns_truth", "consumer", "forbidden_confusion"],
+      "properties": {
+        "layer_kind": { "type": "string", "minLength": 1 },
+        "owns_truth": { "type": "string", "minLength": 1 },
+        "consumer": { "type": "string", "minLength": 1 },
+        "forbidden_confusion": { "type": "string", "minLength": 1 }
+      }
+    },
+    "recipe_authoring_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recipe_owns_truth", "preview_consumes_recipe", "export_consumes_recipe", "ui_does_not_own_truth"],
+      "properties": {
+        "recipe_owns_truth": { "type": "boolean", "const": true },
+        "preview_consumes_recipe": { "type": "boolean" },
+        "export_consumes_recipe": { "type": "boolean" },
+        "ui_does_not_own_truth": { "type": "boolean", "const": true }
+      }
+    },
+    "c4_mediation_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ingress_mediated_by_c4", "egress_mediated_by_c4", "direct_c3_to_c1_forbidden"],
+      "properties": {
+        "ingress_mediated_by_c4": { "type": "boolean", "const": true },
+        "egress_mediated_by_c4": { "type": "boolean", "const": true },
+        "direct_c3_to_c1_forbidden": { "type": "boolean", "const": true }
+      }
+    },
+    "legacy_fossil_translation_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["legacy_term", "observed_need", "translated_ideal_candidate", "direct_adoption_forbidden"],
+      "properties": {
+        "legacy_term": { "type": "string", "minLength": 1 },
+        "observed_need": { "type": "string", "minLength": 1 },
+        "translated_ideal_candidate": { "type": "string", "minLength": 1 },
+        "direct_adoption_forbidden": { "type": "boolean", "const": true }
+      }
+    },
+    "stop_line_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stop_line_id", "reason", "blocked_claims", "reopen_condition"],
+      "properties": {
+        "stop_line_id": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "blocked_claims": { "type": "array", "items": { "type": "string" } },
+        "reopen_condition": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/stop_line_status_values" }
+      }
+    },
+    "unknown_stop_line_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unknown_id", "why_unknown", "allowed_reference_use", "resolution_gate"],
+      "properties": {
+        "unknown_id": { "type": "string", "minLength": 1 },
+        "why_unknown": { "type": "string", "minLength": 1 },
+        "allowed_reference_use": { "type": "string", "minLength": 1 },
+        "resolution_gate": { "type": "string", "minLength": 1 }
+      }
+    },
+    "validator_expectation_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "checked_surface", "fail_condition", "error_code"],
+      "properties": {
+        "rule_id": { "type": "string", "minLength": 1 },
+        "checked_surface": { "type": "string", "minLength": 1 },
+        "fail_condition": { "type": "string", "minLength": 1 },
+        "error_code": { "type": "string", "minLength": 1 }
+      }
+    }
+  },
+  "x-rrkal-forbidden-field-families": [
+    "runtime_state",
+    "renderer_state",
+    "frame_buffer",
+    "callable",
+    "runtime_object",
+    "dataframe",
+    "raw_payload_contract",
+    "c1_direct_dependency",
+    "odoriba_bypass",
+    "ui_state_as_truth",
+    "legacy_runtime_patch_as_ideal_form",
+    "implementation_authorized",
+    "readiness_claimed"
+  ],
+  "x-rrkal-boundary": "Schema contract only. No YAML dictionary, validator script, prototype, runtime API, renderer behavior, formula movement, c4 integration, c1 integration, c2 integration, readiness claim, correctness claim, visual parity claim, leak-fix claim, or runtime replacement authorization."
+}

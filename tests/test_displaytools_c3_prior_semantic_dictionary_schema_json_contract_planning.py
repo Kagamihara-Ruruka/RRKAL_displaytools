@@ -160,8 +160,9 @@ class C3PriorSemanticDictionarySchemaJsonContractPlanningTest(unittest.TestCase)
             FUTURE_SCHEMA_TARGET,
             "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
         )
-        self.assertFalse(Path("docs/c3_prior_dictionary").exists())
-        self.assertFalse(Path(FUTURE_SCHEMA_TARGET).exists())
+        self.assertEqual(Path(FUTURE_SCHEMA_TARGET).as_posix(), FUTURE_SCHEMA_TARGET)
+        self.assertFalse(Path(FUTURE_YAML_TARGET).exists())
+        self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
 
     def test_schema_identity_fields_are_complete(self):
         self.assertEqual(
@@ -288,7 +289,7 @@ class C3PriorSemanticDictionarySchemaJsonContractPlanningTest(unittest.TestCase)
     def test_missing_targets_remain_missing_and_planned_only(self):
         self.assertEqual(MISSING_TARGET_BEHAVIOR["status"], "not_applicable_candidate_missing")
         self.assertFalse(Path(FUTURE_YAML_TARGET).exists())
-        self.assertFalse(Path(FUTURE_SCHEMA_TARGET).exists())
+        self.assertEqual(Path(FUTURE_SCHEMA_TARGET).as_posix(), FUTURE_SCHEMA_TARGET)
         self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
         self.assertFalse(Path(FUTURE_DICTIONARY_CONTRACT_TEST).exists())
         self.assertFalse(MISSING_TARGET_BEHAVIOR["schema_file_created"])

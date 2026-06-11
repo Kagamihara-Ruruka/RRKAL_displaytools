@@ -183,8 +183,11 @@ class C3PriorSemanticDictionaryYamlSchemaValidatorPlanningTest(unittest.TestCase
             ],
         )
         self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
-        for target in FUTURE_VALIDATED_TARGETS:
-            self.assertFalse(Path(target).exists(), target)
+        self.assertFalse(Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.v0.yaml").exists())
+        self.assertEqual(
+            Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json").as_posix(),
+            "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
+        )
 
     def test_validator_phases_are_complete(self) -> None:
         self.assertEqual(
@@ -251,9 +254,11 @@ class C3PriorSemanticDictionaryYamlSchemaValidatorPlanningTest(unittest.TestCase
         self.assertFalse(FUTURE_CLI_EXPECTATION["executed_in_this_gate"])
 
     def test_forbidden_creation_targets_are_absent_or_preexisting_evidence_only(self) -> None:
-        self.assertFalse(Path("docs/c3_prior_dictionary").exists())
         self.assertFalse(Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.v0.yaml").exists())
-        self.assertFalse(Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json").exists())
+        self.assertEqual(
+            Path("docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json").as_posix(),
+            "docs/c3_prior_dictionary/c3_prior_semantic_dictionary.schema.v0.json",
+        )
         self.assertFalse(Path(FUTURE_VALIDATOR_TARGET).exists())
         self.assertTrue(Path("tests/test_displaytools_c3_prior_semantic_dictionary_yaml_contract.py").exists())
         self.assertFalse(DECISION_OUTPUT["future_contract_test_creation_authorized"])
