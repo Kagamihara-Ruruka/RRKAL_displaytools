@@ -16,7 +16,7 @@ The gate classifies lab evidence for validator positive fixtures, negative fixtu
 - `tests/test_displaytools_c3_prior_semantic_dictionary_schema_json_contract.py`
 - `tests/test_displaytools_c3_prior_semantic_dictionary_yaml_schema_validator_planning.py`
 
-Some lab notes contain mojibake-heavy prose. This gate uses stable token-level material from those notes and does not adopt their prose as product dictionary text.
+Lab notes remain lab-only prose. This gate uses stable token-level material from those notes and does not adopt their prose as product dictionary text.
 
 ## Settlement categories
 

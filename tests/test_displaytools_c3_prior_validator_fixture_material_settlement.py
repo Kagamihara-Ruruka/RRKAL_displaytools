@@ -128,7 +128,7 @@ MATERIAL_INVENTORY = {
             "forbidden_fields",
         },
         "validator_fixture_use": "minimal_yaml_entry_shape_fixture_candidate",
-        "caveat": "lab note has mojibake-heavy prose, so only stable token-level fixture surfaces are settled",
+        "caveat": "lab note remains lab-only prose, so only stable token-level fixture surfaces are settled",
         "stop_lines": {
             "no_yaml_dictionary_creation",
             "no_schema_json_change",
@@ -243,7 +243,7 @@ class C3PriorValidatorFixtureMaterialSettlementTest(unittest.TestCase):
             self.assertIn(surface, material["accepted_entry_shape_surfaces"])
         self.assertIn("no_yaml_dictionary_creation", material["stop_lines"])
         self.assertIn("no_implementation_authorization", material["stop_lines"])
-        self.assertIn("mojibake-heavy prose", material["caveat"])
+        self.assertIn("lab-only prose", material["caveat"])
 
     def test_current_validator_gate_is_reference_not_modification_authorization(self) -> None:
         material = MATERIAL_INVENTORY["current_validator_gate"]
