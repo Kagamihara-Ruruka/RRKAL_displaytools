@@ -377,3 +377,6 @@ Every development round must end with:
 ## C3 parallel supply-chain material second settlement gate
 
 - [C3 Parallel Supply-Chain Material Second Settlement Gate](DISPLAYTOOLS_C3_PARALLEL_SUPPLY_CHAIN_MATERIAL_SECOND_SETTLEMENT_GATE.zh-TW.md)
+## C3 prior material third settlement gate
+
+- [C3 Prior Material Third Settlement Gate](DISPLAYTOOLS_C3_PRIOR_MATERIAL_THIRD_SETTLEMENT_GATE.zh-TW.md)
