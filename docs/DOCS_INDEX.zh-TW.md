@@ -363,3 +363,7 @@ Every development round must end with:
 ## C3 prior semantic dictionary YAML skeleton planning gate
 
 - [C3 Prior Semantic Dictionary YAML Skeleton Planning Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_YAML_SKELETON_PLANNING_GATE.zh-TW.md)
+
+## C3 prior semantic dictionary YAML contract gate
+
+- [C3 Prior Semantic Dictionary YAML Contract Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_YAML_CONTRACT_GATE.zh-TW.md)
