@@ -357,3 +357,6 @@ Every development round must end with:
 ## C3 prior dictionary international law registry gate
 
 - [C3 Prior Dictionary International Law Registry Gate](DISPLAYTOOLS_C3_PRIOR_DICTIONARY_INTERNATIONAL_LAW_REGISTRY_GATE.zh-TW.md)
+## C3 prior law material settlement gate
+
+- [C3 Prior Law Material Settlement Gate](DISPLAYTOOLS_C3_PRIOR_LAW_MATERIAL_SETTLEMENT_GATE.zh-TW.md)
