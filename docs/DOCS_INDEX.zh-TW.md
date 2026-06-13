@@ -414,3 +414,7 @@ Every development round must end with:
 ## C3 prior semantic dictionary remaining invalid YAML fixture gate
 
 - [C3 Prior Semantic Dictionary Remaining Invalid YAML Fixture Gate](DISPLAYTOOLS_C3_PRIOR_SEMANTIC_DICTIONARY_REMAINING_INVALID_YAML_FIXTURE_GATE.zh-TW.md)
+
+## C3 prior YAML fixture error-surface material settlement gate
+
+- [C3 Prior YAML Fixture Error-Surface Material Settlement Gate](DISPLAYTOOLS_C3_PRIOR_YAML_FIXTURE_ERROR_SURFACE_MATERIAL_SETTLEMENT_GATE.zh-TW.md)
