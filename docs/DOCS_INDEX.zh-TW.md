@@ -418,3 +418,7 @@ Every development round must end with:
 ## C3 prior YAML fixture error-surface material settlement gate
 
 - [C3 Prior YAML Fixture Error-Surface Material Settlement Gate](DISPLAYTOOLS_C3_PRIOR_YAML_FIXTURE_ERROR_SURFACE_MATERIAL_SETTLEMENT_GATE.zh-TW.md)
+
+## C3 prior validator error message surface planning gate
+
+- [C3 Prior Validator Error Message Surface Planning Gate](DISPLAYTOOLS_C3_PRIOR_VALIDATOR_ERROR_MESSAGE_SURFACE_PLANNING_GATE.zh-TW.md)
